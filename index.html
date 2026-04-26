@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🎳 ボウリング スコア</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700;900&display=swap');
+:root {
+  --bg:#0f0f14; --surface:#1a1a24; --card:#22222e;
+  --accent:#f0c040; --accent2:#e05a2b; --green:#3ecf6e;
+  --text:#f0ede8; --border:#2e2e3e;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;padding-bottom:80px}
+header{background:var(--surface);border-bottom:2px solid var(--accent);padding:14px 16px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+header h1{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;color:var(--accent)}
+.game-count{background:var(--accent2);color:#fff;font-weight:900;font-size:.7rem;padding:4px 10px;border-radius:20px;letter-spacing:1px}
+.tab-bar{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:58px;z-index:190}
+.tab{flex:1;padding:11px 2px;text-align:center;font-size:.7rem;font-weight:700;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.panel{display:none}.panel.active{display:block}
+.section{margin:14px 14px 0}
+.section-label{font-size:.63rem;color:#777;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.pt-pos{color:var(--green)}.pt-neg{color:var(--accent2)}.pt-zero{color:#555}
+.count-stepper{display:flex;align-items:center;justify-content:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px}
+.step-btn{width:42px;height:42px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--accent);font-family:'Bebas Neue',sans-serif;font-size:1.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1}
+.step-btn:active{background:var(--accent);color:var(--bg)}
+.step-btn:disabled{color:#444;cursor:not-allowed}
+.step-display{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--accent);letter-spacing:2px;min-width:80px;text-align:center}
+.step-display .unit{font-size:1rem;color:#888;margin-left:4px}
+.roster-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.roster-row{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 12px}
+.roster-row .rname{flex:1;font-size:.88rem;font-weight:700}
+.roster-del{background:none;border:none;color:#444;font-size:.95rem;cursor:pointer;padding:2px 6px;transition:color .15s}
+.roster-del:active{color:var(--accent2)}
+.roster-add-row{display:flex;gap:8px}
+.roster-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.88rem;font-weight:700;outline:none;transition:border-color .15s}
+.roster-input:focus{border-color:var(--accent)}
+.roster-input::placeholder{color:#444;font-weight:400}
+.roster-add-btn{background:var(--accent);color:var(--bg);border:none;border-radius:10px;padding:10px 16px;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.roster-add-btn:active{opacity:.7}
+.name-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.slot-wrap{position:relative}
+.slot-select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 32px 10px 12px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.88rem;font-weight:700;outline:none;cursor:pointer;-webkit-appearance:none;transition:border-color .15s}
+.slot-select:focus{border-color:var(--accent)}
+.slot-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:.7rem;color:#666;pointer-events:none}
+.game-section{margin:14px 14px 0}
+.game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.game-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--accent);letter-spacing:2px}
+.add-game-btn{background:var(--accent);color:var(--bg);border:none;border-radius:20px;padding:7px 14px;font-family:'Noto Sans JP',sans-serif;font-size:.78rem;font-weight:900;cursor:pointer;transition:opacity .15s}
+.add-game-btn:active{opacity:.7}
+.game-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.game-card-header{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,.025);border-bottom:1px solid var(--border)}
+.game-num{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:#777;letter-spacing:2px}
+.game-card-actions{display:flex;gap:6px;align-items:center}
+.pts-toggle-btn{background:none;border:1px solid var(--border);border-radius:6px;color:#666;font-size:.65rem;font-weight:700;padding:3px 8px;cursor:pointer;transition:all .15s}
+.pts-toggle-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(240,192,64,.07)}
+.del-btn{background:none;border:none;color:#555;font-size:1rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:color .15s}
+.del-btn:active{color:var(--accent2)}
+.game-pts-area{padding:10px 14px;border-bottom:1px solid var(--border);background:rgba(240,192,64,.03);display:none}
+.game-pts-area.open{display:block}
+.game-pts-grid{display:flex;flex-wrap:wrap;gap:8px}
+.game-pts-item{display:flex;align-items:center;gap:5px}
+.game-pts-item label{font-size:.7rem;color:#888;min-width:22px}
+.game-pts-input{background:var(--surface);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1rem;padding:5px 8px;width:62px;outline:none;text-align:center;transition:border-color .15s}
+.game-pts-input:focus{border-color:var(--accent)}
+.rank-inputs{padding:10px 14px 12px;display:flex;flex-direction:column;gap:8px}
+.rank-row{display:flex;align-items:center;gap:10px}
+.rank-row .pname{flex:1;font-size:.85rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-select{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.83rem;font-weight:700;padding:7px 8px;outline:none;width:80px;cursor:pointer;transition:border-color .15s;-webkit-appearance:none;text-align:center}
+.rank-select:focus{border-color:var(--accent)}
+.pt-preview{min-width:42px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px}
+.dup-warn{font-size:.7rem;color:var(--accent2);padding:0 14px 10px}
+#panel-record .total-sticky{position:sticky;top:94px;z-index:50;background:var(--bg);padding:10px 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.total-sticky-inner{display:flex;gap:6px;overflow-x:auto;padding:0 14px;scrollbar-width:none}
+.total-sticky-inner::-webkit-scrollbar{display:none}
+.total-pill{flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 10px;display:flex;align-items:center;gap:6px;min-width:max-content}
+.total-pill.rank-1{background:rgba(240,192,64,.1);border-color:rgba(240,192,64,.4)}
+.total-pill.rank-2{background:rgba(176,176,192,.06);border-color:rgba(176,176,192,.3)}
+.total-pill.rank-3{background:rgba(205,127,50,.06);border-color:rgba(205,127,50,.3)}
+.total-pill .pill-medal{font-size:.85rem}
+.total-pill .pill-name{font-size:.72rem;font-weight:700;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.total-pill .pill-score{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.5px;line-height:1}
+.total-empty{color:#444;font-size:.72rem;padding:6px 14px;text-align:center;width:100%}
+.balance-section{margin:10px 14px 0}
+.balance-card{border-radius:12px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;border:1px solid}
+.balance-card.ok{background:rgba(62,207,110,.07);border-color:var(--green)}
+.balance-card.ng{background:rgba(224,90,43,.07);border-color:var(--accent2)}
+.balance-left{display:flex;align-items:center;gap:10px}
+.balance-icon{font-size:1.4rem}
+.balance-title{font-size:.78rem;font-weight:900;margin-bottom:2px}
+.balance-sub{font-size:.68rem;color:#777}
+.balance-num{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:1px}
+.balance-card.ok .balance-num{color:var(--green)}
+.balance-card.ng .balance-num{color:var(--accent2)}
+.action-row{display:flex;gap:10px;margin:14px 14px 0}
+.save-btn{flex:2;padding:14px;background:var(--accent);border:none;border-radius:12px;color:var(--bg);font-family:'Noto Sans JP',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer;transition:opacity .15s}
+.save-btn:active{opacity:.7}
+.reset-btn{flex:1;padding:14px;background:none;border:1px solid #333;border-radius:12px;color:#555;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;cursor:pointer;transition:all .15s}
+.reset-btn:active{border-color:var(--accent2);color:var(--accent2)}
+.stats-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin:14px 14px 0}
+.stats-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border)}
+.stats-row:last-child{border-bottom:none}
+.stats-row.rank-1{background:rgba(240,192,64,.07)}
+.stats-row.rank-2{background:rgba(176,176,192,.04)}
+.stats-row.rank-3{background:rgba(205,127,50,.04)}
+.stats-left{display:flex;align-items:center;gap:10px}
+.stats-medal{font-size:1.2rem;min-width:26px;text-align:center}
+.stats-name{font-size:.92rem;font-weight:900}
+.stats-right{text-align:right}
+.stats-total{font-family:'Bebas Neue',sans-serif;font-size:1.65rem;letter-spacing:1px}
+.stats-sub{font-size:.65rem;color:#777;margin-top:1px}
+.stats-empty{padding:30px 16px;text-align:center;color:#555;font-size:.82rem}
+.hist-empty{text-align:center;padding:50px 20px;color:#555;font-size:.85rem;line-height:2}
+.hist-session{background:var(--card);border:1px solid var(--border);border-radius:14px;margin:14px 14px 0;overflow:hidden}
+.hist-session-header{display:flex;align-items:center;justify-content:space-between;padding:0;background:rgba(255,255,255,.025);border-bottom:1px solid var(--border)}
+.hist-session-info{flex:1;padding:12px 14px;cursor:pointer;min-width:0}
+.hist-chevron{font-size:.7rem;color:#666;margin-left:4px}
+.hist-date{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent);letter-spacing:2px}
+.hist-meta{font-size:.7rem;color:#666;margin-top:2px}
+.hist-header-actions{display:flex;gap:6px;align-items:center;padding:8px 14px 8px 0;flex-shrink:0;position:relative;z-index:10}
+.hist-edit-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#aaa;font-size:1rem;font-weight:700;padding:8px 12px;cursor:pointer;transition:all .15s;min-width:44px;min-height:40px;pointer-events:auto;position:relative;z-index:11;touch-action:manipulation}
+.hist-edit-btn:active,.hist-edit-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(240,192,64,.1)}
+.hist-del-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#aaa;font-size:1rem;cursor:pointer;padding:8px 12px;transition:all .15s;min-width:44px;min-height:40px;pointer-events:auto;position:relative;z-index:11;touch-action:manipulation}
+.hist-del-btn:active{color:var(--accent2);border-color:var(--accent2);background:rgba(224,90,43,.1)}
+.hist-body{display:none}.hist-body.open{display:block}
+.hist-view{padding:12px 16px}
+.hist-ranking{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.hist-rank-row{display:flex;align-items:center;justify-content:space-between}
+.hist-rank-left{display:flex;align-items:center;gap:8px}
+.hist-rank-medal{font-size:1.1rem;min-width:22px}
+.hist-rank-name{font-size:.85rem;font-weight:700}
+.hist-rank-score{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px}
+.hist-games-label{font-size:.63rem;color:#666;text-transform:uppercase;letter-spacing:1.5px;margin:8px 0 6px}
+.hist-game-item{border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:.75rem}
+.hist-game-title{font-family:'Bebas Neue',sans-serif;font-size:.85rem;color:#777;letter-spacing:1px;margin-bottom:5px}
+.hist-game-rows{display:flex;flex-direction:column;gap:3px}
+.hist-game-prow{display:flex;align-items:center;justify-content:space-between;color:#999}
+.hist-game-prow .hgp-name{font-weight:700;color:var(--text);font-size:.78rem}
+.hist-game-prow .hgp-rank{color:#777;font-size:.72rem}
+.hist-game-prow .hgp-pt{font-family:'Bebas Neue',sans-serif;font-size:.95rem}
+.hist-edit{padding:12px 16px}
+.edit-section-label{font-size:.63rem;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.edit-names-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.edit-slot-wrap{position:relative}
+.edit-slot-select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 28px 8px 10px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.82rem;font-weight:700;outline:none;cursor:pointer;-webkit-appearance:none;transition:border-color .15s}
+.edit-slot-select:focus{border-color:var(--accent)}
+.edit-slot-arrow{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.65rem;color:#666;pointer-events:none}
+.edit-game-block{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:8px}
+.edit-game-header{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border)}
+.edit-game-num{font-family:'Bebas Neue',sans-serif;font-size:.88rem;color:#777;letter-spacing:1px}
+.edit-pts-toggle{background:none;border:1px solid var(--border);border-radius:5px;color:#666;font-size:.62rem;font-weight:700;padding:2px 6px;cursor:pointer;transition:all .15s}
+.edit-pts-toggle.active{border-color:var(--accent);color:var(--accent)}
+.edit-pts-area{padding:8px 12px;border-bottom:1px solid var(--border);background:rgba(240,192,64,.03);display:none}
+.edit-pts-area.open{display:block}
+.edit-pts-grid{display:flex;flex-wrap:wrap;gap:6px}
+.edit-pts-item{display:flex;align-items:center;gap:4px}
+.edit-pts-item label{font-size:.68rem;color:#888;min-width:20px}
+.edit-pts-input{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:.95rem;padding:4px 6px;width:55px;outline:none;text-align:center;transition:border-color .15s}
+.edit-pts-input:focus{border-color:var(--accent)}
+.edit-rank-rows{padding:8px 12px;display:flex;flex-direction:column;gap:6px}
+.edit-rank-row{display:flex;align-items:center;gap:8px}
+.edit-rank-row .epname{flex:1;font-size:.8rem;font-weight:700;color:#aaa}
+.edit-rank-select{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.78rem;font-weight:700;padding:5px 6px;outline:none;width:72px;cursor:pointer;-webkit-appearance:none;text-align:center;transition:border-color .15s}
+.edit-rank-select:focus{border-color:var(--accent)}
+.edit-pt-preview{min-width:38px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1rem}
+.edit-save-btn{width:100%;padding:12px;background:var(--accent);border:none;border-radius:10px;color:var(--bg);font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer;margin-top:10px;transition:opacity .15s}
+.edit-save-btn:active{opacity:.7}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--green);color:#0f1a14;font-weight:900;font-size:.82rem;padding:10px 20px;border-radius:20px;opacity:0;transition:all .28s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.confirm-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.confirm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px)}
+.confirm-box{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 22px 16px;max-width:320px;width:100%;animation:confirm-in .2s ease-out}
+@keyframes confirm-in{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.confirm-title{font-size:1rem;font-weight:900;color:var(--text);margin-bottom:6px;line-height:1.4}
+.confirm-sub{font-size:.78rem;color:#888;margin-bottom:18px;line-height:1.5}
+.confirm-actions{display:flex;gap:10px}
+.confirm-cancel{flex:1;padding:11px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:#aaa;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;touch-action:manipulation}
+.confirm-cancel:active{background:var(--bg)}
+.confirm-ok{flex:1;padding:11px;background:var(--accent2);border:none;border-radius:10px;color:#fff;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer;touch-action:manipulation}
+.confirm-ok:active{opacity:.75}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎳 BOWLING</h1>
+  <div class="game-count" id="gameCount">0 GAMES</div>
+</header>
+<div class="tab-bar">
+  <div class="tab active" onclick="switchTab('record')">📝 記録</div>
+  <div class="tab" onclick="switchTab('stats')">🏆 通算</div>
+  <div class="tab" onclick="switchTab('history')">📅 履歴</div>
+  <div class="tab" onclick="switchTab('users')">👥 ユーザー</div>
+</div>
+<div class="panel active" id="panel-record">
+  <div class="section" style="margin-top:14px;">
+    <div class="section-label">参加人数</div>
+    <div class="count-stepper">
+      <button class="step-btn" id="stepDown" onclick="changeCount(-1)">−</button>
+      <div class="step-display"><span id="stepValue">4</span><span class="unit">人</span></div>
+      <button class="step-btn" id="stepUp" onclick="changeCount(1)">＋</button>
+    </div>
+  </div>
+  <div class="section" style="margin-top:12px;">
+    <div class="section-label">プレイヤー選択</div>
+    <div class="name-grid" id="nameGrid"></div>
+  </div>
+  <div class="total-sticky" id="totalSticky">
+    <div class="total-sticky-inner" id="totalCard"></div>
+  </div>
+  <div class="game-section">
+    <div class="game-header">
+      <span class="game-title">GAMES</span>
+      <button class="add-game-btn" onclick="addGame()">＋ ゲーム追加</button>
+    </div>
+    <div id="gamesContainer"></div>
+  </div>
+  <div class="balance-section">
+    <div id="balanceCard"></div>
+  </div>
+  <div class="action-row">
+    <button class="save-btn" onclick="saveSession()">💾 この日の記録を保存</button>
+    <button class="reset-btn" onclick="resetAll()">🗑 リセット</button>
+  </div>
+</div>
+<div class="panel" id="panel-stats">
+  <div class="section" style="margin-bottom:4px;">
+    <div class="section-label">全履歴 通算ランキング</div>
+  </div>
+  <div class="stats-card" id="statsCard"></div>
+  <div style="margin:10px 14px 0;font-size:.68rem;color:#555;">※ 保存済みの全履歴から集計</div>
+</div>
+<div class="panel" id="panel-history">
+  <div id="historyContainer"></div>
+</div>
+<div class="panel" id="panel-users">
+  <div class="section">
+    <div class="section-label">登録済みユーザー</div>
+    <div class="roster-list" id="rosterList"></div>
+  </div>
+  <div class="section" style="margin-top:14px;">
+    <div class="section-label">新規ユーザー追加</div>
+    <div class="roster-add-row">
+      <input class="roster-input" id="rosterInput" placeholder="名前を入力" maxlength="10" onkeydown="if(event.key==='Enter')addRosterUser()">
+      <button class="roster-add-btn" onclick="addRosterUser()">＋ 追加</button>
+    </div>
+  </div>
+  <div style="margin:12px 14px 0;font-size:.68rem;color:#555;line-height:1.6;">
+    💡 ここで登録したユーザーは記録・履歴の編集時にプルダウンから選べます<br>
+    💡 ユーザーを削除しても過去の履歴は残ります
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const MEDALS=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'];
+const STORAGE_KEY='bowling_v4';
+const MIN_PLAYERS=2,MAX_PLAYERS=12;
+function defaultPtsForCount(n){
+  if(n<=1)return[0];if(n===2)return[5,-5];if(n===3)return[5,0,-5];
+  if(n===4)return[5,3,-3,-5];if(n===5)return[5,3,0,-3,-5];
+  const arr=Array(n).fill(0);arr[0]=5;arr[1]=3;arr[n-2]=-3;arr[n-1]=-5;return arr;
+}
+let playerCount=4,selectedSlots=['','','',''],games=[];
+function loadData(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{"roster":[],"sessions":[]}')}catch{return{roster:[],sessions:[]}}}
+function saveData(d){localStorage.setItem(STORAGE_KEY,JSON.stringify(d))}
+function getRoster(){return loadData().roster}
+function getSessions(){return loadData().sessions}
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['record','stats','history','users'][i]===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(`panel-${tab}`).classList.add('active');
+  if(tab==='stats')renderStats();if(tab==='history')renderHistory();if(tab==='users')renderRoster();
+}
+function renderRoster(){
+  const roster=getRoster(),list=document.getElementById('rosterList');
+  if(roster.length===0){list.innerHTML='<div style="font-size:.75rem;color:#555;padding:4px 0;">まだユーザーがいません</div>';return}
+  list.innerHTML=roster.map(name=>`<div class="roster-row"><span class="rname">${name}</span><button class="roster-del" onclick="deleteRosterUser('${name.replace(/'/g,"\\'")}')">✕</button></div>`).join('');
+}
+function addRosterUser(){
+  const inp=document.getElementById('rosterInput'),name=inp.value.trim();
+  if(!name)return;const d=loadData();
+  if(d.roster.includes(name)){showToast('同じ名前が既にあります');return}
+  d.roster.push(name);saveData(d);inp.value='';renderRoster();renderNameGrid();
+}
+function deleteRosterUser(name){
+  if(!confirm(`「${name}」を削除しますか？`))return;
+  const d=loadData();d.roster=d.roster.filter(r=>r!==name);saveData(d);
+  selectedSlots=selectedSlots.map(s=>s===name?'':s);renderRoster();renderNameGrid();
+}
+function changeCount(delta){setCount(playerCount+delta)}
+function setCount(n){
+  n=Math.max(MIN_PLAYERS,Math.min(MAX_PLAYERS,n));playerCount=n;
+  const sv=document.getElementById('stepValue'),sd=document.getElementById('stepDown'),su=document.getElementById('stepUp');
+  if(sv)sv.textContent=n;if(sd)sd.disabled=(n<=MIN_PLAYERS);if(su)su.disabled=(n>=MAX_PLAYERS);
+  selectedSlots=selectedSlots.slice(0,n);while(selectedSlots.length<n)selectedSlots.push('');
+  games=games.map(g=>{
+    const r=g.ranks.slice(0,n);while(r.length<n)r.push(null);
+    const cp=g.customPoints?g.customPoints.slice(0,n):null;if(cp)while(cp.length<n)cp.push(0);
+    return{ranks:r,customPoints:cp};
+  });
+  renderNameGrid();renderGames();renderTotals();
+}
+function renderNameGrid(){
+  const roster=getRoster(),grid=document.getElementById('nameGrid');grid.innerHTML='';
+  for(let i=0;i<playerCount;i++){
+    const wrap=document.createElement('div');wrap.className='slot-wrap';
+    const sel=document.createElement('select');sel.className='slot-select';
+    let opts=`<option value="">— 選択 —</option>`;
+    roster.forEach(name=>{opts+=`<option value="${name}" ${selectedSlots[i]===name?'selected':''}>${name}</option>`});
+    sel.innerHTML=opts;
+    sel.addEventListener('change',e=>{selectedSlots[i]=e.target.value;renderGames();renderTotals()});
+    const arrow=document.createElement('span');arrow.className='slot-arrow';arrow.textContent='▼';
+    wrap.appendChild(sel);wrap.appendChild(arrow);grid.appendChild(wrap);
+  }
+}
+function dn(i){return selectedSlots[i]||`P${i+1}`}
+function getPts(gi){return games[gi].customPoints||defaultPtsForCount(playerCount)}
+function getPtByRank(gi,rank){return getPts(gi)[rank-1]??0}
+function addGame(){
+  games.push({ranks:Array(playerCount).fill(null),customPoints:null});
+  renderGames();renderTotals();updateGameCount();
+  setTimeout(()=>{const c=document.getElementById('gamesContainer');if(c&&c.firstElementChild)c.firstElementChild.scrollIntoView({behavior:'smooth',block:'center'})},60);
+}
+function deleteGame(idx){games.splice(idx,1);renderGames();renderTotals();updateGameCount()}
+function setRank(gi,pi,val){
+  if(val==='dnp')games[gi].ranks[pi]='dnp';
+  else games[gi].ranks[pi]=val?parseInt(val):null;
+  renderGameCard(gi);renderTotals();
+}
+function toggleCustomPts(gi){
+  const g=games[gi];g.customPoints=g.customPoints?null:[...defaultPtsForCount(playerCount)];
+  renderGameCard(gi);renderTotals();
+}
+function setCustomPt(gi,ri,val){games[gi].customPoints[ri]=parseInt(val)||0;renderGameCard(gi);renderTotals()}
+function renderGames(){
+  const c=document.getElementById('gamesContainer');c.innerHTML='';
+  for(let gi=games.length-1;gi>=0;gi--)c.appendChild(createGameCard(gi));
+  updateGameCount();
+}
+function renderGameCard(gi){
+  const c=document.getElementById('gamesContainer'),domIdx=games.length-1-gi;
+  if(c.children[domIdx])c.replaceChild(createGameCard(gi),c.children[domIdx]);
+}
+function createGameCard(gi){
+  const g=games[gi],hasCustom=!!g.customPoints,pts=getPts(gi);
+  const ranks=g.ranks.filter(r=>r!==null&&r!=='dnp'),hasDup=ranks.length!==new Set(ranks).size;
+  let customHtml='';
+  for(let i=0;i<playerCount;i++)customHtml+=`<div class="game-pts-item"><label>${i+1}位</label><input class="game-pts-input" type="number" value="${pts[i]}" onchange="setCustomPt(${gi},${i},this.value)"></div>`;
+  let rowsHtml='';
+  for(let pi=0;pi<playerCount;pi++){
+    const r=g.ranks[pi];let ptCls,ptStr;
+    if(r==='dnp'){ptCls='pt-zero';ptStr='不参加'}
+    else if(r===null){ptCls='';ptStr='—'}
+    else{const ptVal=pts[r-1];ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=ptVal>0?`+${ptVal}`:`${ptVal}`}
+    let opts=`<option value="" ${r===null?'selected':''}>—</option>`;
+    for(let n=1;n<=playerCount;n++)opts+=`<option value="${n}" ${r===n?'selected':''}>${n}位</option>`;
+    opts+=`<option value="dnp" ${r==='dnp'?'selected':''}>不参加</option>`;
+    rowsHtml+=`<div class="rank-row"><span class="pname">${dn(pi)}</span><select class="rank-select" onchange="setRank(${gi},${pi},this.value)">${opts}</select><span class="pt-preview ${ptCls}">${ptStr}</span></div>`;
+  }
+  const card=document.createElement('div');card.className='game-card';
+  card.innerHTML=`<div class="game-card-header"><span class="game-num">GAME ${gi+1}</span><div class="game-card-actions"><button class="pts-toggle-btn ${hasCustom?'active':''}" onclick="toggleCustomPts(${gi})">${hasCustom?'⚙ カスタム配点中':'⚙ 配点設定'}</button><button class="del-btn" onclick="deleteGame(${gi})">✕</button></div></div><div class="game-pts-area ${hasCustom?'open':''}"><div class="game-pts-grid">${customHtml}</div></div><div class="rank-inputs">${rowsHtml}</div>${hasDup?'<div class="dup-warn">⚠ 同じ順位が重複しています</div>':''}`;
+  return card;
+}
+function calcTotals(){
+  const t=Array(playerCount).fill(0);
+  games.forEach((g,gi)=>g.ranks.forEach((r,pi)=>{if(r!==null&&r!=='dnp')t[pi]+=getPtByRank(gi,r)}));
+  return t;
+}
+function renderTotals(){
+  const totals=calcTotals(),sorted=totals.map((s,i)=>({i,s})).sort((a,b)=>b.s-a.s);
+  const card=document.getElementById('totalCard');
+  if(games.length===0){card.innerHTML='<div class="total-empty">合計スコアはここに表示されます</div>'}
+  else{card.innerHTML=sorted.map((item,rank)=>{const s=item.s,cls=rank<3?`rank-${rank+1}`:'',ptCls=s>0?'pt-pos':s<0?'pt-neg':'pt-zero';return`<div class="total-pill ${cls}"><span class="pill-medal">${MEDALS[rank]||''}</span><span class="pill-name">${dn(item.i)}</span><span class="pill-score ${ptCls}">${s>0?'+':''}${s}</span></div>`}).join('')}
+  const completeGames=games.filter(g=>g.ranks.every(r=>r!==null));
+  const bc=document.getElementById('balanceCard');
+  if(completeGames.length===0){bc.innerHTML='';return}
+  const sum=completeGames.reduce((acc,g)=>{const gi=games.indexOf(g);return acc+g.ranks.reduce((a,r)=>a+(r==='dnp'?0:getPtByRank(gi,r)),0)},0);
+  const isOk=sum===0;
+  bc.innerHTML=`<div class="balance-card ${isOk?'ok':'ng'}"><div class="balance-left"><span class="balance-icon">${isOk?'✅':'⚠️'}</span><div><div class="balance-title">${isOk?'バランス OK':'バランスが合いません'}</div><div class="balance-sub">完全入力 ${completeGames.length}ゲーム分の合計</div></div></div><span class="balance-num">${sum>0?'+':''}${sum}</span></div>`;
+}
+function updateGameCount(){document.getElementById('gameCount').textContent=`${games.length} GAMES`}
+function saveSession(){
+  if(games.length===0){showToast('ゲームがありません');return}
+  const session={id:Date.now(),date:new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}),playerCount,names:[...selectedSlots],games:games.map(g=>({ranks:[...g.ranks],customPoints:g.customPoints?[...g.customPoints]:null})),totals:calcTotals()};
+  const d=loadData();d.sessions.unshift(session);
+  try{saveData(d);showToast('💾 保存しました！')}catch(e){showToast('保存に失敗しました')}
+}
+function renderStats(){
+  const sessions=getSessions(),card=document.getElementById('statsCard');
+  if(sessions.length===0){card.innerHTML='<div class="stats-empty">📭 まだ記録がありません</div>';return}
+  const userMap={};
+  sessions.forEach(s=>{s.names.forEach((name,i)=>{const nm=(name&&name.trim())?name.trim():`P${i+1}`;if(!userMap[nm])userMap[nm]={total:0,gameCount:0,sessionCount:0};userMap[nm].total+=s.totals[i];userMap[nm].sessionCount++;userMap[nm].gameCount+=s.games.filter(g=>g.ranks[i]!==null&&g.ranks[i]!=='dnp').length})});
+  const sorted=Object.entries(userMap).map(([name,v])=>({name,...v})).sort((a,b)=>b.total-a.total);
+  card.innerHTML=sorted.map((u,rank)=>{const cls=rank<3?`stats-row rank-${rank+1}`:'stats-row',ptCls=u.total>0?'pt-pos':u.total<0?'pt-neg':'pt-zero',avg=u.gameCount>0?(u.total/u.gameCount).toFixed(1):'0.0';return`<div class="${cls}"><div class="stats-left"><span class="stats-medal">${MEDALS[rank]||''}</span><div><div class="stats-name">${u.name}</div><div class="stats-sub">${u.sessionCount}回参加 / ${u.gameCount}ゲーム / 平均${avg>0?'+':''}${avg}</div></div></div><div class="stats-right"><div class="stats-total ${ptCls}">${u.total>0?'+':''}${u.total}</div></div></div>`}).join('');
+}
+let editStates={};
+function renderHistory(){
+  const sessions=getSessions(),container=document.getElementById('historyContainer');
+  if(sessions.length===0){container.innerHTML='<div class="hist-empty">📭<br>まだ記録がありません</div>';return}
+  container.innerHTML=sessions.map(s=>buildSessionHtml(s)).join('');
+}
+let historyDelegateBound=false;
+function bindHistoryDelegate(){
+  if(historyDelegateBound)return;const container=document.getElementById('historyContainer');if(!container)return;historyDelegateBound=true;
+  container.addEventListener('click',(e)=>{
+    const sess=e.target.closest('.hist-session');if(!sess)return;const id=parseInt(sess.dataset.id);if(!id)return;
+    if(e.target.closest('.hist-del-btn')){e.stopPropagation();deleteSession(id)}
+    else if(e.target.closest('.hist-edit-btn')){e.stopPropagation();toggleHistEdit(id)}
+    else if(e.target.closest('.hist-session-info')){toggleHistOpen(id)}
+  });
+}
+function buildSessionHtml(s){
+  const es=editStates[s.id]||{open:false,editMode:false};
+  const bodyHtml=es.open?(es.editMode?buildEditHtml(s):buildViewHtml(s)):'';
+  return`<div class="hist-session" id="hsess-${s.id}" data-id="${s.id}"><div class="hist-session-header"><div class="hist-session-info"><div class="hist-date">${s.date} <span class="hist-chevron">${es.open?'▲':'▼'}</span></div><div class="hist-meta">${s.playerCount}人 / ${s.games.length}ゲーム</div></div><div class="hist-header-actions"><button type="button" class="hist-edit-btn ${es.editMode?'active':''}">${es.editMode?'✕':'✏'}</button><button type="button" class="hist-del-btn">🗑</button></div></div><div class="hist-body ${es.open?'open':''}" id="hbody-${s.id}">${bodyHtml}</div></div>`;
+}
+function toggleHistOpen(id){if(!editStates[id])editStates[id]={open:false,editMode:false};editStates[id].open=!editStates[id].open;if(!editStates[id].open)editStates[id].editMode=false;renderHistory()}
+function toggleHistEdit(id){if(!editStates[id])editStates[id]={open:true,editMode:false};editStates[id].editMode=!editStates[id].editMode;editStates[id].open=true;if(!editStates[id].editMode&&editStates[id].draft)delete editStates[id].draft;renderHistory()}
+function deleteSession(id){
+  const d=loadData(),target=d.sessions.find(s=>s.id===id);if(!target)return;
+  showConfirmModal(`${target.date} の記録を削除しますか？`,'この操作は取り消せません',()=>{
+    const d2=loadData();d2.sessions=d2.sessions.filter(s=>s.id!==id);saveData(d2);
+    if(editStates[id])delete editStates[id];renderHistory();showToast('🗑 削除しました');
+  });
+}
+function showConfirmModal(title,sub,onConfirm){
+  const old=document.getElementById('confirmModal');if(old)old.remove();
+  const modal=document.createElement('div');modal.id='confirmModal';modal.className='confirm-modal';
+  modal.innerHTML=`<div class="confirm-backdrop"></div><div class="confirm-box"><div class="confirm-title">${title}</div><div class="confirm-sub">${sub}</div><div class="confirm-actions"><button type="button" class="confirm-cancel">キャンセル</button><button type="button" class="confirm-ok">削除</button></div></div>`;
+  document.body.appendChild(modal);
+  const close=()=>modal.remove();
+  modal.querySelector('.confirm-backdrop').addEventListener('click',close);
+  modal.querySelector('.confirm-cancel').addEventListener('click',close);
+  modal.querySelector('.confirm-ok').addEventListener('click',()=>{close();onConfirm()});
+}
+function buildViewHtml(s){
+  const getName=i=>(s.names[i]&&s.names[i].trim())?s.names[i].trim():`P${i+1}`;
+  const sorted=s.totals.map((sc,i)=>({i,sc})).sort((a,b)=>b.sc-a.sc);
+  const rankingHtml=sorted.map((item,rank)=>{const sc=item.sc,ptCls=sc>0?'pt-pos':sc<0?'pt-neg':'pt-zero';return`<div class="hist-rank-row"><div class="hist-rank-left"><span class="hist-rank-medal">${MEDALS[rank]||''}</span><span class="hist-rank-name">${getName(item.i)}</span></div><span class="hist-rank-score ${ptCls}">${sc>0?'+':''}${sc}</span></div>`}).join('');
+  const gamesHtml=s.games.map((g,gi)=>({g,gi})).reverse().map(({g,gi})=>{
+    const pts=g.customPoints||defaultPtsForCount(s.playerCount);
+    const rows=g.ranks.map((r,pi)=>{
+      if(r===null)return`<div class="hist-game-prow"><span class="hgp-name">${getName(pi)}</span><span class="hgp-rank">—</span><span class="hgp-pt">—</span></div>`;
+      if(r==='dnp')return`<div class="hist-game-prow"><span class="hgp-name">${getName(pi)}</span><span class="hgp-rank">不参加</span><span class="hgp-pt pt-zero">—</span></div>`;
+      const pt=pts[r-1],ptCls=pt>0?'pt-pos':pt<0?'pt-neg':'pt-zero';
+      return`<div class="hist-game-prow"><span class="hgp-name">${getName(pi)}</span><span class="hgp-rank">${r}位</span><span class="hgp-pt ${ptCls}">${pt>0?'+':''}${pt}</span></div>`;
+    }).join('');
+    return`<div class="hist-game-item"><div class="hist-game-title">GAME ${gi+1}${g.customPoints?' <span style="font-size:.65rem;color:var(--accent)">カスタム配点</span>':''}</div><div class="hist-game-rows">${rows}</div></div>`;
+  }).join('');
+  return`<div class="hist-view"><div class="hist-ranking">${rankingHtml}</div><div class="hist-games-label">ゲーム詳細</div>${gamesHtml}</div>`;
+}
+function getEditDraft(s){
+  if(!editStates[s.id])editStates[s.id]={open:true,editMode:true};
+  if(!editStates[s.id].draft)editStates[s.id].draft={names:[...s.names],games:s.games.map(g=>({ranks:[...g.ranks],customPoints:g.customPoints?[...g.customPoints]:null}))};
+  return editStates[s.id].draft;
+}
+function buildEditHtml(s){
+  const draft=getEditDraft(s),n=s.playerCount,roster=getRoster();
+  const getName=i=>(draft.names[i]&&draft.names[i].trim())?draft.names[i].trim():`P${i+1}`;
+  const namesHtml=draft.names.map((nm,i)=>{let opts=`<option value="">— 選択 —</option>`;roster.forEach(name=>{opts+=`<option value="${name}" ${nm===name?'selected':''}>${name}</option>`});return`<div class="edit-slot-wrap"><select class="edit-slot-select" onchange="editSlot(${s.id},${i},this.value)">${opts}</select><span class="edit-slot-arrow">▼</span></div>`}).join('');
+  const gamesHtml=draft.games.map((g,gi)=>({g,gi})).reverse().map(({g,gi})=>{
+    const hasCustom=!!g.customPoints,pts=g.customPoints||defaultPtsForCount(n);
+    let ptsHtml='';for(let i=0;i<n;i++)ptsHtml+=`<div class="edit-pts-item"><label>${i+1}位</label><input class="edit-pts-input" type="number" value="${pts[i]}" onchange="editGamePt(${s.id},${gi},${i},this.value)"></div>`;
+    let rankHtml='';
+    for(let pi=0;pi<n;pi++){
+      const r=g.ranks[pi];let ptCls,ptStr;
+      if(r==='dnp'){ptCls='pt-zero';ptStr='不参加'}else if(r===null){ptCls='';ptStr='—'}else{const ptVal=pts[r-1];ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=ptVal>0?`+${ptVal}`:`${ptVal}`}
+      let opts=`<option value="" ${r===null?'selected':''}>—</option>`;
+      for(let nn=1;nn<=n;nn++)opts+=`<option value="${nn}" ${r===nn?'selected':''}>${nn}位</option>`;
+      opts+=`<option value="dnp" ${r==='dnp'?'selected':''}>不参加</option>`;
+      rankHtml+=`<div class="edit-rank-row"><span class="epname">${getName(pi)}</span><select class="edit-rank-select" onchange="editRank(${s.id},${gi},${pi},this.value)">${opts}</select><span class="edit-pt-preview ${ptCls}" id="epp-${s.id}-${gi}-${pi}">${ptStr}</span></div>`;
+    }
+    return`<div class="edit-game-block"><div class="edit-game-header"><span class="edit-game-num">GAME ${gi+1}</span><button class="edit-pts-toggle ${hasCustom?'active':''}" onclick="editToggleCustomPts(${s.id},${gi})">${hasCustom?'⚙ カスタム配点中':'⚙ 配点設定'}</button></div><div class="edit-pts-area ${hasCustom?'open':''}" id="epa-${s.id}-${gi}"><div class="edit-pts-grid">${ptsHtml}</div></div><div class="edit-rank-rows">${rankHtml}</div></div>`;
+  }).join('');
+  return`<div class="hist-edit"><div class="edit-section-label">プレイヤー名</div><div class="edit-names-grid">${namesHtml}</div><div class="edit-section-label">ゲーム結果</div>${gamesHtml}<button class="edit-save-btn" onclick="commitEdit(${s.id})">✅ 変更を保存</button></div>`;
+}
+function editSlot(id,i,val){const d=loadData(),s=d.sessions.find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);draft.names[i]=val}
+function editRank(id,gi,pi,val){
+  const d=loadData(),s=d.sessions.find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);
+  if(val==='dnp')draft.games[gi].ranks[pi]='dnp';else draft.games[gi].ranks[pi]=val?parseInt(val):null;
+  const pts=draft.games[gi].customPoints||defaultPtsForCount(s.playerCount),r=draft.games[gi].ranks[pi];
+  let ptCls,ptStr;
+  if(r==='dnp'){ptCls='pt-zero';ptStr='不参加'}else if(r===null){ptCls='';ptStr='—'}else{const ptVal=pts[r-1];ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=ptVal>0?`+${ptVal}`:`${ptVal}`}
+  const el=document.getElementById(`epp-${id}-${gi}-${pi}`);if(el){el.className=`edit-pt-preview ${ptCls}`;el.textContent=ptStr}
+}
+function editToggleCustomPts(id,gi){
+  const d=loadData(),s=d.sessions.find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);
+  draft.games[gi].customPoints=draft.games[gi].customPoints?null:[...defaultPtsForCount(s.playerCount)];renderHistory();
+}
+function editGamePt(id,gi,ri,val){const d=loadData(),s=d.sessions.find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);if(draft.games[gi].customPoints)draft.games[gi].customPoints[ri]=parseInt(val)||0}
+function commitEdit(id){
+  if(!editStates[id]||!editStates[id].draft)return;const draft=editStates[id].draft;
+  document.querySelectorAll(`#hsess-${id} .edit-slot-select`).forEach((sel,i)=>{draft.names[i]=sel.value});
+  const d=loadData(),idx=d.sessions.findIndex(s=>s.id===id);if(idx===-1)return;
+  const s=d.sessions[idx];s.names=[...draft.names];s.games=draft.games.map(g=>({ranks:[...g.ranks],customPoints:g.customPoints?[...g.customPoints]:null}));
+  const n=s.playerCount,totals=Array(n).fill(0);
+  s.games.forEach((g,gi)=>{const pts=g.customPoints||defaultPtsForCount(n);g.ranks.forEach((r,pi)=>{if(r!==null&&r!=='dnp')totals[pi]+=pts[r-1]??0})});
+  s.totals=totals;d.sessions[idx]=s;saveData(d);delete editStates[id].draft;editStates[id].editMode=false;renderHistory();showToast('✅ 更新しました！');
+}
+function resetAll(){if(games.length===0)return;if(!confirm('現在の入力をリセットしますか？\n（保存済み履歴は消えません）'))return;games=[];renderGames();renderTotals()}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+renderRoster();setCount(4);renderGames();renderTotals();bindHistoryDelegate();
+</script>
+</body>
+</html>
