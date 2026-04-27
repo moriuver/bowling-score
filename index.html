@@ -16,6 +16,10 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-seri
 header{background:var(--surface);border-bottom:2px solid var(--accent);padding:14px 16px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
 header h1{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;color:var(--accent)}
 .game-count{background:var(--accent2);color:#fff;font-weight:900;font-size:.7rem;padding:4px 10px;border-radius:20px;letter-spacing:1px}
+.sync-status{font-size:.65rem;padding:3px 8px;border-radius:20px;font-weight:700}
+.sync-status.ok{background:rgba(62,207,110,.15);color:var(--green)}
+.sync-status.ng{background:rgba(224,90,43,.15);color:var(--accent2)}
+.sync-status.loading{background:rgba(240,192,64,.15);color:var(--accent)}
 .tab-bar{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:58px;z-index:190}
 .tab{flex:1;padding:11px 2px;text-align:center;font-size:.7rem;font-weight:700;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
@@ -185,7 +189,10 @@ header h1{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3p
 <body>
 <header>
   <h1>🎳 BOWLING</h1>
-  <div class="game-count" id="gameCount">0 GAMES</div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span class="sync-status loading" id="syncStatus">⟳ 接続中</span>
+    <div class="game-count" id="gameCount">0 GAMES</div>
+  </div>
 </header>
 <div class="tab-bar">
   <div class="tab active" onclick="switchTab('record')">📝 記録</div>
@@ -216,24 +223,18 @@ header h1{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3p
     </div>
     <div id="gamesContainer"></div>
   </div>
-  <div class="balance-section">
-    <div id="balanceCard"></div>
-  </div>
+  <div class="balance-section"><div id="balanceCard"></div></div>
   <div class="action-row">
     <button class="save-btn" onclick="saveSession()">💾 この日の記録を保存</button>
     <button class="reset-btn" onclick="resetAll()">🗑 リセット</button>
   </div>
 </div>
 <div class="panel" id="panel-stats">
-  <div class="section" style="margin-bottom:4px;">
-    <div class="section-label">全履歴 通算ランキング</div>
-  </div>
+  <div class="section" style="margin-bottom:4px;"><div class="section-label">全履歴 通算ランキング</div></div>
   <div class="stats-card" id="statsCard"></div>
   <div style="margin:10px 14px 0;font-size:.68rem;color:#555;">※ 保存済みの全履歴から集計</div>
 </div>
-<div class="panel" id="panel-history">
-  <div id="historyContainer"></div>
-</div>
+<div class="panel" id="panel-history"><div id="historyContainer"></div></div>
 <div class="panel" id="panel-users">
   <div class="section">
     <div class="section-label">登録済みユーザー</div>
@@ -252,43 +253,104 @@ header h1{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3p
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<script>
+
+<script type="module">
+// ===== Firebase設定 =====
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  databaseURL: "https://bowling-score-c7380-default-rtdb.firebaseio.com/"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 const MEDALS=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'];
-const STORAGE_KEY='bowling_v4';
 const MIN_PLAYERS=2,MAX_PLAYERS=12;
-function defaultPtsForCount(n){
-  if(n<=1)return[0];if(n===2)return[5,-5];if(n===3)return[5,0,-5];
-  if(n===4)return[5,3,-3,-5];if(n===5)return[5,3,0,-3,-5];
-  const arr=Array(n).fill(0);arr[0]=5;arr[1]=3;arr[n-2]=-3;arr[n-1]=-5;return arr;
-}
 let playerCount=4,selectedSlots=['','','',''],games=[];
-function loadData(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{"roster":[],"sessions":[]}')}catch{return{roster:[],sessions:[]}}}
-function saveData(d){localStorage.setItem(STORAGE_KEY,JSON.stringify(d))}
-function getRoster(){return loadData().roster}
-function getSessions(){return loadData().sessions}
+let cachedData={roster:[],sessions:[]};
+
+function setSyncStatus(state){
+  const el=document.getElementById('syncStatus');
+  if(state==='ok'){el.textContent='✓ 同期済';el.className='sync-status ok'}
+  else if(state==='ng'){el.textContent='✗ オフライン';el.className='sync-status ng'}
+  else{el.textContent='⟳ 同期中';el.className='sync-status loading'}
+}
+
+async function loadData(){
+  try{
+    const snap=await get(ref(db,'bowling'));
+    if(snap.exists()){cachedData=snap.val();if(!cachedData.roster)cachedData.roster=[];if(!cachedData.sessions)cachedData.sessions=[];}
+    setSyncStatus('ok');
+  }catch(e){setSyncStatus('ng');console.error(e)}
+  return cachedData;
+}
+
+async function saveData(d){
+  cachedData=d;
+  setSyncStatus('loading');
+  try{
+    await set(ref(db,'bowling'),d);
+    setSyncStatus('ok');
+  }catch(e){setSyncStatus('ng');console.error(e)}
+}
+
+// リアルタイム同期
+onValue(ref(db,'bowling'),(snap)=>{
+  if(snap.exists()){
+    const newData=snap.val();
+    if(!newData.roster)newData.roster=[];
+    if(!newData.sessions)newData.sessions=[];
+    cachedData=newData;
+    setSyncStatus('ok');
+    // 現在のタブを再描画
+    const activePanel=document.querySelector('.panel.active');
+    if(activePanel){
+      const id=activePanel.id;
+      if(id==='panel-stats')renderStats();
+      if(id==='panel-history')renderHistory();
+      if(id==='panel-users')renderRoster();
+    }
+    renderNameGrid();
+  }
+});
+
+function getRoster(){return cachedData.roster||[]}
+function getSessions(){return cachedData.sessions||[]}
+
 function switchTab(tab){
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['record','stats','history','users'][i]===tab));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById(`panel-${tab}`).classList.add('active');
-  if(tab==='stats')renderStats();if(tab==='history')renderHistory();if(tab==='users')renderRoster();
+  if(tab==='stats')renderStats();
+  if(tab==='history')renderHistory();
+  if(tab==='users')renderRoster();
 }
+
 function renderRoster(){
   const roster=getRoster(),list=document.getElementById('rosterList');
   if(roster.length===0){list.innerHTML='<div style="font-size:.75rem;color:#555;padding:4px 0;">まだユーザーがいません</div>';return}
-  list.innerHTML=roster.map(name=>`<div class="roster-row"><span class="rname">${name}</span><button class="roster-del" onclick="deleteRosterUser('${name.replace(/'/g,"\\'")}')">✕</button></div>`).join('');
+  list.innerHTML=roster.map(name=>`<div class="roster-row"><span class="rname">${name}</span><button class="roster-del" onclick="window.deleteRosterUser('${name.replace(/'/g,"\\'")}')">✕</button></div>`).join('');
 }
-function addRosterUser(){
+
+window.addRosterUser=async function(){
   const inp=document.getElementById('rosterInput'),name=inp.value.trim();
-  if(!name)return;const d=loadData();
+  if(!name)return;
+  const d=JSON.parse(JSON.stringify(cachedData));
+  if(!d.roster)d.roster=[];
   if(d.roster.includes(name)){showToast('同じ名前が既にあります');return}
-  d.roster.push(name);saveData(d);inp.value='';renderRoster();renderNameGrid();
+  d.roster.push(name);await saveData(d);inp.value='';renderRoster();renderNameGrid();
 }
-function deleteRosterUser(name){
+
+window.deleteRosterUser=async function(name){
   if(!confirm(`「${name}」を削除しますか？`))return;
-  const d=loadData();d.roster=d.roster.filter(r=>r!==name);saveData(d);
+  const d=JSON.parse(JSON.stringify(cachedData));
+  d.roster=d.roster.filter(r=>r!==name);await saveData(d);
   selectedSlots=selectedSlots.map(s=>s===name?'':s);renderRoster();renderNameGrid();
 }
-function changeCount(delta){setCount(playerCount+delta)}
+
+window.changeCount=function(delta){setCount(playerCount+delta)}
+
 function setCount(n){
   n=Math.max(MIN_PLAYERS,Math.min(MAX_PLAYERS,n));playerCount=n;
   const sv=document.getElementById('stepValue'),sd=document.getElementById('stepDown'),su=document.getElementById('stepUp');
@@ -301,6 +363,7 @@ function setCount(n){
   });
   renderNameGrid();renderGames();renderTotals();
 }
+
 function renderNameGrid(){
   const roster=getRoster(),grid=document.getElementById('nameGrid');grid.innerHTML='';
   for(let i=0;i<playerCount;i++){
@@ -314,34 +377,49 @@ function renderNameGrid(){
     wrap.appendChild(sel);wrap.appendChild(arrow);grid.appendChild(wrap);
   }
 }
+
 function dn(i){return selectedSlots[i]||`P${i+1}`}
 function getPts(gi){return games[gi].customPoints||defaultPtsForCount(playerCount)}
 function getPtByRank(gi,rank){return getPts(gi)[rank-1]??0}
-function addGame(){
+
+function defaultPtsForCount(n){
+  if(n<=1)return[0];if(n===2)return[5,-5];if(n===3)return[5,0,-5];
+  if(n===4)return[5,3,-3,-5];if(n===5)return[5,3,0,-3,-5];
+  const arr=Array(n).fill(0);arr[0]=5;arr[1]=3;arr[n-2]=-3;arr[n-1]=-5;return arr;
+}
+
+window.addGame=function(){
   games.push({ranks:Array(playerCount).fill(null),customPoints:null});
   renderGames();renderTotals();updateGameCount();
   setTimeout(()=>{const c=document.getElementById('gamesContainer');if(c&&c.firstElementChild)c.firstElementChild.scrollIntoView({behavior:'smooth',block:'center'})},60);
 }
-function deleteGame(idx){games.splice(idx,1);renderGames();renderTotals();updateGameCount()}
-function setRank(gi,pi,val){
+
+window.deleteGame=function(idx){games.splice(idx,1);renderGames();renderTotals();updateGameCount()}
+
+window.setRank=function(gi,pi,val){
   if(val==='dnp')games[gi].ranks[pi]='dnp';
   else games[gi].ranks[pi]=val?parseInt(val):null;
   renderGameCard(gi);renderTotals();
 }
-function toggleCustomPts(gi){
+
+window.toggleCustomPts=function(gi){
   const g=games[gi];g.customPoints=g.customPoints?null:[...defaultPtsForCount(playerCount)];
   renderGameCard(gi);renderTotals();
 }
-function setCustomPt(gi,ri,val){games[gi].customPoints[ri]=parseInt(val)||0;renderGameCard(gi);renderTotals()}
+
+window.setCustomPt=function(gi,ri,val){games[gi].customPoints[ri]=parseInt(val)||0;renderGameCard(gi);renderTotals()}
+
 function renderGames(){
   const c=document.getElementById('gamesContainer');c.innerHTML='';
   for(let gi=games.length-1;gi>=0;gi--)c.appendChild(createGameCard(gi));
   updateGameCount();
 }
+
 function renderGameCard(gi){
   const c=document.getElementById('gamesContainer'),domIdx=games.length-1-gi;
   if(c.children[domIdx])c.replaceChild(createGameCard(gi),c.children[domIdx]);
 }
+
 function createGameCard(gi){
   const g=games[gi],hasCustom=!!g.customPoints,pts=getPts(gi);
   const ranks=g.ranks.filter(r=>r!==null&&r!=='dnp'),hasDup=ranks.length!==new Set(ranks).size;
@@ -362,11 +440,13 @@ function createGameCard(gi){
   card.innerHTML=`<div class="game-card-header"><span class="game-num">GAME ${gi+1}</span><div class="game-card-actions"><button class="pts-toggle-btn ${hasCustom?'active':''}" onclick="toggleCustomPts(${gi})">${hasCustom?'⚙ カスタム配点中':'⚙ 配点設定'}</button><button class="del-btn" onclick="deleteGame(${gi})">✕</button></div></div><div class="game-pts-area ${hasCustom?'open':''}"><div class="game-pts-grid">${customHtml}</div></div><div class="rank-inputs">${rowsHtml}</div>${hasDup?'<div class="dup-warn">⚠ 同じ順位が重複しています</div>':''}`;
   return card;
 }
+
 function calcTotals(){
   const t=Array(playerCount).fill(0);
   games.forEach((g,gi)=>g.ranks.forEach((r,pi)=>{if(r!==null&&r!=='dnp')t[pi]+=getPtByRank(gi,r)}));
   return t;
 }
+
 function renderTotals(){
   const totals=calcTotals(),sorted=totals.map((s,i)=>({i,s})).sort((a,b)=>b.s-a.s);
   const card=document.getElementById('totalCard');
@@ -379,13 +459,19 @@ function renderTotals(){
   const isOk=sum===0;
   bc.innerHTML=`<div class="balance-card ${isOk?'ok':'ng'}"><div class="balance-left"><span class="balance-icon">${isOk?'✅':'⚠️'}</span><div><div class="balance-title">${isOk?'バランス OK':'バランスが合いません'}</div><div class="balance-sub">完全入力 ${completeGames.length}ゲーム分の合計</div></div></div><span class="balance-num">${sum>0?'+':''}${sum}</span></div>`;
 }
+
 function updateGameCount(){document.getElementById('gameCount').textContent=`${games.length} GAMES`}
-function saveSession(){
+
+window.saveSession=async function(){
   if(games.length===0){showToast('ゲームがありません');return}
   const session={id:Date.now(),date:new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}),playerCount,names:[...selectedSlots],games:games.map(g=>({ranks:[...g.ranks],customPoints:g.customPoints?[...g.customPoints]:null})),totals:calcTotals()};
-  const d=loadData();d.sessions.unshift(session);
-  try{saveData(d);showToast('💾 保存しました！')}catch(e){showToast('保存に失敗しました')}
+  const d=JSON.parse(JSON.stringify(cachedData));
+  if(!d.sessions)d.sessions=[];
+  d.sessions.unshift(session);
+  await saveData(d);
+  showToast('💾 保存しました！');
 }
+
 function renderStats(){
   const sessions=getSessions(),card=document.getElementById('statsCard');
   if(sessions.length===0){card.innerHTML='<div class="stats-empty">📭 まだ記録がありません</div>';return}
@@ -394,36 +480,47 @@ function renderStats(){
   const sorted=Object.entries(userMap).map(([name,v])=>({name,...v})).sort((a,b)=>b.total-a.total);
   card.innerHTML=sorted.map((u,rank)=>{const cls=rank<3?`stats-row rank-${rank+1}`:'stats-row',ptCls=u.total>0?'pt-pos':u.total<0?'pt-neg':'pt-zero',avg=u.gameCount>0?(u.total/u.gameCount).toFixed(1):'0.0';return`<div class="${cls}"><div class="stats-left"><span class="stats-medal">${MEDALS[rank]||''}</span><div><div class="stats-name">${u.name}</div><div class="stats-sub">${u.sessionCount}回参加 / ${u.gameCount}ゲーム / 平均${avg>0?'+':''}${avg}</div></div></div><div class="stats-right"><div class="stats-total ${ptCls}">${u.total>0?'+':''}${u.total}</div></div></div>`}).join('');
 }
+
 let editStates={};
+
 function renderHistory(){
   const sessions=getSessions(),container=document.getElementById('historyContainer');
   if(sessions.length===0){container.innerHTML='<div class="hist-empty">📭<br>まだ記録がありません</div>';return}
   container.innerHTML=sessions.map(s=>buildSessionHtml(s)).join('');
 }
-let historyDelegateBound=false;
-function bindHistoryDelegate(){
-  if(historyDelegateBound)return;const container=document.getElementById('historyContainer');if(!container)return;historyDelegateBound=true;
-  container.addEventListener('click',(e)=>{
-    const sess=e.target.closest('.hist-session');if(!sess)return;const id=parseInt(sess.dataset.id);if(!id)return;
-    if(e.target.closest('.hist-del-btn')){e.stopPropagation();deleteSession(id)}
-    else if(e.target.closest('.hist-edit-btn')){e.stopPropagation();toggleHistEdit(id)}
-    else if(e.target.closest('.hist-session-info')){toggleHistOpen(id)}
-  });
-}
+
 function buildSessionHtml(s){
   const es=editStates[s.id]||{open:false,editMode:false};
   const bodyHtml=es.open?(es.editMode?buildEditHtml(s):buildViewHtml(s)):'';
-  return`<div class="hist-session" id="hsess-${s.id}" data-id="${s.id}"><div class="hist-session-header"><div class="hist-session-info"><div class="hist-date">${s.date} <span class="hist-chevron">${es.open?'▲':'▼'}</span></div><div class="hist-meta">${s.playerCount}人 / ${s.games.length}ゲーム</div></div><div class="hist-header-actions"><button type="button" class="hist-edit-btn ${es.editMode?'active':''}">${es.editMode?'✕':'✏'}</button><button type="button" class="hist-del-btn">🗑</button></div></div><div class="hist-body ${es.open?'open':''}" id="hbody-${s.id}">${bodyHtml}</div></div>`;
+  return`<div class="hist-session" id="hsess-${s.id}" data-id="${s.id}"><div class="hist-session-header"><div class="hist-session-info" onclick="toggleHistOpen(${s.id})"><div class="hist-date">${s.date} <span class="hist-chevron">${es.open?'▲':'▼'}</span></div><div class="hist-meta">${s.playerCount}人 / ${s.games.length}ゲーム</div></div><div class="hist-header-actions"><button type="button" class="hist-edit-btn ${es.editMode?'active':''}" onclick="toggleHistEdit(${s.id})">${es.editMode?'✕':'✏'}</button><button type="button" class="hist-del-btn" onclick="deleteSession(${s.id})">🗑</button></div></div><div class="hist-body ${es.open?'open':''}" id="hbody-${s.id}">${bodyHtml}</div></div>`;
 }
-function toggleHistOpen(id){if(!editStates[id])editStates[id]={open:false,editMode:false};editStates[id].open=!editStates[id].open;if(!editStates[id].open)editStates[id].editMode=false;renderHistory()}
-function toggleHistEdit(id){if(!editStates[id])editStates[id]={open:true,editMode:false};editStates[id].editMode=!editStates[id].editMode;editStates[id].open=true;if(!editStates[id].editMode&&editStates[id].draft)delete editStates[id].draft;renderHistory()}
-function deleteSession(id){
-  const d=loadData(),target=d.sessions.find(s=>s.id===id);if(!target)return;
-  showConfirmModal(`${target.date} の記録を削除しますか？`,'この操作は取り消せません',()=>{
-    const d2=loadData();d2.sessions=d2.sessions.filter(s=>s.id!==id);saveData(d2);
-    if(editStates[id])delete editStates[id];renderHistory();showToast('🗑 削除しました');
+
+window.toggleHistOpen=function(id){
+  if(!editStates[id])editStates[id]={open:false,editMode:false};
+  editStates[id].open=!editStates[id].open;
+  if(!editStates[id].open)editStates[id].editMode=false;
+  renderHistory();
+}
+
+window.toggleHistEdit=function(id){
+  if(!editStates[id])editStates[id]={open:true,editMode:false};
+  editStates[id].editMode=!editStates[id].editMode;
+  editStates[id].open=true;
+  if(!editStates[id].editMode&&editStates[id].draft)delete editStates[id].draft;
+  renderHistory();
+}
+
+window.deleteSession=async function(id){
+  const target=getSessions().find(s=>s.id===id);if(!target)return;
+  showConfirmModal(`${target.date} の記録を削除しますか？`,'この操作は取り消せません',async()=>{
+    const d=JSON.parse(JSON.stringify(cachedData));
+    d.sessions=d.sessions.filter(s=>s.id!==id);
+    await saveData(d);
+    if(editStates[id])delete editStates[id];
+    renderHistory();showToast('🗑 削除しました');
   });
 }
+
 function showConfirmModal(title,sub,onConfirm){
   const old=document.getElementById('confirmModal');if(old)old.remove();
   const modal=document.createElement('div');modal.id='confirmModal';modal.className='confirm-modal';
@@ -434,6 +531,7 @@ function showConfirmModal(title,sub,onConfirm){
   modal.querySelector('.confirm-cancel').addEventListener('click',close);
   modal.querySelector('.confirm-ok').addEventListener('click',()=>{close();onConfirm()});
 }
+
 function buildViewHtml(s){
   const getName=i=>(s.names[i]&&s.names[i].trim())?s.names[i].trim():`P${i+1}`;
   const sorted=s.totals.map((sc,i)=>({i,sc})).sort((a,b)=>b.sc-a.sc);
@@ -450,11 +548,13 @@ function buildViewHtml(s){
   }).join('');
   return`<div class="hist-view"><div class="hist-ranking">${rankingHtml}</div><div class="hist-games-label">ゲーム詳細</div>${gamesHtml}</div>`;
 }
+
 function getEditDraft(s){
   if(!editStates[s.id])editStates[s.id]={open:true,editMode:true};
   if(!editStates[s.id].draft)editStates[s.id].draft={names:[...s.names],games:s.games.map(g=>({ranks:[...g.ranks],customPoints:g.customPoints?[...g.customPoints]:null}))};
   return editStates[s.id].draft;
 }
+
 function buildEditHtml(s){
   const draft=getEditDraft(s),n=s.playerCount,roster=getRoster();
   const getName=i=>(draft.names[i]&&draft.names[i].trim())?draft.names[i].trim():`P${i+1}`;
@@ -475,32 +575,46 @@ function buildEditHtml(s){
   }).join('');
   return`<div class="hist-edit"><div class="edit-section-label">プレイヤー名</div><div class="edit-names-grid">${namesHtml}</div><div class="edit-section-label">ゲーム結果</div>${gamesHtml}<button class="edit-save-btn" onclick="commitEdit(${s.id})">✅ 変更を保存</button></div>`;
 }
-function editSlot(id,i,val){const d=loadData(),s=d.sessions.find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);draft.names[i]=val}
-function editRank(id,gi,pi,val){
-  const d=loadData(),s=d.sessions.find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);
+
+window.editSlot=function(id,i,val){const s=getSessions().find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);draft.names[i]=val}
+window.editRank=function(id,gi,pi,val){
+  const s=getSessions().find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);
   if(val==='dnp')draft.games[gi].ranks[pi]='dnp';else draft.games[gi].ranks[pi]=val?parseInt(val):null;
   const pts=draft.games[gi].customPoints||defaultPtsForCount(s.playerCount),r=draft.games[gi].ranks[pi];
   let ptCls,ptStr;
   if(r==='dnp'){ptCls='pt-zero';ptStr='不参加'}else if(r===null){ptCls='';ptStr='—'}else{const ptVal=pts[r-1];ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=ptVal>0?`+${ptVal}`:`${ptVal}`}
   const el=document.getElementById(`epp-${id}-${gi}-${pi}`);if(el){el.className=`edit-pt-preview ${ptCls}`;el.textContent=ptStr}
 }
-function editToggleCustomPts(id,gi){
-  const d=loadData(),s=d.sessions.find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);
+window.editToggleCustomPts=function(id,gi){
+  const s=getSessions().find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);
   draft.games[gi].customPoints=draft.games[gi].customPoints?null:[...defaultPtsForCount(s.playerCount)];renderHistory();
 }
-function editGamePt(id,gi,ri,val){const d=loadData(),s=d.sessions.find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);if(draft.games[gi].customPoints)draft.games[gi].customPoints[ri]=parseInt(val)||0}
-function commitEdit(id){
-  if(!editStates[id]||!editStates[id].draft)return;const draft=editStates[id].draft;
+window.editGamePt=function(id,gi,ri,val){const s=getSessions().find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);if(draft.games[gi].customPoints)draft.games[gi].customPoints[ri]=parseInt(val)||0}
+window.commitEdit=async function(id){
+  const s=getSessions().find(x=>x.id===id);if(!s||!editStates[id]||!editStates[id].draft)return;
+  const draft=editStates[id].draft;
   document.querySelectorAll(`#hsess-${id} .edit-slot-select`).forEach((sel,i)=>{draft.names[i]=sel.value});
-  const d=loadData(),idx=d.sessions.findIndex(s=>s.id===id);if(idx===-1)return;
-  const s=d.sessions[idx];s.names=[...draft.names];s.games=draft.games.map(g=>({ranks:[...g.ranks],customPoints:g.customPoints?[...g.customPoints]:null}));
-  const n=s.playerCount,totals=Array(n).fill(0);
-  s.games.forEach((g,gi)=>{const pts=g.customPoints||defaultPtsForCount(n);g.ranks.forEach((r,pi)=>{if(r!==null&&r!=='dnp')totals[pi]+=pts[r-1]??0})});
-  s.totals=totals;d.sessions[idx]=s;saveData(d);delete editStates[id].draft;editStates[id].editMode=false;renderHistory();showToast('✅ 更新しました！');
+  const d=JSON.parse(JSON.stringify(cachedData));
+  const idx=d.sessions.findIndex(x=>x.id===id);if(idx===-1)return;
+  d.sessions[idx].names=[...draft.names];
+  d.sessions[idx].games=draft.games.map(g=>({ranks:[...g.ranks],customPoints:g.customPoints?[...g.customPoints]:null}));
+  const n=d.sessions[idx].playerCount,totals=Array(n).fill(0);
+  d.sessions[idx].games.forEach((g,gi)=>{const pts=g.customPoints||defaultPtsForCount(n);g.ranks.forEach((r,pi)=>{if(r!==null&&r!=='dnp')totals[pi]+=pts[r-1]??0})});
+  d.sessions[idx].totals=totals;
+  await saveData(d);
+  delete editStates[id].draft;editStates[id].editMode=false;renderHistory();showToast('✅ 更新しました！');
 }
-function resetAll(){if(games.length===0)return;if(!confirm('現在の入力をリセットしますか？\n（保存済み履歴は消えません）'))return;games=[];renderGames();renderTotals()}
+
+window.resetAll=function(){if(games.length===0)return;if(!confirm('現在の入力をリセットしますか？\n（保存済み履歴は消えません）'))return;games=[];renderGames();renderTotals()}
+
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
-renderRoster();setCount(4);renderGames();renderTotals();bindHistoryDelegate();
+
+// 初期化
+await loadData();
+renderRoster();
+setCount(4);
+renderGames();
+renderTotals();
 </script>
 </body>
 </html>
