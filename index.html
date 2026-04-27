@@ -610,11 +610,12 @@ window.resetAll=function(){if(games.length===0)return;if(!confirm('現在の入�
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 
 // 初期化
-await loadData();
-renderRoster();
-setCount(4);
-renderGames();
-renderTotals();
+loadData().then(()=>{
+  renderRoster();
+  setCount(4);
+  renderGames();
+  renderTotals();
+});
 </script>
 </body>
 </html>
