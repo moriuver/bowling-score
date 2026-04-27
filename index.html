@@ -6,11 +6,7 @@
 <title>🎳 ボウリング スコア</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700;900&display=swap');
-:root {
-  --bg:#0f0f14; --surface:#1a1a24; --card:#22222e;
-  --accent:#f0c040; --accent2:#e05a2b; --green:#3ecf6e;
-  --text:#f0ede8; --border:#2e2e3e;
-}
+:root{--bg:#0f0f14;--surface:#1a1a24;--card:#22222e;--accent:#f0c040;--accent2:#e05a2b;--green:#3ecf6e;--text:#f0ede8;--border:#2e2e3e}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;padding-bottom:80px}
 header{background:var(--surface);border-bottom:2px solid var(--accent);padding:14px 16px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
@@ -124,9 +120,9 @@ header h1{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3p
 .hist-date{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent);letter-spacing:2px}
 .hist-meta{font-size:.7rem;color:#666;margin-top:2px}
 .hist-header-actions{display:flex;gap:6px;align-items:center;padding:8px 14px 8px 0;flex-shrink:0;position:relative;z-index:10}
-.hist-edit-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#aaa;font-size:1rem;font-weight:700;padding:8px 12px;cursor:pointer;transition:all .15s;min-width:44px;min-height:40px;pointer-events:auto;position:relative;z-index:11;touch-action:manipulation}
+.hist-edit-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#aaa;font-size:1rem;font-weight:700;padding:8px 12px;cursor:pointer;transition:all .15s;min-width:44px;min-height:40px}
 .hist-edit-btn:active,.hist-edit-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(240,192,64,.1)}
-.hist-del-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#aaa;font-size:1rem;cursor:pointer;padding:8px 12px;transition:all .15s;min-width:44px;min-height:40px;pointer-events:auto;position:relative;z-index:11;touch-action:manipulation}
+.hist-del-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#aaa;font-size:1rem;cursor:pointer;padding:8px 12px;transition:all .15s;min-width:44px;min-height:40px}
 .hist-del-btn:active{color:var(--accent2);border-color:var(--accent2);background:rgba(224,90,43,.1)}
 .hist-body{display:none}.hist-body.open{display:block}
 .hist-view{padding:12px 16px}
@@ -175,15 +171,12 @@ header h1{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3p
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .confirm-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
 .confirm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px)}
-.confirm-box{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 22px 16px;max-width:320px;width:100%;animation:confirm-in .2s ease-out}
-@keyframes confirm-in{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.confirm-box{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 22px 16px;max-width:320px;width:100%}
 .confirm-title{font-size:1rem;font-weight:900;color:var(--text);margin-bottom:6px;line-height:1.4}
 .confirm-sub{font-size:.78rem;color:#888;margin-bottom:18px;line-height:1.5}
 .confirm-actions{display:flex;gap:10px}
-.confirm-cancel{flex:1;padding:11px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:#aaa;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;touch-action:manipulation}
-.confirm-cancel:active{background:var(--bg)}
-.confirm-ok{flex:1;padding:11px;background:var(--accent2);border:none;border-radius:10px;color:#fff;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer;touch-action:manipulation}
-.confirm-ok:active{opacity:.75}
+.confirm-cancel{flex:1;padding:11px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:#aaa;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer}
+.confirm-ok{flex:1;padding:11px;background:var(--accent2);border:none;border-radius:10px;color:#fff;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer}
 </style>
 </head>
 <body>
@@ -213,9 +206,7 @@ header h1{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3p
     <div class="section-label">プレイヤー選択</div>
     <div class="name-grid" id="nameGrid"></div>
   </div>
-  <div class="total-sticky" id="totalSticky">
-    <div class="total-sticky-inner" id="totalCard"></div>
-  </div>
+  <div class="total-sticky"><div class="total-sticky-inner" id="totalCard"></div></div>
   <div class="game-section">
     <div class="game-header">
       <span class="game-title">GAMES</span>
@@ -254,59 +245,57 @@ header h1{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3p
 </div>
 <div class="toast" id="toast"></div>
 
-<script type="module">
-// ===== Firebase設定 =====
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const firebaseConfig = {
-  databaseURL: "https://bowling-score-c7380-default-rtdb.firebaseio.com/"
-};
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-const MEDALS=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'];
-const MIN_PLAYERS=2,MAX_PLAYERS=12;
-let playerCount=4,selectedSlots=['','','',''],games=[];
-let cachedData={roster:[],sessions:[]};
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({databaseURL:"https://bowling-score-c7380-default-rtdb.firebaseio.com/"});
+var db=firebase.database();
+var MEDALS=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'];
+var MIN_PLAYERS=2,MAX_PLAYERS=12;
+var playerCount=4,selectedSlots=['','','',''],games=[];
+var cachedData={roster:[],sessions:[]};
+var editStates={};
 
 function setSyncStatus(state){
-  const el=document.getElementById('syncStatus');
-  if(state==='ok'){el.textContent='✓ 同期済';el.className='sync-status ok'}
-  else if(state==='ng'){el.textContent='✗ オフライン';el.className='sync-status ng'}
-  else{el.textContent='⟳ 同期中';el.className='sync-status loading'}
+  var el=document.getElementById('syncStatus');
+  if(state==='ok'){el.textContent='✓ 同期済';el.className='sync-status ok';}
+  else if(state==='ng'){el.textContent='✗ オフライン';el.className='sync-status ng';}
+  else{el.textContent='⟳ 同期中';el.className='sync-status loading';}
 }
 
-async function loadData(){
-  try{
-    const snap=await get(ref(db,'bowling'));
-    if(snap.exists()){cachedData=snap.val();if(!cachedData.roster)cachedData.roster=[];if(!cachedData.sessions)cachedData.sessions=[];}
+function loadData(cb){
+  setSyncStatus('loading');
+  db.ref('bowling').get().then(function(snap){
+    if(snap.exists()){
+      cachedData=snap.val();
+      if(!cachedData.roster)cachedData.roster=[];
+      if(!cachedData.sessions)cachedData.sessions=[];
+    }
     setSyncStatus('ok');
-  }catch(e){setSyncStatus('ng');console.error(e)}
-  return cachedData;
+    if(cb)cb();
+  }).catch(function(e){setSyncStatus('ng');console.error(e);if(cb)cb();});
 }
 
-async function saveData(d){
+function saveData(d,cb){
   cachedData=d;
   setSyncStatus('loading');
-  try{
-    await set(ref(db,'bowling'),d);
+  db.ref('bowling').set(d).then(function(){
     setSyncStatus('ok');
-  }catch(e){setSyncStatus('ng');console.error(e)}
+    if(cb)cb();
+  }).catch(function(e){setSyncStatus('ng');console.error(e);});
 }
 
 // リアルタイム同期
-onValue(ref(db,'bowling'),(snap)=>{
+db.ref('bowling').on('value',function(snap){
   if(snap.exists()){
-    const newData=snap.val();
+    var newData=snap.val();
     if(!newData.roster)newData.roster=[];
     if(!newData.sessions)newData.sessions=[];
     cachedData=newData;
     setSyncStatus('ok');
-    // 現在のタブを再描画
-    const activePanel=document.querySelector('.panel.active');
+    var activePanel=document.querySelector('.panel.active');
     if(activePanel){
-      const id=activePanel.id;
+      var id=activePanel.id;
       if(id==='panel-stats')renderStats();
       if(id==='panel-history')renderHistory();
       if(id==='panel-users')renderRoster();
@@ -315,194 +304,219 @@ onValue(ref(db,'bowling'),(snap)=>{
   }
 });
 
-function getRoster(){return cachedData.roster||[]}
-function getSessions(){return cachedData.sessions||[]}
+function getRoster(){return cachedData.roster||[];}
+function getSessions(){return cachedData.sessions||[];}
 
 function switchTab(tab){
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['record','stats','history','users'][i]===tab));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById(`panel-${tab}`).classList.add('active');
+  document.querySelectorAll('.tab').forEach(function(t,i){
+    t.classList.toggle('active',['record','stats','history','users'][i]===tab);
+  });
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('panel-'+tab).classList.add('active');
   if(tab==='stats')renderStats();
   if(tab==='history')renderHistory();
   if(tab==='users')renderRoster();
 }
 
 function renderRoster(){
-  const roster=getRoster(),list=document.getElementById('rosterList');
-  if(roster.length===0){list.innerHTML='<div style="font-size:.75rem;color:#555;padding:4px 0;">まだユーザーがいません</div>';return}
-  list.innerHTML=roster.map(name=>`<div class="roster-row"><span class="rname">${name}</span><button class="roster-del" onclick="window.deleteRosterUser('${name.replace(/'/g,"\\'")}')">✕</button></div>`).join('');
+  var roster=getRoster(),list=document.getElementById('rosterList');
+  if(roster.length===0){list.innerHTML='<div style="font-size:.75rem;color:#555;padding:4px 0;">まだユーザーがいません</div>';return;}
+  list.innerHTML=roster.map(function(name){
+    return '<div class="roster-row"><span class="rname">'+name+'</span><button class="roster-del" onclick="deleteRosterUser(\''+name.replace(/'/g,"\\'")+'\')">\u2715</button></div>';
+  }).join('');
 }
 
-window.addRosterUser=async function(){
-  const inp=document.getElementById('rosterInput'),name=inp.value.trim();
+function addRosterUser(){
+  var inp=document.getElementById('rosterInput'),name=inp.value.trim();
   if(!name)return;
-  const d=JSON.parse(JSON.stringify(cachedData));
+  var d=JSON.parse(JSON.stringify(cachedData));
   if(!d.roster)d.roster=[];
-  if(d.roster.includes(name)){showToast('同じ名前が既にあります');return}
-  d.roster.push(name);await saveData(d);inp.value='';renderRoster();renderNameGrid();
+  if(d.roster.includes(name)){showToast('同じ名前が既にあります');return;}
+  d.roster.push(name);
+  saveData(d,function(){inp.value='';renderRoster();renderNameGrid();});
 }
 
-window.deleteRosterUser=async function(name){
-  if(!confirm(`「${name}」を削除しますか？`))return;
-  const d=JSON.parse(JSON.stringify(cachedData));
-  d.roster=d.roster.filter(r=>r!==name);await saveData(d);
-  selectedSlots=selectedSlots.map(s=>s===name?'':s);renderRoster();renderNameGrid();
+function deleteRosterUser(name){
+  if(!confirm('「'+name+'」を削除しますか？'))return;
+  var d=JSON.parse(JSON.stringify(cachedData));
+  d.roster=d.roster.filter(function(r){return r!==name;});
+  saveData(d,function(){
+    selectedSlots=selectedSlots.map(function(s){return s===name?'':s;});
+    renderRoster();renderNameGrid();
+  });
 }
 
-window.changeCount=function(delta){setCount(playerCount+delta)}
+function changeCount(delta){setCount(playerCount+delta);}
 
 function setCount(n){
-  n=Math.max(MIN_PLAYERS,Math.min(MAX_PLAYERS,n));playerCount=n;
-  const sv=document.getElementById('stepValue'),sd=document.getElementById('stepDown'),su=document.getElementById('stepUp');
-  if(sv)sv.textContent=n;if(sd)sd.disabled=(n<=MIN_PLAYERS);if(su)su.disabled=(n>=MAX_PLAYERS);
-  selectedSlots=selectedSlots.slice(0,n);while(selectedSlots.length<n)selectedSlots.push('');
-  games=games.map(g=>{
-    const r=g.ranks.slice(0,n);while(r.length<n)r.push(null);
-    const cp=g.customPoints?g.customPoints.slice(0,n):null;if(cp)while(cp.length<n)cp.push(0);
+  n=Math.max(MIN_PLAYERS,Math.min(MAX_PLAYERS,n));
+  playerCount=n;
+  var sv=document.getElementById('stepValue'),sd=document.getElementById('stepDown'),su=document.getElementById('stepUp');
+  if(sv)sv.textContent=n;
+  if(sd)sd.disabled=(n<=MIN_PLAYERS);
+  if(su)su.disabled=(n>=MAX_PLAYERS);
+  selectedSlots=selectedSlots.slice(0,n);
+  while(selectedSlots.length<n)selectedSlots.push('');
+  games=games.map(function(g){
+    var r=g.ranks.slice(0,n);while(r.length<n)r.push(null);
+    var cp=g.customPoints?g.customPoints.slice(0,n):null;if(cp)while(cp.length<n)cp.push(0);
     return{ranks:r,customPoints:cp};
   });
   renderNameGrid();renderGames();renderTotals();
 }
 
 function renderNameGrid(){
-  const roster=getRoster(),grid=document.getElementById('nameGrid');grid.innerHTML='';
-  for(let i=0;i<playerCount;i++){
-    const wrap=document.createElement('div');wrap.className='slot-wrap';
-    const sel=document.createElement('select');sel.className='slot-select';
-    let opts=`<option value="">— 選択 —</option>`;
-    roster.forEach(name=>{opts+=`<option value="${name}" ${selectedSlots[i]===name?'selected':''}>${name}</option>`});
+  var roster=getRoster(),grid=document.getElementById('nameGrid');
+  grid.innerHTML='';
+  for(var i=0;i<playerCount;i++){
+    var wrap=document.createElement('div');wrap.className='slot-wrap';
+    var sel=document.createElement('select');sel.className='slot-select';
+    var opts='<option value="">— 選択 —</option>';
+    roster.forEach(function(name){
+      opts+='<option value="'+name+'"'+(selectedSlots[i]===name?' selected':'')+'>'+name+'</option>';
+    });
     sel.innerHTML=opts;
-    sel.addEventListener('change',e=>{selectedSlots[i]=e.target.value;renderGames();renderTotals()});
-    const arrow=document.createElement('span');arrow.className='slot-arrow';arrow.textContent='▼';
+    (function(idx){
+      sel.addEventListener('change',function(e){selectedSlots[idx]=e.target.value;renderGames();renderTotals();});
+    })(i);
+    var arrow=document.createElement('span');arrow.className='slot-arrow';arrow.textContent='▼';
     wrap.appendChild(sel);wrap.appendChild(arrow);grid.appendChild(wrap);
   }
 }
 
-function dn(i){return selectedSlots[i]||`P${i+1}`}
-function getPts(gi){return games[gi].customPoints||defaultPtsForCount(playerCount)}
-function getPtByRank(gi,rank){return getPts(gi)[rank-1]??0}
+function dn(i){return selectedSlots[i]||'P'+(i+1);}
 
 function defaultPtsForCount(n){
   if(n<=1)return[0];if(n===2)return[5,-5];if(n===3)return[5,0,-5];
   if(n===4)return[5,3,-3,-5];if(n===5)return[5,3,0,-3,-5];
-  const arr=Array(n).fill(0);arr[0]=5;arr[1]=3;arr[n-2]=-3;arr[n-1]=-5;return arr;
+  var arr=Array(n).fill(0);arr[0]=5;arr[1]=3;arr[n-2]=-3;arr[n-1]=-5;return arr;
 }
 
-window.addGame=function(){
+function getPts(gi){return games[gi].customPoints||defaultPtsForCount(playerCount);}
+function getPtByRank(gi,rank){var p=getPts(gi);return p[rank-1]!==undefined?p[rank-1]:0;}
+
+function addGame(){
   games.push({ranks:Array(playerCount).fill(null),customPoints:null});
   renderGames();renderTotals();updateGameCount();
-  setTimeout(()=>{const c=document.getElementById('gamesContainer');if(c&&c.firstElementChild)c.firstElementChild.scrollIntoView({behavior:'smooth',block:'center'})},60);
+  setTimeout(function(){var c=document.getElementById('gamesContainer');if(c&&c.firstElementChild)c.firstElementChild.scrollIntoView({behavior:'smooth',block:'center'});},60);
 }
 
-window.deleteGame=function(idx){games.splice(idx,1);renderGames();renderTotals();updateGameCount()}
+function deleteGame(idx){games.splice(idx,1);renderGames();renderTotals();updateGameCount();}
 
-window.setRank=function(gi,pi,val){
+function setRank(gi,pi,val){
   if(val==='dnp')games[gi].ranks[pi]='dnp';
   else games[gi].ranks[pi]=val?parseInt(val):null;
   renderGameCard(gi);renderTotals();
 }
 
-window.toggleCustomPts=function(gi){
-  const g=games[gi];g.customPoints=g.customPoints?null:[...defaultPtsForCount(playerCount)];
+function toggleCustomPts(gi){
+  var g=games[gi];g.customPoints=g.customPoints?null:defaultPtsForCount(playerCount).slice();
   renderGameCard(gi);renderTotals();
 }
 
-window.setCustomPt=function(gi,ri,val){games[gi].customPoints[ri]=parseInt(val)||0;renderGameCard(gi);renderTotals()}
+function setCustomPt(gi,ri,val){games[gi].customPoints[ri]=parseInt(val)||0;renderGameCard(gi);renderTotals();}
 
 function renderGames(){
-  const c=document.getElementById('gamesContainer');c.innerHTML='';
-  for(let gi=games.length-1;gi>=0;gi--)c.appendChild(createGameCard(gi));
+  var c=document.getElementById('gamesContainer');c.innerHTML='';
+  for(var gi=games.length-1;gi>=0;gi--)c.appendChild(createGameCard(gi));
   updateGameCount();
 }
 
 function renderGameCard(gi){
-  const c=document.getElementById('gamesContainer'),domIdx=games.length-1-gi;
+  var c=document.getElementById('gamesContainer'),domIdx=games.length-1-gi;
   if(c.children[domIdx])c.replaceChild(createGameCard(gi),c.children[domIdx]);
 }
 
 function createGameCard(gi){
-  const g=games[gi],hasCustom=!!g.customPoints,pts=getPts(gi);
-  const ranks=g.ranks.filter(r=>r!==null&&r!=='dnp'),hasDup=ranks.length!==new Set(ranks).size;
-  let customHtml='';
-  for(let i=0;i<playerCount;i++)customHtml+=`<div class="game-pts-item"><label>${i+1}位</label><input class="game-pts-input" type="number" value="${pts[i]}" onchange="setCustomPt(${gi},${i},this.value)"></div>`;
-  let rowsHtml='';
-  for(let pi=0;pi<playerCount;pi++){
-    const r=g.ranks[pi];let ptCls,ptStr;
-    if(r==='dnp'){ptCls='pt-zero';ptStr='不参加'}
-    else if(r===null){ptCls='';ptStr='—'}
-    else{const ptVal=pts[r-1];ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=ptVal>0?`+${ptVal}`:`${ptVal}`}
-    let opts=`<option value="" ${r===null?'selected':''}>—</option>`;
-    for(let n=1;n<=playerCount;n++)opts+=`<option value="${n}" ${r===n?'selected':''}>${n}位</option>`;
-    opts+=`<option value="dnp" ${r==='dnp'?'selected':''}>不参加</option>`;
-    rowsHtml+=`<div class="rank-row"><span class="pname">${dn(pi)}</span><select class="rank-select" onchange="setRank(${gi},${pi},this.value)">${opts}</select><span class="pt-preview ${ptCls}">${ptStr}</span></div>`;
+  var g=games[gi],hasCustom=!!g.customPoints,pts=getPts(gi);
+  var ranks=g.ranks.filter(function(r){return r!==null&&r!=='dnp';}),hasDup=ranks.length!==new Set(ranks).size;
+  var customHtml='';
+  for(var i=0;i<playerCount;i++)customHtml+='<div class="game-pts-item"><label>'+(i+1)+'位</label><input class="game-pts-input" type="number" value="'+pts[i]+'" onchange="setCustomPt('+gi+','+i+',this.value)"></div>';
+  var rowsHtml='';
+  for(var pi=0;pi<playerCount;pi++){
+    var r=g.ranks[pi],ptCls,ptStr;
+    if(r==='dnp'){ptCls='pt-zero';ptStr='不参加';}
+    else if(r===null){ptCls='';ptStr='—';}
+    else{var ptVal=pts[r-1];ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=ptVal>0?'+'+ptVal:''+ptVal;}
+    var opts='<option value=""'+(r===null?' selected':'')+'>—</option>';
+    for(var n=1;n<=playerCount;n++)opts+='<option value="'+n+'"'+(r===n?' selected':'')+'>'+n+'位</option>';
+    opts+='<option value="dnp"'+(r==='dnp'?' selected':'')+'>不参加</option>';
+    rowsHtml+='<div class="rank-row"><span class="pname">'+dn(pi)+'</span><select class="rank-select" onchange="setRank('+gi+','+pi+',this.value)">'+opts+'</select><span class="pt-preview '+ptCls+'">'+ptStr+'</span></div>';
   }
-  const card=document.createElement('div');card.className='game-card';
-  card.innerHTML=`<div class="game-card-header"><span class="game-num">GAME ${gi+1}</span><div class="game-card-actions"><button class="pts-toggle-btn ${hasCustom?'active':''}" onclick="toggleCustomPts(${gi})">${hasCustom?'⚙ カスタム配点中':'⚙ 配点設定'}</button><button class="del-btn" onclick="deleteGame(${gi})">✕</button></div></div><div class="game-pts-area ${hasCustom?'open':''}"><div class="game-pts-grid">${customHtml}</div></div><div class="rank-inputs">${rowsHtml}</div>${hasDup?'<div class="dup-warn">⚠ 同じ順位が重複しています</div>':''}`;
+  var card=document.createElement('div');card.className='game-card';
+  card.innerHTML='<div class="game-card-header"><span class="game-num">GAME '+(gi+1)+'</span><div class="game-card-actions"><button class="pts-toggle-btn'+(hasCustom?' active':'')+'" onclick="toggleCustomPts('+gi+')">'+(hasCustom?'⚙ カスタム配点中':'⚙ 配点設定')+'</button><button class="del-btn" onclick="deleteGame('+gi+')">\u2715</button></div></div><div class="game-pts-area'+(hasCustom?' open':'')+'"><div class="game-pts-grid">'+customHtml+'</div></div><div class="rank-inputs">'+rowsHtml+'</div>'+(hasDup?'<div class="dup-warn">⚠ 同じ順位が重複しています</div>':'');
   return card;
 }
 
 function calcTotals(){
-  const t=Array(playerCount).fill(0);
-  games.forEach((g,gi)=>g.ranks.forEach((r,pi)=>{if(r!==null&&r!=='dnp')t[pi]+=getPtByRank(gi,r)}));
+  var t=Array(playerCount).fill(0);
+  games.forEach(function(g,gi){g.ranks.forEach(function(r,pi){if(r!==null&&r!=='dnp')t[pi]+=getPtByRank(gi,r);});});
   return t;
 }
 
 function renderTotals(){
-  const totals=calcTotals(),sorted=totals.map((s,i)=>({i,s})).sort((a,b)=>b.s-a.s);
-  const card=document.getElementById('totalCard');
-  if(games.length===0){card.innerHTML='<div class="total-empty">合計スコアはここに表示されます</div>'}
-  else{card.innerHTML=sorted.map((item,rank)=>{const s=item.s,cls=rank<3?`rank-${rank+1}`:'',ptCls=s>0?'pt-pos':s<0?'pt-neg':'pt-zero';return`<div class="total-pill ${cls}"><span class="pill-medal">${MEDALS[rank]||''}</span><span class="pill-name">${dn(item.i)}</span><span class="pill-score ${ptCls}">${s>0?'+':''}${s}</span></div>`}).join('')}
-  const completeGames=games.filter(g=>g.ranks.every(r=>r!==null));
-  const bc=document.getElementById('balanceCard');
-  if(completeGames.length===0){bc.innerHTML='';return}
-  const sum=completeGames.reduce((acc,g)=>{const gi=games.indexOf(g);return acc+g.ranks.reduce((a,r)=>a+(r==='dnp'?0:getPtByRank(gi,r)),0)},0);
-  const isOk=sum===0;
-  bc.innerHTML=`<div class="balance-card ${isOk?'ok':'ng'}"><div class="balance-left"><span class="balance-icon">${isOk?'✅':'⚠️'}</span><div><div class="balance-title">${isOk?'バランス OK':'バランスが合いません'}</div><div class="balance-sub">完全入力 ${completeGames.length}ゲーム分の合計</div></div></div><span class="balance-num">${sum>0?'+':''}${sum}</span></div>`;
+  var totals=calcTotals(),sorted=totals.map(function(s,i){return{i:i,s:s};}).sort(function(a,b){return b.s-a.s;});
+  var card=document.getElementById('totalCard');
+  if(games.length===0){card.innerHTML='<div class="total-empty">合計スコアはここに表示されます</div>';}
+  else{card.innerHTML=sorted.map(function(item,rank){var s=item.s,cls=rank<3?'rank-'+(rank+1):'',ptCls=s>0?'pt-pos':s<0?'pt-neg':'pt-zero';return'<div class="total-pill '+cls+'"><span class="pill-medal">'+(MEDALS[rank]||'')+'</span><span class="pill-name">'+dn(item.i)+'</span><span class="pill-score '+ptCls+'">'+(s>0?'+':'')+s+'</span></div>';}).join('');}
+  var completeGames=games.filter(function(g){return g.ranks.every(function(r){return r!==null;});});
+  var bc=document.getElementById('balanceCard');
+  if(completeGames.length===0){bc.innerHTML='';return;}
+  var sum=completeGames.reduce(function(acc,g){var gi=games.indexOf(g);return acc+g.ranks.reduce(function(a,r){return a+(r==='dnp'?0:getPtByRank(gi,r));},0);},0);
+  var isOk=sum===0;
+  bc.innerHTML='<div class="balance-card '+(isOk?'ok':'ng')+'"><div class="balance-left"><span class="balance-icon">'+(isOk?'✅':'⚠️')+'</span><div><div class="balance-title">'+(isOk?'バランス OK':'バランスが合いません')+'</div><div class="balance-sub">完全入力 '+completeGames.length+'ゲーム分の合計</div></div></div><span class="balance-num">'+(sum>0?'+':'')+sum+'</span></div>';
 }
 
-function updateGameCount(){document.getElementById('gameCount').textContent=`${games.length} GAMES`}
+function updateGameCount(){document.getElementById('gameCount').textContent=games.length+' GAMES';}
 
-window.saveSession=async function(){
-  if(games.length===0){showToast('ゲームがありません');return}
-  const session={id:Date.now(),date:new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}),playerCount,names:[...selectedSlots],games:games.map(g=>({ranks:[...g.ranks],customPoints:g.customPoints?[...g.customPoints]:null})),totals:calcTotals()};
-  const d=JSON.parse(JSON.stringify(cachedData));
+function saveSession(){
+  if(games.length===0){showToast('ゲームがありません');return;}
+  var session={id:Date.now(),date:new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}),playerCount:playerCount,names:selectedSlots.slice(),games:games.map(function(g){return{ranks:g.ranks.slice(),customPoints:g.customPoints?g.customPoints.slice():null};}),totals:calcTotals()};
+  var d=JSON.parse(JSON.stringify(cachedData));
   if(!d.sessions)d.sessions=[];
   d.sessions.unshift(session);
-  await saveData(d);
-  showToast('💾 保存しました！');
+  saveData(d,function(){showToast('💾 保存しました！');});
 }
 
 function renderStats(){
-  const sessions=getSessions(),card=document.getElementById('statsCard');
-  if(sessions.length===0){card.innerHTML='<div class="stats-empty">📭 まだ記録がありません</div>';return}
-  const userMap={};
-  sessions.forEach(s=>{s.names.forEach((name,i)=>{const nm=(name&&name.trim())?name.trim():`P${i+1}`;if(!userMap[nm])userMap[nm]={total:0,gameCount:0,sessionCount:0};userMap[nm].total+=s.totals[i];userMap[nm].sessionCount++;userMap[nm].gameCount+=s.games.filter(g=>g.ranks[i]!==null&&g.ranks[i]!=='dnp').length})});
-  const sorted=Object.entries(userMap).map(([name,v])=>({name,...v})).sort((a,b)=>b.total-a.total);
-  card.innerHTML=sorted.map((u,rank)=>{const cls=rank<3?`stats-row rank-${rank+1}`:'stats-row',ptCls=u.total>0?'pt-pos':u.total<0?'pt-neg':'pt-zero',avg=u.gameCount>0?(u.total/u.gameCount).toFixed(1):'0.0';return`<div class="${cls}"><div class="stats-left"><span class="stats-medal">${MEDALS[rank]||''}</span><div><div class="stats-name">${u.name}</div><div class="stats-sub">${u.sessionCount}回参加 / ${u.gameCount}ゲーム / 平均${avg>0?'+':''}${avg}</div></div></div><div class="stats-right"><div class="stats-total ${ptCls}">${u.total>0?'+':''}${u.total}</div></div></div>`}).join('');
+  var sessions=getSessions(),card=document.getElementById('statsCard');
+  if(sessions.length===0){card.innerHTML='<div class="stats-empty">📭 まだ記録がありません</div>';return;}
+  var userMap={};
+  sessions.forEach(function(s){
+    s.names.forEach(function(name,i){
+      var nm=(name&&name.trim())?name.trim():'P'+(i+1);
+      if(!userMap[nm])userMap[nm]={total:0,gameCount:0,sessionCount:0};
+      userMap[nm].total+=s.totals[i];userMap[nm].sessionCount++;
+      userMap[nm].gameCount+=s.games.filter(function(g){return g.ranks[i]!==null&&g.ranks[i]!=='dnp';}).length;
+    });
+  });
+  var sorted=Object.entries(userMap).map(function(e){return{name:e[0],total:e[1].total,gameCount:e[1].gameCount,sessionCount:e[1].sessionCount};}).sort(function(a,b){return b.total-a.total;});
+  card.innerHTML=sorted.map(function(u,rank){
+    var cls=rank<3?'stats-row rank-'+(rank+1):'stats-row',ptCls=u.total>0?'pt-pos':u.total<0?'pt-neg':'pt-zero',avg=u.gameCount>0?(u.total/u.gameCount).toFixed(1):'0.0';
+    return'<div class="'+cls+'"><div class="stats-left"><span class="stats-medal">'+(MEDALS[rank]||'')+'</span><div><div class="stats-name">'+u.name+'</div><div class="stats-sub">'+u.sessionCount+'回参加 / '+u.gameCount+'ゲーム / 平均'+(avg>0?'+':'')+avg+'</div></div></div><div class="stats-right"><div class="stats-total '+ptCls+'">'+(u.total>0?'+':'')+u.total+'</div></div></div>';
+  }).join('');
 }
 
-let editStates={};
-
 function renderHistory(){
-  const sessions=getSessions(),container=document.getElementById('historyContainer');
-  if(sessions.length===0){container.innerHTML='<div class="hist-empty">📭<br>まだ記録がありません</div>';return}
-  container.innerHTML=sessions.map(s=>buildSessionHtml(s)).join('');
+  var sessions=getSessions(),container=document.getElementById('historyContainer');
+  if(sessions.length===0){container.innerHTML='<div class="hist-empty">📭<br>まだ記録がありません</div>';return;}
+  container.innerHTML=sessions.map(function(s){return buildSessionHtml(s);}).join('');
 }
 
 function buildSessionHtml(s){
-  const es=editStates[s.id]||{open:false,editMode:false};
-  const bodyHtml=es.open?(es.editMode?buildEditHtml(s):buildViewHtml(s)):'';
-  return`<div class="hist-session" id="hsess-${s.id}" data-id="${s.id}"><div class="hist-session-header"><div class="hist-session-info" onclick="toggleHistOpen(${s.id})"><div class="hist-date">${s.date} <span class="hist-chevron">${es.open?'▲':'▼'}</span></div><div class="hist-meta">${s.playerCount}人 / ${s.games.length}ゲーム</div></div><div class="hist-header-actions"><button type="button" class="hist-edit-btn ${es.editMode?'active':''}" onclick="toggleHistEdit(${s.id})">${es.editMode?'✕':'✏'}</button><button type="button" class="hist-del-btn" onclick="deleteSession(${s.id})">🗑</button></div></div><div class="hist-body ${es.open?'open':''}" id="hbody-${s.id}">${bodyHtml}</div></div>`;
+  var es=editStates[s.id]||{open:false,editMode:false};
+  var bodyHtml=es.open?(es.editMode?buildEditHtml(s):buildViewHtml(s)):'';
+  return'<div class="hist-session" id="hsess-'+s.id+'" data-id="'+s.id+'"><div class="hist-session-header"><div class="hist-session-info" onclick="toggleHistOpen('+s.id+')"><div class="hist-date">'+s.date+' <span class="hist-chevron">'+(es.open?'▲':'▼')+'</span></div><div class="hist-meta">'+s.playerCount+'人 / '+s.games.length+'ゲーム</div></div><div class="hist-header-actions"><button type="button" class="hist-edit-btn'+(es.editMode?' active':'')+'" onclick="toggleHistEdit('+s.id+')">'+(es.editMode?'✕':'✏')+'</button><button type="button" class="hist-del-btn" onclick="deleteSession('+s.id+')">🗑</button></div></div><div class="hist-body'+(es.open?' open':'')+'" id="hbody-'+s.id+'">'+bodyHtml+'</div></div>';
 }
 
-window.toggleHistOpen=function(id){
+function toggleHistOpen(id){
   if(!editStates[id])editStates[id]={open:false,editMode:false};
   editStates[id].open=!editStates[id].open;
   if(!editStates[id].open)editStates[id].editMode=false;
   renderHistory();
 }
 
-window.toggleHistEdit=function(id){
+function toggleHistEdit(id){
   if(!editStates[id])editStates[id]={open:true,editMode:false};
   editStates[id].editMode=!editStates[id].editMode;
   editStates[id].open=true;
@@ -510,112 +524,107 @@ window.toggleHistEdit=function(id){
   renderHistory();
 }
 
-window.deleteSession=async function(id){
-  const target=getSessions().find(s=>s.id===id);if(!target)return;
-  showConfirmModal(`${target.date} の記録を削除しますか？`,'この操作は取り消せません',async()=>{
-    const d=JSON.parse(JSON.stringify(cachedData));
-    d.sessions=d.sessions.filter(s=>s.id!==id);
-    await saveData(d);
-    if(editStates[id])delete editStates[id];
-    renderHistory();showToast('🗑 削除しました');
+function deleteSession(id){
+  var target=getSessions().find(function(s){return s.id===id;});if(!target)return;
+  showConfirmModal(target.date+' の記録を削除しますか？','この操作は取り消せません',function(){
+    var d=JSON.parse(JSON.stringify(cachedData));
+    d.sessions=d.sessions.filter(function(s){return s.id!==id;});
+    saveData(d,function(){if(editStates[id])delete editStates[id];renderHistory();showToast('🗑 削除しました');});
   });
 }
 
 function showConfirmModal(title,sub,onConfirm){
-  const old=document.getElementById('confirmModal');if(old)old.remove();
-  const modal=document.createElement('div');modal.id='confirmModal';modal.className='confirm-modal';
-  modal.innerHTML=`<div class="confirm-backdrop"></div><div class="confirm-box"><div class="confirm-title">${title}</div><div class="confirm-sub">${sub}</div><div class="confirm-actions"><button type="button" class="confirm-cancel">キャンセル</button><button type="button" class="confirm-ok">削除</button></div></div>`;
+  var old=document.getElementById('confirmModal');if(old)old.remove();
+  var modal=document.createElement('div');modal.id='confirmModal';modal.className='confirm-modal';
+  modal.innerHTML='<div class="confirm-backdrop"></div><div class="confirm-box"><div class="confirm-title">'+title+'</div><div class="confirm-sub">'+sub+'</div><div class="confirm-actions"><button type="button" class="confirm-cancel">キャンセル</button><button type="button" class="confirm-ok">削除</button></div></div>';
   document.body.appendChild(modal);
-  const close=()=>modal.remove();
+  var close=function(){modal.remove();};
   modal.querySelector('.confirm-backdrop').addEventListener('click',close);
   modal.querySelector('.confirm-cancel').addEventListener('click',close);
-  modal.querySelector('.confirm-ok').addEventListener('click',()=>{close();onConfirm()});
+  modal.querySelector('.confirm-ok').addEventListener('click',function(){close();onConfirm();});
 }
 
 function buildViewHtml(s){
-  const getName=i=>(s.names[i]&&s.names[i].trim())?s.names[i].trim():`P${i+1}`;
-  const sorted=s.totals.map((sc,i)=>({i,sc})).sort((a,b)=>b.sc-a.sc);
-  const rankingHtml=sorted.map((item,rank)=>{const sc=item.sc,ptCls=sc>0?'pt-pos':sc<0?'pt-neg':'pt-zero';return`<div class="hist-rank-row"><div class="hist-rank-left"><span class="hist-rank-medal">${MEDALS[rank]||''}</span><span class="hist-rank-name">${getName(item.i)}</span></div><span class="hist-rank-score ${ptCls}">${sc>0?'+':''}${sc}</span></div>`}).join('');
-  const gamesHtml=s.games.map((g,gi)=>({g,gi})).reverse().map(({g,gi})=>{
-    const pts=g.customPoints||defaultPtsForCount(s.playerCount);
-    const rows=g.ranks.map((r,pi)=>{
-      if(r===null)return`<div class="hist-game-prow"><span class="hgp-name">${getName(pi)}</span><span class="hgp-rank">—</span><span class="hgp-pt">—</span></div>`;
-      if(r==='dnp')return`<div class="hist-game-prow"><span class="hgp-name">${getName(pi)}</span><span class="hgp-rank">不参加</span><span class="hgp-pt pt-zero">—</span></div>`;
-      const pt=pts[r-1],ptCls=pt>0?'pt-pos':pt<0?'pt-neg':'pt-zero';
-      return`<div class="hist-game-prow"><span class="hgp-name">${getName(pi)}</span><span class="hgp-rank">${r}位</span><span class="hgp-pt ${ptCls}">${pt>0?'+':''}${pt}</span></div>`;
+  var getName=function(i){return(s.names[i]&&s.names[i].trim())?s.names[i].trim():'P'+(i+1);};
+  var sorted=s.totals.map(function(sc,i){return{i:i,sc:sc};}).sort(function(a,b){return b.sc-a.sc;});
+  var rankingHtml=sorted.map(function(item,rank){var sc=item.sc,ptCls=sc>0?'pt-pos':sc<0?'pt-neg':'pt-zero';return'<div class="hist-rank-row"><div class="hist-rank-left"><span class="hist-rank-medal">'+(MEDALS[rank]||'')+'</span><span class="hist-rank-name">'+getName(item.i)+'</span></div><span class="hist-rank-score '+ptCls+'">'+(sc>0?'+':'')+sc+'</span></div>';}).join('');
+  var gamesHtml=s.games.map(function(g,gi){return{g:g,gi:gi};}).reverse().map(function(obj){
+    var g=obj.g,gi=obj.gi,pts=g.customPoints||defaultPtsForCount(s.playerCount);
+    var rows=g.ranks.map(function(r,pi){
+      if(r===null)return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">—</span><span class="hgp-pt">—</span></div>';
+      if(r==='dnp')return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">不参加</span><span class="hgp-pt pt-zero">—</span></div>';
+      var pt=pts[r-1],ptCls=pt>0?'pt-pos':pt<0?'pt-neg':'pt-zero';
+      return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">'+r+'位</span><span class="hgp-pt '+ptCls+'">'+(pt>0?'+':'')+pt+'</span></div>';
     }).join('');
-    return`<div class="hist-game-item"><div class="hist-game-title">GAME ${gi+1}${g.customPoints?' <span style="font-size:.65rem;color:var(--accent)">カスタム配点</span>':''}</div><div class="hist-game-rows">${rows}</div></div>`;
+    return'<div class="hist-game-item"><div class="hist-game-title">GAME '+(gi+1)+(g.customPoints?' <span style="font-size:.65rem;color:var(--accent)">カスタム配点</span>':'')+'</div><div class="hist-game-rows">'+rows+'</div></div>';
   }).join('');
-  return`<div class="hist-view"><div class="hist-ranking">${rankingHtml}</div><div class="hist-games-label">ゲーム詳細</div>${gamesHtml}</div>`;
+  return'<div class="hist-view"><div class="hist-ranking">'+rankingHtml+'</div><div class="hist-games-label">ゲーム詳細</div>'+gamesHtml+'</div>';
 }
 
 function getEditDraft(s){
   if(!editStates[s.id])editStates[s.id]={open:true,editMode:true};
-  if(!editStates[s.id].draft)editStates[s.id].draft={names:[...s.names],games:s.games.map(g=>({ranks:[...g.ranks],customPoints:g.customPoints?[...g.customPoints]:null}))};
+  if(!editStates[s.id].draft)editStates[s.id].draft={names:s.names.slice(),games:s.games.map(function(g){return{ranks:g.ranks.slice(),customPoints:g.customPoints?g.customPoints.slice():null};})};
   return editStates[s.id].draft;
 }
 
 function buildEditHtml(s){
-  const draft=getEditDraft(s),n=s.playerCount,roster=getRoster();
-  const getName=i=>(draft.names[i]&&draft.names[i].trim())?draft.names[i].trim():`P${i+1}`;
-  const namesHtml=draft.names.map((nm,i)=>{let opts=`<option value="">— 選択 —</option>`;roster.forEach(name=>{opts+=`<option value="${name}" ${nm===name?'selected':''}>${name}</option>`});return`<div class="edit-slot-wrap"><select class="edit-slot-select" onchange="editSlot(${s.id},${i},this.value)">${opts}</select><span class="edit-slot-arrow">▼</span></div>`}).join('');
-  const gamesHtml=draft.games.map((g,gi)=>({g,gi})).reverse().map(({g,gi})=>{
-    const hasCustom=!!g.customPoints,pts=g.customPoints||defaultPtsForCount(n);
-    let ptsHtml='';for(let i=0;i<n;i++)ptsHtml+=`<div class="edit-pts-item"><label>${i+1}位</label><input class="edit-pts-input" type="number" value="${pts[i]}" onchange="editGamePt(${s.id},${gi},${i},this.value)"></div>`;
-    let rankHtml='';
-    for(let pi=0;pi<n;pi++){
-      const r=g.ranks[pi];let ptCls,ptStr;
-      if(r==='dnp'){ptCls='pt-zero';ptStr='不参加'}else if(r===null){ptCls='';ptStr='—'}else{const ptVal=pts[r-1];ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=ptVal>0?`+${ptVal}`:`${ptVal}`}
-      let opts=`<option value="" ${r===null?'selected':''}>—</option>`;
-      for(let nn=1;nn<=n;nn++)opts+=`<option value="${nn}" ${r===nn?'selected':''}>${nn}位</option>`;
-      opts+=`<option value="dnp" ${r==='dnp'?'selected':''}>不参加</option>`;
-      rankHtml+=`<div class="edit-rank-row"><span class="epname">${getName(pi)}</span><select class="edit-rank-select" onchange="editRank(${s.id},${gi},${pi},this.value)">${opts}</select><span class="edit-pt-preview ${ptCls}" id="epp-${s.id}-${gi}-${pi}">${ptStr}</span></div>`;
-    }
-    return`<div class="edit-game-block"><div class="edit-game-header"><span class="edit-game-num">GAME ${gi+1}</span><button class="edit-pts-toggle ${hasCustom?'active':''}" onclick="editToggleCustomPts(${s.id},${gi})">${hasCustom?'⚙ カスタム配点中':'⚙ 配点設定'}</button></div><div class="edit-pts-area ${hasCustom?'open':''}" id="epa-${s.id}-${gi}"><div class="edit-pts-grid">${ptsHtml}</div></div><div class="edit-rank-rows">${rankHtml}</div></div>`;
+  var draft=getEditDraft(s),n=s.playerCount,roster=getRoster();
+  var getName=function(i){return(draft.names[i]&&draft.names[i].trim())?draft.names[i].trim():'P'+(i+1);};
+  var namesHtml=draft.names.map(function(nm,i){
+    var opts='<option value="">— 選択 —</option>';
+    roster.forEach(function(name){opts+='<option value="'+name+'"'+(nm===name?' selected':'')+'>'+name+'</option>';});
+    return'<div class="edit-slot-wrap"><select class="edit-slot-select" onchange="editSlot('+s.id+','+i+',this.value)">'+opts+'</select><span class="edit-slot-arrow">▼</span></div>';
   }).join('');
-  return`<div class="hist-edit"><div class="edit-section-label">プレイヤー名</div><div class="edit-names-grid">${namesHtml}</div><div class="edit-section-label">ゲーム結果</div>${gamesHtml}<button class="edit-save-btn" onclick="commitEdit(${s.id})">✅ 変更を保存</button></div>`;
+  var gamesHtml=draft.games.map(function(g,gi){return{g:g,gi:gi};}).reverse().map(function(obj){
+    var g=obj.g,gi=obj.gi,hasCustom=!!g.customPoints,pts=g.customPoints||defaultPtsForCount(n);
+    var ptsHtml='';for(var i=0;i<n;i++)ptsHtml+='<div class="edit-pts-item"><label>'+(i+1)+'位</label><input class="edit-pts-input" type="number" value="'+pts[i]+'" onchange="editGamePt('+s.id+','+gi+','+i+',this.value)"></div>';
+    var rankHtml='';
+    for(var pi=0;pi<n;pi++){
+      var r=g.ranks[pi],ptCls,ptStr;
+      if(r==='dnp'){ptCls='pt-zero';ptStr='不参加';}else if(r===null){ptCls='';ptStr='—';}else{var ptVal=pts[r-1];ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=ptVal>0?'+'+ptVal:''+ptVal;}
+      var opts='<option value=""'+(r===null?' selected':'')+'>—</option>';
+      for(var nn=1;nn<=n;nn++)opts+='<option value="'+nn+'"'+(r===nn?' selected':'')+'>'+nn+'位</option>';
+      opts+='<option value="dnp"'+(r==='dnp'?' selected':'')+'>不参加</option>';
+      rankHtml+='<div class="edit-rank-row"><span class="epname">'+getName(pi)+'</span><select class="edit-rank-select" onchange="editRank('+s.id+','+gi+','+pi+',this.value)">'+opts+'</select><span class="edit-pt-preview '+ptCls+'" id="epp-'+s.id+'-'+gi+'-'+pi+'">'+ptStr+'</span></div>';
+    }
+    return'<div class="edit-game-block"><div class="edit-game-header"><span class="edit-game-num">GAME '+(gi+1)+'</span><button class="edit-pts-toggle'+(hasCustom?' active':'')+'" onclick="editToggleCustomPts('+s.id+','+gi+')">'+(hasCustom?'⚙ カスタム配点中':'⚙ 配点設定')+'</button></div><div class="edit-pts-area'+(hasCustom?' open':'')+'" id="epa-'+s.id+'-'+gi+'"><div class="edit-pts-grid">'+ptsHtml+'</div></div><div class="edit-rank-rows">'+rankHtml+'</div></div>';
+  }).join('');
+  return'<div class="hist-edit"><div class="edit-section-label">プレイヤー名</div><div class="edit-names-grid">'+namesHtml+'</div><div class="edit-section-label">ゲーム結果</div>'+gamesHtml+'<button class="edit-save-btn" onclick="commitEdit('+s.id+')">✅ 変更を保存</button></div>';
 }
 
-window.editSlot=function(id,i,val){const s=getSessions().find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);draft.names[i]=val}
-window.editRank=function(id,gi,pi,val){
-  const s=getSessions().find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);
+function editSlot(id,i,val){var s=getSessions().find(function(x){return x.id===id;});if(!s)return;var draft=getEditDraft(s);draft.names[i]=val;}
+function editRank(id,gi,pi,val){
+  var s=getSessions().find(function(x){return x.id===id;});if(!s)return;var draft=getEditDraft(s);
   if(val==='dnp')draft.games[gi].ranks[pi]='dnp';else draft.games[gi].ranks[pi]=val?parseInt(val):null;
-  const pts=draft.games[gi].customPoints||defaultPtsForCount(s.playerCount),r=draft.games[gi].ranks[pi];
-  let ptCls,ptStr;
-  if(r==='dnp'){ptCls='pt-zero';ptStr='不参加'}else if(r===null){ptCls='';ptStr='—'}else{const ptVal=pts[r-1];ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=ptVal>0?`+${ptVal}`:`${ptVal}`}
-  const el=document.getElementById(`epp-${id}-${gi}-${pi}`);if(el){el.className=`edit-pt-preview ${ptCls}`;el.textContent=ptStr}
+  var pts=draft.games[gi].customPoints||defaultPtsForCount(s.playerCount),r=draft.games[gi].ranks[pi];
+  var ptCls,ptStr;
+  if(r==='dnp'){ptCls='pt-zero';ptStr='不参加';}else if(r===null){ptCls='';ptStr='—';}else{var ptVal=pts[r-1];ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=ptVal>0?'+'+ptVal:''+ptVal;}
+  var el=document.getElementById('epp-'+id+'-'+gi+'-'+pi);if(el){el.className='edit-pt-preview '+ptCls;el.textContent=ptStr;}
 }
-window.editToggleCustomPts=function(id,gi){
-  const s=getSessions().find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);
-  draft.games[gi].customPoints=draft.games[gi].customPoints?null:[...defaultPtsForCount(s.playerCount)];renderHistory();
+function editToggleCustomPts(id,gi){
+  var s=getSessions().find(function(x){return x.id===id;});if(!s)return;var draft=getEditDraft(s);
+  draft.games[gi].customPoints=draft.games[gi].customPoints?null:defaultPtsForCount(s.playerCount).slice();renderHistory();
 }
-window.editGamePt=function(id,gi,ri,val){const s=getSessions().find(x=>x.id===id);if(!s)return;const draft=getEditDraft(s);if(draft.games[gi].customPoints)draft.games[gi].customPoints[ri]=parseInt(val)||0}
-window.commitEdit=async function(id){
-  const s=getSessions().find(x=>x.id===id);if(!s||!editStates[id]||!editStates[id].draft)return;
-  const draft=editStates[id].draft;
-  document.querySelectorAll(`#hsess-${id} .edit-slot-select`).forEach((sel,i)=>{draft.names[i]=sel.value});
-  const d=JSON.parse(JSON.stringify(cachedData));
-  const idx=d.sessions.findIndex(x=>x.id===id);if(idx===-1)return;
-  d.sessions[idx].names=[...draft.names];
-  d.sessions[idx].games=draft.games.map(g=>({ranks:[...g.ranks],customPoints:g.customPoints?[...g.customPoints]:null}));
-  const n=d.sessions[idx].playerCount,totals=Array(n).fill(0);
-  d.sessions[idx].games.forEach((g,gi)=>{const pts=g.customPoints||defaultPtsForCount(n);g.ranks.forEach((r,pi)=>{if(r!==null&&r!=='dnp')totals[pi]+=pts[r-1]??0})});
+function editGamePt(id,gi,ri,val){var s=getSessions().find(function(x){return x.id===id;});if(!s)return;var draft=getEditDraft(s);if(draft.games[gi].customPoints)draft.games[gi].customPoints[ri]=parseInt(val)||0;}
+function commitEdit(id){
+  var s=getSessions().find(function(x){return x.id===id;});if(!s||!editStates[id]||!editStates[id].draft)return;
+  var draft=editStates[id].draft;
+  document.querySelectorAll('#hsess-'+id+' .edit-slot-select').forEach(function(sel,i){draft.names[i]=sel.value;});
+  var d=JSON.parse(JSON.stringify(cachedData)),idx=d.sessions.findIndex(function(x){return x.id===id;});if(idx===-1)return;
+  d.sessions[idx].names=draft.names.slice();
+  d.sessions[idx].games=draft.games.map(function(g){return{ranks:g.ranks.slice(),customPoints:g.customPoints?g.customPoints.slice():null};});
+  var n=d.sessions[idx].playerCount,totals=Array(n).fill(0);
+  d.sessions[idx].games.forEach(function(g){var pts=g.customPoints||defaultPtsForCount(n);g.ranks.forEach(function(r,pi){if(r!==null&&r!=='dnp')totals[pi]+=(pts[r-1]||0);});});
   d.sessions[idx].totals=totals;
-  await saveData(d);
-  delete editStates[id].draft;editStates[id].editMode=false;renderHistory();showToast('✅ 更新しました！');
+  saveData(d,function(){delete editStates[id].draft;editStates[id].editMode=false;renderHistory();showToast('✅ 更新しました！');});
 }
 
-window.resetAll=function(){if(games.length===0)return;if(!confirm('現在の入力をリセットしますか？\n（保存済み履歴は消えません）'))return;games=[];renderGames();renderTotals()}
+function resetAll(){if(games.length===0)return;if(!confirm('現在の入力をリセットしますか？\n（保存済み履歴は消えません）'))return;games=[];renderGames();renderTotals();}
 
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
 
 // 初期化
-loadData().then(()=>{
-  renderRoster();
-  setCount(4);
-  renderGames();
-  renderTotals();
-});
+loadData(function(){renderRoster();setCount(4);renderGames();renderTotals();});
 </script>
 </body>
 </html>
