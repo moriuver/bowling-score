@@ -5,7 +5,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>🎳 STRIKE ZONE — ボウリング スコア</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<!-- preconnect for faster font loading -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Load fonts async so they never block rendering -->
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap"></noscript>
 <style>
 :root{
   --bg:#03030a;
@@ -23,6 +28,11 @@
 }
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+/* Font fallback definitions — these kick in if Google Fonts fails to load */
+/* Bebas Neue -> Impact (condensed display font, all systems) */
+/* Orbitron -> Courier New (monospace techy feel) */
+/* Noto Sans JP -> Hiragino Sans / Yu Gothic (iOS/macOS Japanese) */
 
 /* SCANLINES */
 body::before{
@@ -42,7 +52,7 @@ pointer-events:none;z-index:0;
 
 body{
 background:var(–bg);color:var(–text);
-font-family:‘Noto Sans JP’,sans-serif;
+font-family:‘Noto Sans JP’,‘Hiragino Sans’,‘Hiragino Kaku Gothic ProN’,‘Yu Gothic UI’,‘Meiryo’,sans-serif;
 min-height:100vh;padding-bottom:80px;
 }
 
@@ -57,7 +67,7 @@ box-shadow:0 0 30px rgba(255,238,0,0.1),0 2px 0 rgba(255,238,0,0.3);
 }
 
 header h1{
-font-family:‘Bebas Neue’,cursive;
+font-family:‘Bebas Neue’,Impact,‘Arial Narrow’,Arial,sans-serif;
 font-size:1.9rem;letter-spacing:4px;
 color:var(–accent);
 text-shadow:0 0 10px var(–accent),0 0 30px rgba(255,238,0,0.5);
@@ -70,7 +80,7 @@ animation:flickerH 9s infinite;
 background:rgba(255,0,128,0.2);
 border:1px solid rgba(255,0,128,0.5);
 color:var(–accent2);
-font-family:‘Orbitron’,monospace;
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;
 font-size:.62rem;font-weight:700;
 padding:4px 10px;border-radius:3px;
 letter-spacing:2px;
@@ -79,7 +89,7 @@ box-shadow:0 0 10px rgba(255,0,128,0.2);
 }
 
 .sync-status{
-font-family:‘Orbitron’,monospace;
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;
 font-size:.58rem;font-weight:700;
 padding:3px 8px;border-radius:3px;letter-spacing:1px;
 }
@@ -98,7 +108,7 @@ position:sticky;top:58px;z-index:190;
 
 .tab{
 flex:1;padding:11px 2px;text-align:center;
-font-family:‘Orbitron’,monospace;
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;
 font-size:.58rem;font-weight:700;letter-spacing:1px;
 color:var(–text-dim);cursor:pointer;
 border-bottom:2px solid transparent;
@@ -117,7 +127,7 @@ background:rgba(255,238,0,0.03);
 /* ===== SECTION LABELS ===== */
 .section{margin:14px 14px 0}
 .section-label{
-font-family:‘Orbitron’,monospace;
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;
 font-size:.58rem;color:var(–cyan);
 text-transform:uppercase;letter-spacing:3px;margin-bottom:8px;
 text-shadow:0 0 8px var(–cyan);
@@ -142,7 +152,7 @@ width:44px;height:44px;border-radius:3px;
 background:var(–surface);
 border:1px solid rgba(255,238,0,0.3);
 color:var(–accent);
-font-family:‘Bebas Neue’,cursive;font-size:1.8rem;
+font-family:‘Bebas Neue’,Impact,‘Arial Narrow’,Arial,sans-serif;font-size:1.8rem;
 cursor:pointer;display:flex;align-items:center;justify-content:center;
 transition:all .15s;line-height:1;
 box-shadow:0 0 8px rgba(255,238,0,0.1);
@@ -151,7 +161,7 @@ box-shadow:0 0 8px rgba(255,238,0,0.1);
 .step-btn:disabled{color:#2a2a3a;border-color:#1a1a2e;box-shadow:none;cursor:not-allowed;}
 
 .step-display{
-font-family:‘Bebas Neue’,cursive;font-size:2.2rem;
+font-family:‘Bebas Neue’,Impact,‘Arial Narrow’,Arial,sans-serif;font-size:2.2rem;
 color:var(–accent);letter-spacing:3px;
 min-width:80px;text-align:center;
 text-shadow:0 0 15px var(–accent);
@@ -179,7 +189,7 @@ transition:all .15s;
 .roster-input{
 flex:1;background:var(–card);border:1px solid var(–border);
 border-radius:4px;padding:10px 12px;
-color:var(–text);font-family:‘Noto Sans JP’,sans-serif;
+color:var(–text);font-family:‘Noto Sans JP’,‘Hiragino Sans’,‘Yu Gothic UI’,‘Meiryo’,sans-serif;
 font-size:.88rem;font-weight:700;outline:none;
 transition:border-color .15s;
 }
@@ -189,7 +199,7 @@ transition:border-color .15s;
 .roster-add-btn{
 background:rgba(255,238,0,0.15);border:1px solid rgba(255,238,0,0.5);
 border-radius:4px;padding:10px 16px;
-color:var(–accent);font-family:‘Orbitron’,monospace;
+color:var(–accent);font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;
 font-size:.72rem;font-weight:700;letter-spacing:1px;
 cursor:pointer;white-space:nowrap;
 text-shadow:0 0 8px var(–accent);
@@ -205,7 +215,7 @@ transition:all .15s;
 width:100%;background:var(–card);
 border:1px solid rgba(0,245,255,0.2);
 border-radius:4px;padding:10px 32px 10px 12px;
-color:var(–text);font-family:‘Noto Sans JP’,sans-serif;
+color:var(–text);font-family:‘Noto Sans JP’,‘Hiragino Sans’,‘Yu Gothic UI’,‘Meiryo’,sans-serif;
 font-size:.88rem;font-weight:700;
 outline:none;cursor:pointer;-webkit-appearance:none;
 transition:border-color .15s;
@@ -254,10 +264,10 @@ border-color:rgba(205,127,50,0.3);
 .total-pill .pill-medal{font-size:.85rem;}
 .total-pill .pill-name{font-size:.72rem;font-weight:700;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .total-pill .pill-score{
-font-family:‘Bebas Neue’,cursive;font-size:1.1rem;
+font-family:‘Bebas Neue’,Impact,‘Arial Narrow’,Arial,sans-serif;font-size:1.1rem;
 letter-spacing:.5px;line-height:1;
 }
-.total-empty{color:#333;font-size:.72rem;padding:6px 14px;text-align:center;width:100%;font-family:‘Orbitron’,monospace;letter-spacing:2px;}
+.total-empty{color:#333;font-size:.72rem;padding:6px 14px;text-align:center;width:100%;font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;letter-spacing:2px;}
 
 /* ===== POINT COLORS ===== */
 .pt-pos{color:var(–green);text-shadow:0 0 8px rgba(57,255,20,0.6);}
@@ -268,7 +278,7 @@ letter-spacing:.5px;line-height:1;
 .game-section{margin:14px 14px 0;}
 .game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .game-title{
-font-family:‘Bebas Neue’,cursive;font-size:1.4rem;
+font-family:‘Bebas Neue’,Impact,‘Arial Narrow’,Arial,sans-serif;font-size:1.4rem;
 color:var(–accent);letter-spacing:4px;
 text-shadow:0 0 10px var(–accent);
 }
@@ -276,7 +286,7 @@ text-shadow:0 0 10px var(–accent);
 background:rgba(255,238,0,0.12);
 border:1px solid rgba(255,238,0,0.5);
 border-radius:3px;padding:7px 16px;
-color:var(–accent);font-family:‘Orbitron’,monospace;
+color:var(–accent);font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;
 font-size:.68rem;font-weight:700;letter-spacing:2px;
 cursor:pointer;
 text-shadow:0 0 8px var(–accent);
@@ -301,7 +311,7 @@ background:rgba(191,0,255,0.06);
 border-bottom:1px solid rgba(191,0,255,0.15);
 }
 .game-num{
-font-family:‘Orbitron’,monospace;font-size:.78rem;font-weight:700;
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;font-size:.78rem;font-weight:700;
 color:var(–purple);letter-spacing:3px;
 text-shadow:0 0 8px var(–purple);
 }
@@ -310,7 +320,7 @@ text-shadow:0 0 8px var(–purple);
 .pts-toggle-btn{
 background:none;border:1px solid var(–border);
 border-radius:3px;color:var(–text-dim);
-font-family:‘Orbitron’,monospace;font-size:.58rem;font-weight:700;
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;font-size:.58rem;font-weight:700;
 padding:3px 8px;cursor:pointer;letter-spacing:1px;
 transition:all .15s;
 }
@@ -331,12 +341,12 @@ background:rgba(255,238,0,0.02);display:none;
 .game-pts-grid{display:flex;flex-wrap:wrap;gap:8px;}
 .game-pts-item{display:flex;align-items:center;gap:5px;}
 .game-pts-item label{
-font-family:‘Orbitron’,monospace;font-size:.6rem;color:var(–text-dim);min-width:22px;
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;font-size:.6rem;color:var(–text-dim);min-width:22px;
 }
 .game-pts-input{
 background:var(–surface);border:1px solid var(–border);
 border-radius:3px;color:var(–text);
-font-family:‘Bebas Neue’,cursive;font-size:1rem;
+font-family:‘Bebas Neue’,Impact,‘Arial Narrow’,Arial,sans-serif;font-size:1rem;
 padding:5px 8px;width:62px;outline:none;text-align:center;
 transition:border-color .15s;
 }
@@ -351,7 +361,7 @@ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 .rank-select{
 background:var(–surface);border:1px solid var(–border);
 border-radius:3px;color:var(–text);
-font-family:‘Noto Sans JP’,sans-serif;font-size:.83rem;font-weight:700;
+font-family:‘Noto Sans JP’,‘Hiragino Sans’,‘Yu Gothic UI’,‘Meiryo’,sans-serif;font-size:.83rem;font-weight:700;
 padding:7px 8px;outline:none;width:80px;cursor:pointer;
 -webkit-appearance:none;text-align:center;transition:border-color .15s;
 }
@@ -359,11 +369,11 @@ padding:7px 8px;outline:none;width:80px;cursor:pointer;
 
 .pt-preview{
 min-width:46px;text-align:right;
-font-family:‘Bebas Neue’,cursive;font-size:1.15rem;letter-spacing:1px;
+font-family:‘Bebas Neue’,Impact,‘Arial Narrow’,Arial,sans-serif;font-size:1.15rem;letter-spacing:1px;
 }
 
 .dup-warn{
-font-family:‘Orbitron’,monospace;font-size:.65rem;
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;font-size:.65rem;
 color:var(–accent2);padding:0 14px 10px;letter-spacing:1px;
 text-shadow:0 0 8px var(–accent2);
 }
@@ -386,12 +396,12 @@ box-shadow:0 0 20px rgba(255,0,128,0.06);
 .balance-left{display:flex;align-items:center;gap:10px;}
 .balance-icon{font-size:1.4rem;}
 .balance-title{
-font-family:‘Orbitron’,monospace;font-size:.72rem;font-weight:700;
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;font-size:.72rem;font-weight:700;
 margin-bottom:2px;letter-spacing:1px;
 }
 .balance-sub{font-size:.65rem;color:var(–text-dim);}
 .balance-num{
-font-family:‘Bebas Neue’,cursive;font-size:1.65rem;letter-spacing:2px;
+font-family:‘Bebas Neue’,Impact,‘Arial Narrow’,Arial,sans-serif;font-size:1.65rem;letter-spacing:2px;
 }
 .balance-card.ok .balance-num{color:var(–green);text-shadow:0 0 12px rgba(57,255,20,0.5);}
 .balance-card.ng .balance-num{color:var(–accent2);text-shadow:0 0 12px rgba(255,0,128,0.5);}
@@ -403,7 +413,7 @@ flex:2;padding:14px;
 background:rgba(255,238,0,0.15);
 border:1px solid rgba(255,238,0,0.6);
 border-radius:4px;
-color:var(–accent);font-family:‘Orbitron’,monospace;
+color:var(–accent);font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;
 font-size:.78rem;font-weight:700;letter-spacing:2px;
 cursor:pointer;
 text-shadow:0 0 8px var(–accent);
@@ -416,7 +426,7 @@ transition:all .15s;
 flex:1;padding:14px;
 background:none;border:1px solid #252530;
 border-radius:4px;color:#444;
-font-family:‘Orbitron’,monospace;font-size:.75rem;
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;font-size:.75rem;
 cursor:pointer;transition:all .15s;
 }
 .reset-btn:active{border-color:var(–accent2);color:var(–accent2);}
@@ -440,16 +450,16 @@ transition:background .2s;
 .stats-name{font-size:.92rem;font-weight:700;}
 .stats-right{text-align:right;}
 .stats-total{
-font-family:‘Bebas Neue’,cursive;font-size:1.7rem;letter-spacing:1px;
+font-family:‘Bebas Neue’,Impact,‘Arial Narrow’,Arial,sans-serif;font-size:1.7rem;letter-spacing:1px;
 }
 .stats-sub{font-size:.62rem;color:var(–text-dim);margin-top:1px;}
-.stats-empty{padding:30px 16px;text-align:center;color:#444;font-size:.82rem;font-family:‘Orbitron’,monospace;letter-spacing:2px;}
+.stats-empty{padding:30px 16px;text-align:center;color:#444;font-size:.82rem;font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;letter-spacing:2px;}
 
 /* ===== HISTORY ===== */
 .hist-empty{
 text-align:center;padding:50px 20px;
 color:#444;font-size:.82rem;line-height:2.5;
-font-family:‘Orbitron’,monospace;letter-spacing:2px;
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;letter-spacing:2px;
 }
 .hist-session{
 background:var(–card);border:1px solid rgba(0,245,255,0.15);
@@ -466,7 +476,7 @@ background:rgba(0,245,255,0.04);border-bottom:1px solid rgba(0,245,255,0.1);
 .hist-session-info{flex:1;padding:12px 14px;cursor:pointer;min-width:0;}
 .hist-chevron{font-size:.65rem;color:var(–cyan);margin-left:6px;text-shadow:0 0 6px var(–cyan);}
 .hist-date{
-font-family:‘Bebas Neue’,cursive;font-size:1.15rem;
+font-family:‘Bebas Neue’,Impact,‘Arial Narrow’,Arial,sans-serif;font-size:1.15rem;
 color:var(–cyan);letter-spacing:3px;
 text-shadow:0 0 10px rgba(0,245,255,0.5);
 }
@@ -494,9 +504,9 @@ transition:all .15s;min-width:44px;min-height:40px;
 .hist-rank-left{display:flex;align-items:center;gap:8px;}
 .hist-rank-medal{font-size:1.1rem;min-width:22px;}
 .hist-rank-name{font-size:.85rem;font-weight:700;}
-.hist-rank-score{font-family:‘Bebas Neue’,cursive;font-size:1.35rem;letter-spacing:1px;}
+.hist-rank-score{font-family:‘Bebas Neue’,Impact,‘Arial Narrow’,Arial,sans-serif;font-size:1.35rem;letter-spacing:1px;}
 .hist-games-label{
-font-family:‘Orbitron’,monospace;font-size:.58rem;color:var(–text-dim);
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;font-size:.58rem;color:var(–text-dim);
 text-transform:uppercase;letter-spacing:2px;margin:8px 0 6px;
 }
 .hist-game-item{
@@ -504,17 +514,17 @@ border:1px solid var(–border);border-radius:4px;
 padding:8px 10px;margin-bottom:6px;font-size:.75rem;
 }
 .hist-game-title{
-font-family:‘Bebas Neue’,cursive;font-size:.88rem;
+font-family:‘Bebas Neue’,Impact,‘Arial Narrow’,Arial,sans-serif;font-size:.88rem;
 color:var(–text-dim);letter-spacing:2px;margin-bottom:5px;
 }
 .hist-game-rows{display:flex;flex-direction:column;gap:3px;}
 .hist-game-prow{display:flex;align-items:center;justify-content:space-between;color:#666;}
 .hist-game-prow .hgp-name{font-weight:700;color:var(–text);font-size:.78rem;}
 .hist-game-prow .hgp-rank{color:#555;font-size:.72rem;}
-.hist-game-prow .hgp-pt{font-family:‘Bebas Neue’,cursive;font-size:.95rem;}
+.hist-game-prow .hgp-pt{font-family:‘Bebas Neue’,Impact,‘Arial Narrow’,Arial,sans-serif;font-size:.95rem;}
 .hist-edit{padding:12px 16px;}
 .edit-section-label{
-font-family:‘Orbitron’,monospace;font-size:.58rem;
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;font-size:.58rem;
 color:var(–accent);text-transform:uppercase;
 letter-spacing:3px;margin-bottom:8px;
 text-shadow:0 0 8px var(–accent);
@@ -525,7 +535,7 @@ text-shadow:0 0 8px var(–accent);
 width:100%;background:var(–surface);
 border:1px solid var(–border);
 border-radius:3px;padding:8px 28px 8px 10px;
-color:var(–text);font-family:‘Noto Sans JP’,sans-serif;
+color:var(–text);font-family:‘Noto Sans JP’,‘Hiragino Sans’,‘Yu Gothic UI’,‘Meiryo’,sans-serif;
 font-size:.82rem;font-weight:700;outline:none;cursor:pointer;
 -webkit-appearance:none;transition:border-color .15s;
 }
@@ -538,12 +548,12 @@ padding:7px 12px;background:rgba(255,255,255,.02);
 border-bottom:1px solid var(–border);
 }
 .edit-game-num{
-font-family:‘Orbitron’,monospace;font-size:.75rem;
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;font-size:.75rem;
 color:var(–text-dim);letter-spacing:2px;
 }
 .edit-pts-toggle{
 background:none;border:1px solid var(–border);border-radius:3px;
-color:#555;font-family:‘Orbitron’,monospace;font-size:.58rem;font-weight:700;
+color:#555;font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;font-size:.58rem;font-weight:700;
 padding:2px 7px;cursor:pointer;transition:all .15s;letter-spacing:1px;
 }
 .edit-pts-toggle.active{border-color:var(–accent);color:var(–accent);}
@@ -554,11 +564,11 @@ background:rgba(255,238,0,0.02);display:none;
 .edit-pts-area.open{display:block;}
 .edit-pts-grid{display:flex;flex-wrap:wrap;gap:6px;}
 .edit-pts-item{display:flex;align-items:center;gap:4px;}
-.edit-pts-item label{font-family:‘Orbitron’,monospace;font-size:.6rem;color:#555;min-width:20px;}
+.edit-pts-item label{font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;font-size:.6rem;color:#555;min-width:20px;}
 .edit-pts-input{
 background:var(–bg);border:1px solid var(–border);
 border-radius:3px;color:var(–text);
-font-family:‘Bebas Neue’,cursive;font-size:.95rem;
+font-family:‘Bebas Neue’,Impact,‘Arial Narrow’,Arial,sans-serif;font-size:.95rem;
 padding:4px 6px;width:55px;outline:none;text-align:center;
 transition:border-color .15s;
 }
@@ -569,18 +579,18 @@ transition:border-color .15s;
 .edit-rank-select{
 background:var(–bg);border:1px solid var(–border);
 border-radius:3px;color:var(–text);
-font-family:‘Noto Sans JP’,sans-serif;font-size:.78rem;font-weight:700;
+font-family:‘Noto Sans JP’,‘Hiragino Sans’,‘Yu Gothic UI’,‘Meiryo’,sans-serif;font-size:.78rem;font-weight:700;
 padding:5px 6px;outline:none;width:72px;cursor:pointer;
 -webkit-appearance:none;text-align:center;transition:border-color .15s;
 }
 .edit-rank-select:focus{border-color:var(–accent);}
-.edit-pt-preview{min-width:38px;text-align:right;font-family:‘Bebas Neue’,cursive;font-size:1rem;}
+.edit-pt-preview{min-width:38px;text-align:right;font-family:‘Bebas Neue’,Impact,‘Arial Narrow’,Arial,sans-serif;font-size:1rem;}
 .edit-save-btn{
 width:100%;padding:12px;
 background:rgba(255,238,0,0.15);
 border:1px solid rgba(255,238,0,0.5);
 border-radius:4px;color:var(–accent);
-font-family:‘Orbitron’,monospace;font-size:.78rem;font-weight:700;letter-spacing:2px;
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;font-size:.78rem;font-weight:700;letter-spacing:2px;
 cursor:pointer;margin-top:10px;
 text-shadow:0 0 8px var(–accent);
 transition:all .15s;
@@ -592,7 +602,7 @@ transition:all .15s;
 position:fixed;bottom:28px;left:50%;
 transform:translateX(-50%) translateY(16px);
 background:var(–green);color:#030a03;
-font-family:‘Orbitron’,monospace;font-weight:700;font-size:.75rem;
+font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;font-weight:700;font-size:.75rem;
 padding:10px 22px;border-radius:3px;letter-spacing:2px;
 opacity:0;transition:all .28s;pointer-events:none;z-index:999;white-space:nowrap;
 box-shadow:0 0 20px rgba(57,255,20,0.5);
@@ -609,20 +619,20 @@ border:1px solid rgba(255,0,128,0.4);
 border-radius:6px;padding:24px 22px 18px;max-width:320px;width:100%;
 box-shadow:0 0 40px rgba(255,0,128,0.15);
 }
-.confirm-title{font-family:‘Orbitron’,monospace;font-size:.88rem;font-weight:700;color:var(–text);margin-bottom:6px;line-height:1.5;letter-spacing:1px;}
+.confirm-title{font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;font-size:.88rem;font-weight:700;color:var(–text);margin-bottom:6px;line-height:1.5;letter-spacing:1px;}
 .confirm-sub{font-size:.75rem;color:#666;margin-bottom:20px;line-height:1.6;}
 .confirm-actions{display:flex;gap:10px;}
 .confirm-cancel{
 flex:1;padding:11px;background:var(–card);
 border:1px solid var(–border);border-radius:4px;
-color:#666;font-family:‘Orbitron’,monospace;
+color:#666;font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;
 font-size:.75rem;font-weight:700;cursor:pointer;letter-spacing:1px;
 }
 .confirm-ok{
 flex:1;padding:11px;
 background:rgba(255,0,128,0.2);
 border:1px solid var(–accent2);border-radius:4px;
-color:var(–accent2);font-family:‘Orbitron’,monospace;
+color:var(–accent2);font-family:‘Orbitron’,‘Courier New’,‘Lucida Console’,monospace;
 font-size:.75rem;font-weight:700;cursor:pointer;letter-spacing:1px;
 text-shadow:0 0 8px var(–accent2);
 box-shadow:0 0 15px rgba(255,0,128,0.15);
@@ -674,7 +684,7 @@ box-shadow:0 0 15px rgba(255,0,128,0.15);
 <div class="panel" id="panel-stats">
   <div class="section" style="margin-bottom:4px;"><div class="section-label">全履歴 通算ランキング</div></div>
   <div class="stats-card" id="statsCard"></div>
-  <div style="margin:10px 14px 0;font-family:'Orbitron',monospace;font-size:.58rem;color:#444;letter-spacing:1px;">※ 保存済みの全履歴から集計</div>
+  <div style="margin:10px 14px 0;font-family:'Orbitron','Courier New','Lucida Console',monospace;font-size:.58rem;color:#444;letter-spacing:1px;">※ 保存済みの全履歴から集計</div>
 </div>
 <div class="panel" id="panel-history"><div id="historyContainer"></div></div>
 <div class="panel" id="panel-users">
@@ -689,7 +699,7 @@ box-shadow:0 0 15px rgba(255,0,128,0.15);
       <button class="roster-add-btn" onclick="addRosterUser()">＋ 追加</button>
     </div>
   </div>
-  <div style="margin:12px 14px 0;font-family:'Orbitron',monospace;font-size:.6rem;color:#333;line-height:2;letter-spacing:1px;">
+  <div style="margin:12px 14px 0;font-family:'Orbitron','Courier New','Lucida Console',monospace;font-size:.6rem;color:#333;line-height:2;letter-spacing:1px;">
     💡 ここで登録したユーザーは記録・履歴の編集時にプルダウンから選べます<br>
     💡 ユーザーを削除しても過去の履歴は残ります
   </div>
@@ -808,7 +818,7 @@ function switchTab(tab){
 
 function renderRoster(){
   var roster=getRoster(),list=document.getElementById('rosterList');
-  if(roster.length===0){list.innerHTML='<div style="font-family:\'Orbitron\',monospace;font-size:.68rem;color:#333;padding:4px 0;letter-spacing:2px;">まだユーザーがいません</div>';return;}
+  if(roster.length===0){list.innerHTML='<div style="font-family:\'Orbitron\',\'Courier New\',monospace;font-size:.68rem;color:#333;padding:4px 0;letter-spacing:2px;">まだユーザーがいません</div>';return;}
   list.innerHTML=roster.map(function(name){
     return '<div class="roster-row"><span class="rname">'+name+'</span><button class="roster-del" onclick="deleteRosterUser(\''+name.replace(/'/g,"\\'")+'\')">\u2715</button></div>';
   }).join('');
