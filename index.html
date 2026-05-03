@@ -3,6 +3,8 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta name="color-scheme" content="dark">
+<style>html{background:#03030a;}</style>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>🎳 STRIKE ZONE — ボウリング スコア</title>
 <!-- preconnect for faster font loading -->
@@ -51,9 +53,17 @@ pointer-events:none;z-index:0;
 }
 
 body{
-background:var(–bg);color:var(–text);
+background:#03030a !important;
+background-color:#03030a !important;
+color:#f0ede8 !important;
 font-family:‘Noto Sans JP’,‘Hiragino Sans’,‘Hiragino Kaku Gothic ProN’,‘Yu Gothic UI’,‘Meiryo’,sans-serif;
 min-height:100vh;padding-bottom:80px;
+}
+/* Force dark theme on all major containers */
+.panel,.section,.game-section,.balance-section,.action-row,
+.count-stepper,.game-card,.roster-row,.stats-card,.hist-session,
+.total-pill,.balance-card,.confirm-box{
+color:#f0ede8;
 }
 
 /* ===== HEADER ===== */
