@@ -1,189 +1,640 @@
 <!DOCTYPE html>
+
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>🎳 ボウリング スコア</title>
+<title>🎳 STRIKE ZONE — ボウリング スコア</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700;900&display=swap');
-:root{--bg:#0f0f14;--surface:#1a1a24;--card:#22222e;--accent:#f0c040;--accent2:#e05a2b;--green:#3ecf6e;--text:#f0ede8;--border:#2e2e3e}
+:root{
+  --bg:#03030a;
+  --surface:#08080f;
+  --card:#0d0d1a;
+  --border:#1c1c30;
+  --accent:#ffee00;
+  --accent2:#ff0080;
+  --green:#39ff14;
+  --cyan:#00f5ff;
+  --purple:#bf00ff;
+  --orange:#ff6600;
+  --text:#f0ede8;
+  --text-dim:#6a6a8a;
+}
+
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;padding-bottom:80px}
-header{background:var(--surface);border-bottom:2px solid var(--accent);padding:14px 16px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
-header h1{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;color:var(--accent)}
-.game-count{background:var(--accent2);color:#fff;font-weight:900;font-size:.7rem;padding:4px 10px;border-radius:20px;letter-spacing:1px}
-.sync-status{font-size:.65rem;padding:3px 8px;border-radius:20px;font-weight:700}
-.sync-status.ok{background:rgba(62,207,110,.15);color:var(--green)}
-.sync-status.ng{background:rgba(224,90,43,.15);color:var(--accent2)}
-.sync-status.loading{background:rgba(240,192,64,.15);color:var(--accent)}
-.tab-bar{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:58px;z-index:190}
-.tab{flex:1;padding:11px 2px;text-align:center;font-size:.7rem;font-weight:700;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* SCANLINES */
+body::before{
+content:’’;position:fixed;inset:0;
+background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px);
+pointer-events:none;z-index:9999;
+}
+/* BG GLOW */
+body::after{
+content:’’;position:fixed;inset:0;
+background:
+radial-gradient(ellipse 70% 40% at 15% 10%,rgba(255,0,128,0.07) 0%,transparent 60%),
+radial-gradient(ellipse 50% 50% at 85% 85%,rgba(0,245,255,0.06) 0%,transparent 60%),
+radial-gradient(ellipse 40% 60% at 50% 50%,rgba(191,0,255,0.04) 0%,transparent 70%);
+pointer-events:none;z-index:0;
+}
+
+body{
+background:var(–bg);color:var(–text);
+font-family:‘Noto Sans JP’,sans-serif;
+min-height:100vh;padding-bottom:80px;
+}
+
+/* ===== HEADER ===== */
+header{
+background:rgba(8,8,15,0.97);
+border-bottom:2px solid rgba(255,238,0,0.5);
+padding:12px 16px 10px;
+display:flex;align-items:center;justify-content:space-between;
+position:sticky;top:0;z-index:200;
+box-shadow:0 0 30px rgba(255,238,0,0.1),0 2px 0 rgba(255,238,0,0.3);
+}
+
+header h1{
+font-family:‘Bebas Neue’,cursive;
+font-size:1.9rem;letter-spacing:4px;
+color:var(–accent);
+text-shadow:0 0 10px var(–accent),0 0 30px rgba(255,238,0,0.5);
+animation:flickerH 9s infinite;
+}
+
+@keyframes flickerH{0%,91%,93%,100%{opacity:1}92%{opacity:.6}}
+
+.game-count{
+background:rgba(255,0,128,0.2);
+border:1px solid rgba(255,0,128,0.5);
+color:var(–accent2);
+font-family:‘Orbitron’,monospace;
+font-size:.62rem;font-weight:700;
+padding:4px 10px;border-radius:3px;
+letter-spacing:2px;
+text-shadow:0 0 8px var(–accent2);
+box-shadow:0 0 10px rgba(255,0,128,0.2);
+}
+
+.sync-status{
+font-family:‘Orbitron’,monospace;
+font-size:.58rem;font-weight:700;
+padding:3px 8px;border-radius:3px;letter-spacing:1px;
+}
+.sync-status.ok{background:rgba(57,255,20,.12);color:var(–green);border:1px solid rgba(57,255,20,.4);text-shadow:0 0 6px var(–green);}
+.sync-status.ng{background:rgba(255,0,128,.12);color:var(–accent2);border:1px solid rgba(255,0,128,.4);text-shadow:0 0 6px var(–accent2);}
+.sync-status.loading{background:rgba(255,238,0,.1);color:var(–accent);border:1px solid rgba(255,238,0,.3);animation:syncPulse 1.2s ease-in-out infinite;}
+@keyframes syncPulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ===== TABS ===== */
+.tab-bar{
+display:flex;
+background:rgba(8,8,15,0.98);
+border-bottom:1px solid var(–border);
+position:sticky;top:58px;z-index:190;
+}
+
+.tab{
+flex:1;padding:11px 2px;text-align:center;
+font-family:‘Orbitron’,monospace;
+font-size:.58rem;font-weight:700;letter-spacing:1px;
+color:var(–text-dim);cursor:pointer;
+border-bottom:2px solid transparent;
+transition:all .15s;
+}
+.tab.active{
+color:var(–accent);
+border-bottom-color:var(–accent);
+text-shadow:0 0 8px var(–accent);
+background:rgba(255,238,0,0.03);
+}
+.tab:hover:not(.active){color:rgba(255,255,255,0.5);}
+
 .panel{display:none}.panel.active{display:block}
+
+/* ===== SECTION LABELS ===== */
 .section{margin:14px 14px 0}
-.section-label{font-size:.63rem;color:#777;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
-.pt-pos{color:var(--green)}.pt-neg{color:var(--accent2)}.pt-zero{color:#555}
-.count-stepper{display:flex;align-items:center;justify-content:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px}
-.step-btn{width:42px;height:42px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--accent);font-family:'Bebas Neue',sans-serif;font-size:1.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1}
-.step-btn:active{background:var(--accent);color:var(--bg)}
-.step-btn:disabled{color:#444;cursor:not-allowed}
-.step-display{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--accent);letter-spacing:2px;min-width:80px;text-align:center}
-.step-display .unit{font-size:1rem;color:#888;margin-left:4px}
-.roster-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
-.roster-row{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 12px}
-.roster-row .rname{flex:1;font-size:.88rem;font-weight:700}
-.roster-del{background:none;border:none;color:#444;font-size:.95rem;cursor:pointer;padding:2px 6px;transition:color .15s}
-.roster-del:active{color:var(--accent2)}
-.roster-add-row{display:flex;gap:8px}
-.roster-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.88rem;font-weight:700;outline:none;transition:border-color .15s}
-.roster-input:focus{border-color:var(--accent)}
-.roster-input::placeholder{color:#444;font-weight:400}
-.roster-add-btn{background:var(--accent);color:var(--bg);border:none;border-radius:10px;padding:10px 16px;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer;white-space:nowrap;transition:opacity .15s}
-.roster-add-btn:active{opacity:.7}
-.name-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.slot-wrap{position:relative}
-.slot-select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 32px 10px 12px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.88rem;font-weight:700;outline:none;cursor:pointer;-webkit-appearance:none;transition:border-color .15s}
-.slot-select:focus{border-color:var(--accent)}
-.slot-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:.7rem;color:#666;pointer-events:none}
-.game-section{margin:14px 14px 0}
-.game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.game-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--accent);letter-spacing:2px}
-.add-game-btn{background:var(--accent);color:var(--bg);border:none;border-radius:20px;padding:7px 14px;font-family:'Noto Sans JP',sans-serif;font-size:.78rem;font-weight:900;cursor:pointer;transition:opacity .15s}
-.add-game-btn:active{opacity:.7}
-.game-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
-.game-card-header{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,.025);border-bottom:1px solid var(--border)}
-.game-num{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:#777;letter-spacing:2px}
-.game-card-actions{display:flex;gap:6px;align-items:center}
-.pts-toggle-btn{background:none;border:1px solid var(--border);border-radius:6px;color:#666;font-size:.65rem;font-weight:700;padding:3px 8px;cursor:pointer;transition:all .15s}
-.pts-toggle-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(240,192,64,.07)}
-.del-btn{background:none;border:none;color:#555;font-size:1rem;cursor:pointer;padding:2px 6px;border-radius:6px;transition:color .15s}
-.del-btn:active{color:var(--accent2)}
-.game-pts-area{padding:10px 14px;border-bottom:1px solid var(--border);background:rgba(240,192,64,.03);display:none}
-.game-pts-area.open{display:block}
-.game-pts-grid{display:flex;flex-wrap:wrap;gap:8px}
-.game-pts-item{display:flex;align-items:center;gap:5px}
-.game-pts-item label{font-size:.7rem;color:#888;min-width:22px}
-.game-pts-input{background:var(--surface);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1rem;padding:5px 8px;width:62px;outline:none;text-align:center;transition:border-color .15s}
-.game-pts-input:focus{border-color:var(--accent)}
-.rank-inputs{padding:10px 14px 12px;display:flex;flex-direction:column;gap:8px}
-.rank-row{display:flex;align-items:center;gap:10px}
-.rank-row .pname{flex:1;font-size:.85rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rank-select{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.83rem;font-weight:700;padding:7px 8px;outline:none;width:80px;cursor:pointer;transition:border-color .15s;-webkit-appearance:none;text-align:center}
-.rank-select:focus{border-color:var(--accent)}
-.pt-preview{min-width:42px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px}
-.dup-warn{font-size:.7rem;color:var(--accent2);padding:0 14px 10px}
-#panel-record .total-sticky{position:sticky;top:94px;z-index:50;background:var(--bg);padding:10px 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px}
-.total-sticky-inner{display:flex;gap:6px;overflow-x:auto;padding:0 14px;scrollbar-width:none}
-.total-sticky-inner::-webkit-scrollbar{display:none}
-.total-pill{flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 10px;display:flex;align-items:center;gap:6px;min-width:max-content}
-.total-pill.rank-1{background:rgba(240,192,64,.1);border-color:rgba(240,192,64,.4)}
-.total-pill.rank-2{background:rgba(176,176,192,.06);border-color:rgba(176,176,192,.3)}
-.total-pill.rank-3{background:rgba(205,127,50,.06);border-color:rgba(205,127,50,.3)}
-.total-pill .pill-medal{font-size:.85rem}
-.total-pill .pill-name{font-size:.72rem;font-weight:700;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.total-pill .pill-score{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.5px;line-height:1}
-.total-empty{color:#444;font-size:.72rem;padding:6px 14px;text-align:center;width:100%}
-.balance-section{margin:10px 14px 0}
-.balance-card{border-radius:12px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;border:1px solid}
-.balance-card.ok{background:rgba(62,207,110,.07);border-color:var(--green)}
-.balance-card.ng{background:rgba(224,90,43,.07);border-color:var(--accent2)}
-.balance-left{display:flex;align-items:center;gap:10px}
-.balance-icon{font-size:1.4rem}
-.balance-title{font-size:.78rem;font-weight:900;margin-bottom:2px}
-.balance-sub{font-size:.68rem;color:#777}
-.balance-num{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:1px}
-.balance-card.ok .balance-num{color:var(--green)}
-.balance-card.ng .balance-num{color:var(--accent2)}
-.action-row{display:flex;gap:10px;margin:14px 14px 0}
-.save-btn{flex:2;padding:14px;background:var(--accent);border:none;border-radius:12px;color:var(--bg);font-family:'Noto Sans JP',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer;transition:opacity .15s}
-.save-btn:active{opacity:.7}
-.reset-btn{flex:1;padding:14px;background:none;border:1px solid #333;border-radius:12px;color:#555;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;cursor:pointer;transition:all .15s}
-.reset-btn:active{border-color:var(--accent2);color:var(--accent2)}
-.stats-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin:14px 14px 0}
-.stats-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border)}
-.stats-row:last-child{border-bottom:none}
-.stats-row.rank-1{background:rgba(240,192,64,.07)}
-.stats-row.rank-2{background:rgba(176,176,192,.04)}
-.stats-row.rank-3{background:rgba(205,127,50,.04)}
-.stats-left{display:flex;align-items:center;gap:10px}
-.stats-medal{font-size:1.2rem;min-width:26px;text-align:center}
-.stats-name{font-size:.92rem;font-weight:900}
-.stats-right{text-align:right}
-.stats-total{font-family:'Bebas Neue',sans-serif;font-size:1.65rem;letter-spacing:1px}
-.stats-sub{font-size:.65rem;color:#777;margin-top:1px}
-.stats-empty{padding:30px 16px;text-align:center;color:#555;font-size:.82rem}
-.hist-empty{text-align:center;padding:50px 20px;color:#555;font-size:.85rem;line-height:2}
-.hist-session{background:var(--card);border:1px solid var(--border);border-radius:14px;margin:14px 14px 0;overflow:hidden}
-.hist-session-header{display:flex;align-items:center;justify-content:space-between;padding:0;background:rgba(255,255,255,.025);border-bottom:1px solid var(--border)}
-.hist-session-info{flex:1;padding:12px 14px;cursor:pointer;min-width:0}
-.hist-chevron{font-size:.7rem;color:#666;margin-left:4px}
-.hist-date{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent);letter-spacing:2px}
-.hist-meta{font-size:.7rem;color:#666;margin-top:2px}
-.hist-header-actions{display:flex;gap:6px;align-items:center;padding:8px 14px 8px 0;flex-shrink:0;position:relative;z-index:10}
-.hist-edit-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#aaa;font-size:1rem;font-weight:700;padding:8px 12px;cursor:pointer;transition:all .15s;min-width:44px;min-height:40px}
-.hist-edit-btn:active,.hist-edit-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(240,192,64,.1)}
-.hist-del-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#aaa;font-size:1rem;cursor:pointer;padding:8px 12px;transition:all .15s;min-width:44px;min-height:40px}
-.hist-del-btn:active{color:var(--accent2);border-color:var(--accent2);background:rgba(224,90,43,.1)}
+.section-label{
+font-family:‘Orbitron’,monospace;
+font-size:.58rem;color:var(–cyan);
+text-transform:uppercase;letter-spacing:3px;margin-bottom:8px;
+text-shadow:0 0 8px var(–cyan);
+display:flex;align-items:center;gap:8px;
+}
+.section-label::after{
+content:’’;flex:1;height:1px;
+background:linear-gradient(90deg,rgba(0,245,255,0.3),transparent);
+}
+
+/* ===== STEPPER ===== */
+.count-stepper{
+display:flex;align-items:center;justify-content:center;gap:14px;
+background:var(–card);
+border:1px solid rgba(255,238,0,0.25);
+border-radius:4px;padding:10px;
+box-shadow:0 0 20px rgba(255,238,0,0.05),inset 0 0 20px rgba(0,0,0,0.4);
+}
+
+.step-btn{
+width:44px;height:44px;border-radius:3px;
+background:var(–surface);
+border:1px solid rgba(255,238,0,0.3);
+color:var(–accent);
+font-family:‘Bebas Neue’,cursive;font-size:1.8rem;
+cursor:pointer;display:flex;align-items:center;justify-content:center;
+transition:all .15s;line-height:1;
+box-shadow:0 0 8px rgba(255,238,0,0.1);
+}
+.step-btn:active{background:var(–accent);color:var(–bg);box-shadow:0 0 20px rgba(255,238,0,0.5);}
+.step-btn:disabled{color:#2a2a3a;border-color:#1a1a2e;box-shadow:none;cursor:not-allowed;}
+
+.step-display{
+font-family:‘Bebas Neue’,cursive;font-size:2.2rem;
+color:var(–accent);letter-spacing:3px;
+min-width:80px;text-align:center;
+text-shadow:0 0 15px var(–accent);
+}
+.step-display .unit{font-size:1rem;color:var(–text-dim);margin-left:4px;}
+
+/* ===== ROSTER / USERS ===== */
+.roster-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.roster-row{
+display:flex;align-items:center;gap:8px;
+background:var(–card);border:1px solid var(–border);
+border-radius:4px;padding:8px 12px;
+transition:border-color .2s;
+}
+.roster-row:hover{border-color:rgba(255,238,0,0.2);}
+.roster-row .rname{flex:1;font-size:.88rem;font-weight:700;letter-spacing:.5px;}
+.roster-del{
+background:none;border:1px solid #2a2a3a;border-radius:3px;
+color:#444;font-size:.85rem;cursor:pointer;padding:3px 8px;
+transition:all .15s;
+}
+.roster-del:active{color:var(–accent2);border-color:var(–accent2);text-shadow:0 0 8px var(–accent2);}
+
+.roster-add-row{display:flex;gap:8px;}
+.roster-input{
+flex:1;background:var(–card);border:1px solid var(–border);
+border-radius:4px;padding:10px 12px;
+color:var(–text);font-family:‘Noto Sans JP’,sans-serif;
+font-size:.88rem;font-weight:700;outline:none;
+transition:border-color .15s;
+}
+.roster-input:focus{border-color:var(–accent);box-shadow:0 0 10px rgba(255,238,0,0.15);}
+.roster-input::placeholder{color:#333;font-weight:400;}
+
+.roster-add-btn{
+background:rgba(255,238,0,0.15);border:1px solid rgba(255,238,0,0.5);
+border-radius:4px;padding:10px 16px;
+color:var(–accent);font-family:‘Orbitron’,monospace;
+font-size:.72rem;font-weight:700;letter-spacing:1px;
+cursor:pointer;white-space:nowrap;
+text-shadow:0 0 8px var(–accent);
+box-shadow:0 0 12px rgba(255,238,0,0.1);
+transition:all .15s;
+}
+.roster-add-btn:active{background:rgba(255,238,0,0.3);box-shadow:0 0 20px rgba(255,238,0,0.3);}
+
+/* ===== NAME GRID / SELECTS ===== */
+.name-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.slot-wrap{position:relative;}
+.slot-select{
+width:100%;background:var(–card);
+border:1px solid rgba(0,245,255,0.2);
+border-radius:4px;padding:10px 32px 10px 12px;
+color:var(–text);font-family:‘Noto Sans JP’,sans-serif;
+font-size:.88rem;font-weight:700;
+outline:none;cursor:pointer;-webkit-appearance:none;
+transition:border-color .15s;
+}
+.slot-select:focus{border-color:var(–cyan);box-shadow:0 0 10px rgba(0,245,255,0.15);}
+.slot-arrow{
+position:absolute;right:10px;top:50%;transform:translateY(-50%);
+font-size:.6rem;color:var(–cyan);pointer-events:none;
+text-shadow:0 0 6px var(–cyan);
+}
+
+/* ===== TOTALS STICKY ===== */
+#panel-record .total-sticky{
+position:sticky;top:94px;z-index:50;
+background:var(–bg);
+padding:8px 0 6px;
+border-bottom:1px solid var(–border);
+margin-bottom:4px;
+}
+.total-sticky-inner{
+display:flex;gap:6px;overflow-x:auto;
+padding:0 14px;scrollbar-width:none;
+}
+.total-sticky-inner::-webkit-scrollbar{display:none;}
+
+.total-pill{
+flex-shrink:0;background:var(–card);
+border:1px solid var(–border);
+border-radius:4px;padding:6px 12px;
+display:flex;align-items:center;gap:7px;
+min-width:max-content;transition:all .2s;
+}
+.total-pill.rank-1{
+background:rgba(255,238,0,0.08);
+border-color:rgba(255,238,0,0.5);
+box-shadow:0 0 12px rgba(255,238,0,0.1);
+}
+.total-pill.rank-2{
+background:rgba(192,192,192,0.06);
+border-color:rgba(192,192,192,0.3);
+}
+.total-pill.rank-3{
+background:rgba(205,127,50,0.06);
+border-color:rgba(205,127,50,0.3);
+}
+.total-pill .pill-medal{font-size:.85rem;}
+.total-pill .pill-name{font-size:.72rem;font-weight:700;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.total-pill .pill-score{
+font-family:‘Bebas Neue’,cursive;font-size:1.1rem;
+letter-spacing:.5px;line-height:1;
+}
+.total-empty{color:#333;font-size:.72rem;padding:6px 14px;text-align:center;width:100%;font-family:‘Orbitron’,monospace;letter-spacing:2px;}
+
+/* ===== POINT COLORS ===== */
+.pt-pos{color:var(–green);text-shadow:0 0 8px rgba(57,255,20,0.6);}
+.pt-neg{color:var(–accent2);text-shadow:0 0 8px rgba(255,0,128,0.6);}
+.pt-zero{color:#333;}
+
+/* ===== GAME SECTION ===== */
+.game-section{margin:14px 14px 0;}
+.game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.game-title{
+font-family:‘Bebas Neue’,cursive;font-size:1.4rem;
+color:var(–accent);letter-spacing:4px;
+text-shadow:0 0 10px var(–accent);
+}
+.add-game-btn{
+background:rgba(255,238,0,0.12);
+border:1px solid rgba(255,238,0,0.5);
+border-radius:3px;padding:7px 16px;
+color:var(–accent);font-family:‘Orbitron’,monospace;
+font-size:.68rem;font-weight:700;letter-spacing:2px;
+cursor:pointer;
+text-shadow:0 0 8px var(–accent);
+box-shadow:0 0 12px rgba(255,238,0,0.1);
+transition:all .15s;
+}
+.add-game-btn:active{background:rgba(255,238,0,0.25);box-shadow:0 0 20px rgba(255,238,0,0.25);}
+
+/* ===== GAME CARD ===== */
+.game-card{
+background:var(–card);
+border:1px solid rgba(191,0,255,0.2);
+border-radius:4px;margin-bottom:10px;overflow:hidden;
+box-shadow:0 0 20px rgba(191,0,255,0.05);
+transition:border-color .2s;
+}
+.game-card:hover{border-color:rgba(191,0,255,0.4);}
+.game-card-header{
+display:flex;align-items:center;justify-content:space-between;
+padding:9px 14px;
+background:rgba(191,0,255,0.06);
+border-bottom:1px solid rgba(191,0,255,0.15);
+}
+.game-num{
+font-family:‘Orbitron’,monospace;font-size:.78rem;font-weight:700;
+color:var(–purple);letter-spacing:3px;
+text-shadow:0 0 8px var(–purple);
+}
+.game-card-actions{display:flex;gap:6px;align-items:center;}
+
+.pts-toggle-btn{
+background:none;border:1px solid var(–border);
+border-radius:3px;color:var(–text-dim);
+font-family:‘Orbitron’,monospace;font-size:.58rem;font-weight:700;
+padding:3px 8px;cursor:pointer;letter-spacing:1px;
+transition:all .15s;
+}
+.pts-toggle-btn.active{border-color:var(–accent);color:var(–accent);background:rgba(255,238,0,0.07);text-shadow:0 0 6px var(–accent);}
+
+.del-btn{
+background:none;border:1px solid #1e1e2e;border-radius:3px;
+color:#444;font-size:1rem;cursor:pointer;padding:2px 8px;
+transition:all .15s;
+}
+.del-btn:active{color:var(–accent2);border-color:var(–accent2);text-shadow:0 0 8px var(–accent2);}
+
+.game-pts-area{
+padding:10px 14px;border-bottom:1px solid var(–border);
+background:rgba(255,238,0,0.02);display:none;
+}
+.game-pts-area.open{display:block;}
+.game-pts-grid{display:flex;flex-wrap:wrap;gap:8px;}
+.game-pts-item{display:flex;align-items:center;gap:5px;}
+.game-pts-item label{
+font-family:‘Orbitron’,monospace;font-size:.6rem;color:var(–text-dim);min-width:22px;
+}
+.game-pts-input{
+background:var(–surface);border:1px solid var(–border);
+border-radius:3px;color:var(–text);
+font-family:‘Bebas Neue’,cursive;font-size:1rem;
+padding:5px 8px;width:62px;outline:none;text-align:center;
+transition:border-color .15s;
+}
+.game-pts-input:focus{border-color:var(–accent);box-shadow:0 0 8px rgba(255,238,0,0.15);}
+
+.rank-inputs{padding:10px 14px 12px;display:flex;flex-direction:column;gap:8px;}
+.rank-row{display:flex;align-items:center;gap:10px;}
+.rank-row .pname{
+flex:1;font-size:.85rem;font-weight:700;
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.rank-select{
+background:var(–surface);border:1px solid var(–border);
+border-radius:3px;color:var(–text);
+font-family:‘Noto Sans JP’,sans-serif;font-size:.83rem;font-weight:700;
+padding:7px 8px;outline:none;width:80px;cursor:pointer;
+-webkit-appearance:none;text-align:center;transition:border-color .15s;
+}
+.rank-select:focus{border-color:var(–cyan);box-shadow:0 0 8px rgba(0,245,255,0.15);}
+
+.pt-preview{
+min-width:46px;text-align:right;
+font-family:‘Bebas Neue’,cursive;font-size:1.15rem;letter-spacing:1px;
+}
+
+.dup-warn{
+font-family:‘Orbitron’,monospace;font-size:.65rem;
+color:var(–accent2);padding:0 14px 10px;letter-spacing:1px;
+text-shadow:0 0 8px var(–accent2);
+}
+
+/* ===== BALANCE CARD ===== */
+.balance-section{margin:10px 14px 0;}
+.balance-card{
+border-radius:4px;padding:14px 18px;
+display:flex;align-items:center;justify-content:space-between;
+border:1px solid;transition:all .2s;
+}
+.balance-card.ok{
+background:rgba(57,255,20,0.06);border-color:rgba(57,255,20,0.4);
+box-shadow:0 0 20px rgba(57,255,20,0.06);
+}
+.balance-card.ng{
+background:rgba(255,0,128,0.06);border-color:rgba(255,0,128,0.4);
+box-shadow:0 0 20px rgba(255,0,128,0.06);
+}
+.balance-left{display:flex;align-items:center;gap:10px;}
+.balance-icon{font-size:1.4rem;}
+.balance-title{
+font-family:‘Orbitron’,monospace;font-size:.72rem;font-weight:700;
+margin-bottom:2px;letter-spacing:1px;
+}
+.balance-sub{font-size:.65rem;color:var(–text-dim);}
+.balance-num{
+font-family:‘Bebas Neue’,cursive;font-size:1.65rem;letter-spacing:2px;
+}
+.balance-card.ok .balance-num{color:var(–green);text-shadow:0 0 12px rgba(57,255,20,0.5);}
+.balance-card.ng .balance-num{color:var(–accent2);text-shadow:0 0 12px rgba(255,0,128,0.5);}
+
+/* ===== ACTION BUTTONS ===== */
+.action-row{display:flex;gap:10px;margin:14px 14px 0;}
+.save-btn{
+flex:2;padding:14px;
+background:rgba(255,238,0,0.15);
+border:1px solid rgba(255,238,0,0.6);
+border-radius:4px;
+color:var(–accent);font-family:‘Orbitron’,monospace;
+font-size:.78rem;font-weight:700;letter-spacing:2px;
+cursor:pointer;
+text-shadow:0 0 8px var(–accent);
+box-shadow:0 0 20px rgba(255,238,0,0.1);
+transition:all .15s;
+}
+.save-btn:active{background:rgba(255,238,0,0.28);box-shadow:0 0 30px rgba(255,238,0,0.25);}
+
+.reset-btn{
+flex:1;padding:14px;
+background:none;border:1px solid #252530;
+border-radius:4px;color:#444;
+font-family:‘Orbitron’,monospace;font-size:.75rem;
+cursor:pointer;transition:all .15s;
+}
+.reset-btn:active{border-color:var(–accent2);color:var(–accent2);}
+
+/* ===== STATS ===== */
+.stats-card{
+background:var(–card);border:1px solid var(–border);
+border-radius:4px;overflow:hidden;margin:14px 14px 0;
+}
+.stats-row{
+display:flex;align-items:center;justify-content:space-between;
+padding:13px 16px;border-bottom:1px solid var(–border);
+transition:background .2s;
+}
+.stats-row:last-child{border-bottom:none;}
+.stats-row.rank-1{background:rgba(255,238,0,0.06);}
+.stats-row.rank-2{background:rgba(192,192,192,0.04);}
+.stats-row.rank-3{background:rgba(205,127,50,0.04);}
+.stats-left{display:flex;align-items:center;gap:10px;}
+.stats-medal{font-size:1.2rem;min-width:26px;text-align:center;}
+.stats-name{font-size:.92rem;font-weight:700;}
+.stats-right{text-align:right;}
+.stats-total{
+font-family:‘Bebas Neue’,cursive;font-size:1.7rem;letter-spacing:1px;
+}
+.stats-sub{font-size:.62rem;color:var(–text-dim);margin-top:1px;}
+.stats-empty{padding:30px 16px;text-align:center;color:#444;font-size:.82rem;font-family:‘Orbitron’,monospace;letter-spacing:2px;}
+
+/* ===== HISTORY ===== */
+.hist-empty{
+text-align:center;padding:50px 20px;
+color:#444;font-size:.82rem;line-height:2.5;
+font-family:‘Orbitron’,monospace;letter-spacing:2px;
+}
+.hist-session{
+background:var(–card);border:1px solid rgba(0,245,255,0.15);
+border-radius:4px;margin:14px 14px 0;overflow:hidden;
+transition:border-color .2s;
+box-shadow:0 0 15px rgba(0,245,255,0.03);
+}
+.hist-session:hover{border-color:rgba(0,245,255,0.3);}
+
+.hist-session-header{
+display:flex;align-items:center;justify-content:space-between;
+background:rgba(0,245,255,0.04);border-bottom:1px solid rgba(0,245,255,0.1);
+}
+.hist-session-info{flex:1;padding:12px 14px;cursor:pointer;min-width:0;}
+.hist-chevron{font-size:.65rem;color:var(–cyan);margin-left:6px;text-shadow:0 0 6px var(–cyan);}
+.hist-date{
+font-family:‘Bebas Neue’,cursive;font-size:1.15rem;
+color:var(–cyan);letter-spacing:3px;
+text-shadow:0 0 10px rgba(0,245,255,0.5);
+}
+.hist-meta{font-size:.68rem;color:var(–text-dim);margin-top:2px;letter-spacing:.5px;}
+.hist-header-actions{display:flex;gap:6px;align-items:center;padding:8px 14px 8px 0;flex-shrink:0;position:relative;z-index:10;}
+.hist-edit-btn{
+background:var(–surface);border:1px solid var(–border);border-radius:3px;
+color:#888;font-size:.95rem;padding:8px 12px;cursor:pointer;
+transition:all .15s;min-width:44px;min-height:40px;
+}
+.hist-edit-btn:active,.hist-edit-btn.active{
+border-color:var(–accent);color:var(–accent);
+background:rgba(255,238,0,0.08);text-shadow:0 0 8px var(–accent);
+}
+.hist-del-btn{
+background:var(–surface);border:1px solid var(–border);border-radius:3px;
+color:#888;font-size:.95rem;cursor:pointer;padding:8px 12px;
+transition:all .15s;min-width:44px;min-height:40px;
+}
+.hist-del-btn:active{color:var(–accent2);border-color:var(–accent2);background:rgba(255,0,128,0.08);}
 .hist-body{display:none}.hist-body.open{display:block}
-.hist-view{padding:12px 16px}
-.hist-ranking{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
-.hist-rank-row{display:flex;align-items:center;justify-content:space-between}
-.hist-rank-left{display:flex;align-items:center;gap:8px}
-.hist-rank-medal{font-size:1.1rem;min-width:22px}
-.hist-rank-name{font-size:.85rem;font-weight:700}
-.hist-rank-score{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px}
-.hist-games-label{font-size:.63rem;color:#666;text-transform:uppercase;letter-spacing:1.5px;margin:8px 0 6px}
-.hist-game-item{border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:.75rem}
-.hist-game-title{font-family:'Bebas Neue',sans-serif;font-size:.85rem;color:#777;letter-spacing:1px;margin-bottom:5px}
-.hist-game-rows{display:flex;flex-direction:column;gap:3px}
-.hist-game-prow{display:flex;align-items:center;justify-content:space-between;color:#999}
-.hist-game-prow .hgp-name{font-weight:700;color:var(--text);font-size:.78rem}
-.hist-game-prow .hgp-rank{color:#777;font-size:.72rem}
-.hist-game-prow .hgp-pt{font-family:'Bebas Neue',sans-serif;font-size:.95rem}
-.hist-edit{padding:12px 16px}
-.edit-section-label{font-size:.63rem;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
-.edit-names-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
-.edit-slot-wrap{position:relative}
-.edit-slot-select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 28px 8px 10px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.82rem;font-weight:700;outline:none;cursor:pointer;-webkit-appearance:none;transition:border-color .15s}
-.edit-slot-select:focus{border-color:var(--accent)}
-.edit-slot-arrow{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.65rem;color:#666;pointer-events:none}
-.edit-game-block{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:8px}
-.edit-game-header{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border)}
-.edit-game-num{font-family:'Bebas Neue',sans-serif;font-size:.88rem;color:#777;letter-spacing:1px}
-.edit-pts-toggle{background:none;border:1px solid var(--border);border-radius:5px;color:#666;font-size:.62rem;font-weight:700;padding:2px 6px;cursor:pointer;transition:all .15s}
-.edit-pts-toggle.active{border-color:var(--accent);color:var(--accent)}
-.edit-pts-area{padding:8px 12px;border-bottom:1px solid var(--border);background:rgba(240,192,64,.03);display:none}
-.edit-pts-area.open{display:block}
-.edit-pts-grid{display:flex;flex-wrap:wrap;gap:6px}
-.edit-pts-item{display:flex;align-items:center;gap:4px}
-.edit-pts-item label{font-size:.68rem;color:#888;min-width:20px}
-.edit-pts-input{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:.95rem;padding:4px 6px;width:55px;outline:none;text-align:center;transition:border-color .15s}
-.edit-pts-input:focus{border-color:var(--accent)}
-.edit-rank-rows{padding:8px 12px;display:flex;flex-direction:column;gap:6px}
-.edit-rank-row{display:flex;align-items:center;gap:8px}
-.edit-rank-row .epname{flex:1;font-size:.8rem;font-weight:700;color:#aaa}
-.edit-rank-select{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.78rem;font-weight:700;padding:5px 6px;outline:none;width:72px;cursor:pointer;-webkit-appearance:none;text-align:center;transition:border-color .15s}
-.edit-rank-select:focus{border-color:var(--accent)}
-.edit-pt-preview{min-width:38px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1rem}
-.edit-save-btn{width:100%;padding:12px;background:var(--accent);border:none;border-radius:10px;color:var(--bg);font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer;margin-top:10px;transition:opacity .15s}
-.edit-save-btn:active{opacity:.7}
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--green);color:#0f1a14;font-weight:900;font-size:.82rem;padding:10px 20px;border-radius:20px;opacity:0;transition:all .28s;pointer-events:none;z-index:999;white-space:nowrap}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.confirm-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
-.confirm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px)}
-.confirm-box{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 22px 16px;max-width:320px;width:100%}
-.confirm-title{font-size:1rem;font-weight:900;color:var(--text);margin-bottom:6px;line-height:1.4}
-.confirm-sub{font-size:.78rem;color:#888;margin-bottom:18px;line-height:1.5}
-.confirm-actions{display:flex;gap:10px}
-.confirm-cancel{flex:1;padding:11px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:#aaa;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer}
-.confirm-ok{flex:1;padding:11px;background:var(--accent2);border:none;border-radius:10px;color:#fff;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer}
+.hist-view{padding:12px 16px;}
+.hist-ranking{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.hist-rank-row{display:flex;align-items:center;justify-content:space-between;}
+.hist-rank-left{display:flex;align-items:center;gap:8px;}
+.hist-rank-medal{font-size:1.1rem;min-width:22px;}
+.hist-rank-name{font-size:.85rem;font-weight:700;}
+.hist-rank-score{font-family:‘Bebas Neue’,cursive;font-size:1.35rem;letter-spacing:1px;}
+.hist-games-label{
+font-family:‘Orbitron’,monospace;font-size:.58rem;color:var(–text-dim);
+text-transform:uppercase;letter-spacing:2px;margin:8px 0 6px;
+}
+.hist-game-item{
+border:1px solid var(–border);border-radius:4px;
+padding:8px 10px;margin-bottom:6px;font-size:.75rem;
+}
+.hist-game-title{
+font-family:‘Bebas Neue’,cursive;font-size:.88rem;
+color:var(–text-dim);letter-spacing:2px;margin-bottom:5px;
+}
+.hist-game-rows{display:flex;flex-direction:column;gap:3px;}
+.hist-game-prow{display:flex;align-items:center;justify-content:space-between;color:#666;}
+.hist-game-prow .hgp-name{font-weight:700;color:var(–text);font-size:.78rem;}
+.hist-game-prow .hgp-rank{color:#555;font-size:.72rem;}
+.hist-game-prow .hgp-pt{font-family:‘Bebas Neue’,cursive;font-size:.95rem;}
+.hist-edit{padding:12px 16px;}
+.edit-section-label{
+font-family:‘Orbitron’,monospace;font-size:.58rem;
+color:var(–accent);text-transform:uppercase;
+letter-spacing:3px;margin-bottom:8px;
+text-shadow:0 0 8px var(–accent);
+}
+.edit-names-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;}
+.edit-slot-wrap{position:relative;}
+.edit-slot-select{
+width:100%;background:var(–surface);
+border:1px solid var(–border);
+border-radius:3px;padding:8px 28px 8px 10px;
+color:var(–text);font-family:‘Noto Sans JP’,sans-serif;
+font-size:.82rem;font-weight:700;outline:none;cursor:pointer;
+-webkit-appearance:none;transition:border-color .15s;
+}
+.edit-slot-select:focus{border-color:var(–accent);}
+.edit-slot-arrow{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.6rem;color:var(–text-dim);pointer-events:none;}
+.edit-game-block{border:1px solid var(–border);border-radius:4px;overflow:hidden;margin-bottom:8px;}
+.edit-game-header{
+display:flex;align-items:center;justify-content:space-between;
+padding:7px 12px;background:rgba(255,255,255,.02);
+border-bottom:1px solid var(–border);
+}
+.edit-game-num{
+font-family:‘Orbitron’,monospace;font-size:.75rem;
+color:var(–text-dim);letter-spacing:2px;
+}
+.edit-pts-toggle{
+background:none;border:1px solid var(–border);border-radius:3px;
+color:#555;font-family:‘Orbitron’,monospace;font-size:.58rem;font-weight:700;
+padding:2px 7px;cursor:pointer;transition:all .15s;letter-spacing:1px;
+}
+.edit-pts-toggle.active{border-color:var(–accent);color:var(–accent);}
+.edit-pts-area{
+padding:8px 12px;border-bottom:1px solid var(–border);
+background:rgba(255,238,0,0.02);display:none;
+}
+.edit-pts-area.open{display:block;}
+.edit-pts-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.edit-pts-item{display:flex;align-items:center;gap:4px;}
+.edit-pts-item label{font-family:‘Orbitron’,monospace;font-size:.6rem;color:#555;min-width:20px;}
+.edit-pts-input{
+background:var(–bg);border:1px solid var(–border);
+border-radius:3px;color:var(–text);
+font-family:‘Bebas Neue’,cursive;font-size:.95rem;
+padding:4px 6px;width:55px;outline:none;text-align:center;
+transition:border-color .15s;
+}
+.edit-pts-input:focus{border-color:var(–accent);}
+.edit-rank-rows{padding:8px 12px;display:flex;flex-direction:column;gap:6px;}
+.edit-rank-row{display:flex;align-items:center;gap:8px;}
+.edit-rank-row .epname{flex:1;font-size:.8rem;font-weight:700;color:#888;}
+.edit-rank-select{
+background:var(–bg);border:1px solid var(–border);
+border-radius:3px;color:var(–text);
+font-family:‘Noto Sans JP’,sans-serif;font-size:.78rem;font-weight:700;
+padding:5px 6px;outline:none;width:72px;cursor:pointer;
+-webkit-appearance:none;text-align:center;transition:border-color .15s;
+}
+.edit-rank-select:focus{border-color:var(–accent);}
+.edit-pt-preview{min-width:38px;text-align:right;font-family:‘Bebas Neue’,cursive;font-size:1rem;}
+.edit-save-btn{
+width:100%;padding:12px;
+background:rgba(255,238,0,0.15);
+border:1px solid rgba(255,238,0,0.5);
+border-radius:4px;color:var(–accent);
+font-family:‘Orbitron’,monospace;font-size:.78rem;font-weight:700;letter-spacing:2px;
+cursor:pointer;margin-top:10px;
+text-shadow:0 0 8px var(–accent);
+transition:all .15s;
+}
+.edit-save-btn:active{background:rgba(255,238,0,0.28);}
+
+/* ===== TOAST ===== */
+.toast{
+position:fixed;bottom:28px;left:50%;
+transform:translateX(-50%) translateY(16px);
+background:var(–green);color:#030a03;
+font-family:‘Orbitron’,monospace;font-weight:700;font-size:.75rem;
+padding:10px 22px;border-radius:3px;letter-spacing:2px;
+opacity:0;transition:all .28s;pointer-events:none;z-index:999;white-space:nowrap;
+box-shadow:0 0 20px rgba(57,255,20,0.5);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ===== CONFIRM MODAL ===== */
+.confirm-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+.confirm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);}
+.confirm-box{
+position:relative;
+background:var(–surface);
+border:1px solid rgba(255,0,128,0.4);
+border-radius:6px;padding:24px 22px 18px;max-width:320px;width:100%;
+box-shadow:0 0 40px rgba(255,0,128,0.15);
+}
+.confirm-title{font-family:‘Orbitron’,monospace;font-size:.88rem;font-weight:700;color:var(–text);margin-bottom:6px;line-height:1.5;letter-spacing:1px;}
+.confirm-sub{font-size:.75rem;color:#666;margin-bottom:20px;line-height:1.6;}
+.confirm-actions{display:flex;gap:10px;}
+.confirm-cancel{
+flex:1;padding:11px;background:var(–card);
+border:1px solid var(–border);border-radius:4px;
+color:#666;font-family:‘Orbitron’,monospace;
+font-size:.75rem;font-weight:700;cursor:pointer;letter-spacing:1px;
+}
+.confirm-ok{
+flex:1;padding:11px;
+background:rgba(255,0,128,0.2);
+border:1px solid var(–accent2);border-radius:4px;
+color:var(–accent2);font-family:‘Orbitron’,monospace;
+font-size:.75rem;font-weight:700;cursor:pointer;letter-spacing:1px;
+text-shadow:0 0 8px var(–accent2);
+box-shadow:0 0 15px rgba(255,0,128,0.15);
+}
 </style>
+
 </head>
 <body>
 <header>
-  <h1>🎳 BOWLING</h1>
+  <h1>🎳 STRIKE ZONE</h1>
   <div style="display:flex;align-items:center;gap:8px">
-    <span class="sync-status loading" id="syncStatus">⟳ 接続中</span>
+    <span class="sync-status loading" id="syncStatus">⟳ SYNC</span>
     <div class="game-count" id="gameCount">0 GAMES</div>
   </div>
 </header>
@@ -223,7 +674,7 @@ header h1{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3p
 <div class="panel" id="panel-stats">
   <div class="section" style="margin-bottom:4px;"><div class="section-label">全履歴 通算ランキング</div></div>
   <div class="stats-card" id="statsCard"></div>
-  <div style="margin:10px 14px 0;font-size:.68rem;color:#555;">※ 保存済みの全履歴から集計</div>
+  <div style="margin:10px 14px 0;font-family:'Orbitron',monospace;font-size:.58rem;color:#444;letter-spacing:1px;">※ 保存済みの全履歴から集計</div>
 </div>
 <div class="panel" id="panel-history"><div id="historyContainer"></div></div>
 <div class="panel" id="panel-users">
@@ -238,18 +689,55 @@ header h1{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3p
       <button class="roster-add-btn" onclick="addRosterUser()">＋ 追加</button>
     </div>
   </div>
-  <div style="margin:12px 14px 0;font-size:.68rem;color:#555;line-height:1.6;">
+  <div style="margin:12px 14px 0;font-family:'Orbitron',monospace;font-size:.6rem;color:#333;line-height:2;letter-spacing:1px;">
     💡 ここで登録したユーザーは記録・履歴の編集時にプルダウンから選べます<br>
     💡 ユーザーを削除しても過去の履歴は残ります
   </div>
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onerror="window._fbFailed=true"></script>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js" onerror="window._fbFailed=true"></script>
+
 <script>
-firebase.initializeApp({databaseURL:"https://bowling-score-c7380-default-rtdb.firebaseio.com/"});
-var db=firebase.database();
+// Firebase with localStorage fallback
+var db;
+var _useLocal = false;
+try {
+  if(window._fbFailed || typeof firebase === 'undefined') throw new Error('Firebase not loaded');
+  firebase.initializeApp({databaseURL:"https://bowling-score-c7380-default-rtdb.firebaseio.com/"});
+  db = firebase.database();
+} catch(e) {
+  _useLocal = true;
+  // Minimal mock db using localStorage
+  db = {
+    ref: function(path) {
+      return {
+        get: function() {
+          return Promise.resolve({
+            exists: function() {
+              return !!localStorage.getItem('bowling_data');
+            },
+            val: function() {
+              var s = localStorage.getItem('bowling_data');
+              return s ? JSON.parse(s) : null;
+            }
+          });
+        },
+        set: function(data) {
+          try { localStorage.setItem('bowling_data', JSON.stringify(data)); } catch(e2){}
+          return Promise.resolve();
+        },
+        on: function(ev, cb) {
+          // No real-time sync in local mode; fire once on register
+          var s = localStorage.getItem('bowling_data');
+          if(s) { try { cb({ exists:function(){return true;}, val:function(){return JSON.parse(s);} }); } catch(e2){} }
+        }
+      };
+    }
+  };
+}
 var MEDALS=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'];
 var MIN_PLAYERS=2,MAX_PLAYERS=12;
 var playerCount=4,selectedSlots=['','','',''],games=[];
@@ -258,9 +746,10 @@ var editStates={};
 
 function setSyncStatus(state){
   var el=document.getElementById('syncStatus');
-  if(state==='ok'){el.textContent='✓ 同期済';el.className='sync-status ok';}
-  else if(state==='ng'){el.textContent='✗ オフライン';el.className='sync-status ng';}
-  else{el.textContent='⟳ 同期中';el.className='sync-status loading';}
+  if(_useLocal){el.textContent='💾 LOCAL';el.className='sync-status ok';return;}
+  if(state==='ok'){el.textContent='✓ SYNCED';el.className='sync-status ok';}
+  else if(state==='ng'){el.textContent='✗ OFFLINE';el.className='sync-status ng';}
+  else{el.textContent='⟳ SYNC';el.className='sync-status loading';}
 }
 
 function loadData(cb){
@@ -285,7 +774,6 @@ function saveData(d,cb){
   }).catch(function(e){setSyncStatus('ng');console.error(e);});
 }
 
-// リアルタイム同期
 db.ref('bowling').on('value',function(snap){
   if(snap.exists()){
     var newData=snap.val();
@@ -320,7 +808,7 @@ function switchTab(tab){
 
 function renderRoster(){
   var roster=getRoster(),list=document.getElementById('rosterList');
-  if(roster.length===0){list.innerHTML='<div style="font-size:.75rem;color:#555;padding:4px 0;">まだユーザーがいません</div>';return;}
+  if(roster.length===0){list.innerHTML='<div style="font-family:\'Orbitron\',monospace;font-size:.68rem;color:#333;padding:4px 0;letter-spacing:2px;">まだユーザーがいません</div>';return;}
   list.innerHTML=roster.map(function(name){
     return '<div class="roster-row"><span class="rname">'+name+'</span><button class="roster-del" onclick="deleteRosterUser(\''+name.replace(/'/g,"\\'")+'\')">\u2715</button></div>';
   }).join('');
@@ -457,14 +945,14 @@ function calcTotals(){
 function renderTotals(){
   var totals=calcTotals(),sorted=totals.map(function(s,i){return{i:i,s:s};}).sort(function(a,b){return b.s-a.s;});
   var card=document.getElementById('totalCard');
-  if(games.length===0){card.innerHTML='<div class="total-empty">合計スコアはここに表示されます</div>';}
+  if(games.length===0){card.innerHTML='<div class="total-empty">— SCORES —</div>';}
   else{card.innerHTML=sorted.map(function(item,rank){var s=item.s,cls=rank<3?'rank-'+(rank+1):'',ptCls=s>0?'pt-pos':s<0?'pt-neg':'pt-zero';return'<div class="total-pill '+cls+'"><span class="pill-medal">'+(MEDALS[rank]||'')+'</span><span class="pill-name">'+dn(item.i)+'</span><span class="pill-score '+ptCls+'">'+(s>0?'+':'')+s+'</span></div>';}).join('');}
   var completeGames=games.filter(function(g){return g.ranks.every(function(r){return r!==null;});});
   var bc=document.getElementById('balanceCard');
   if(completeGames.length===0){bc.innerHTML='';return;}
   var sum=completeGames.reduce(function(acc,g){var gi=games.indexOf(g);return acc+g.ranks.reduce(function(a,r){return a+(r==='dnp'?0:getPtByRank(gi,r));},0);},0);
   var isOk=sum===0;
-  bc.innerHTML='<div class="balance-card '+(isOk?'ok':'ng')+'"><div class="balance-left"><span class="balance-icon">'+(isOk?'✅':'⚠️')+'</span><div><div class="balance-title">'+(isOk?'バランス OK':'バランスが合いません')+'</div><div class="balance-sub">完全入力 '+completeGames.length+'ゲーム分の合計</div></div></div><span class="balance-num">'+(sum>0?'+':'')+sum+'</span></div>';
+  bc.innerHTML='<div class="balance-card '+(isOk?'ok':'ng')+'"><div class="balance-left"><span class="balance-icon">'+(isOk?'✅':'⚠️')+'</span><div><div class="balance-title">'+(isOk?'BALANCE OK':'BALANCE ERROR')+'</div><div class="balance-sub">完全入力 '+completeGames.length+'ゲーム分の合計</div></div></div><span class="balance-num">'+(sum>0?'+':'')+sum+'</span></div>';
 }
 
 function updateGameCount(){document.getElementById('gameCount').textContent=games.length+' GAMES';}
@@ -475,12 +963,12 @@ function saveSession(){
   var d=JSON.parse(JSON.stringify(cachedData));
   if(!d.sessions)d.sessions=[];
   d.sessions.unshift(session);
-  saveData(d,function(){showToast('💾 保存しました！');});
+  saveData(d,function(){showToast('💾 SAVED!');});
 }
 
 function renderStats(){
   var sessions=getSessions(),card=document.getElementById('statsCard');
-  if(sessions.length===0){card.innerHTML='<div class="stats-empty">📭 まだ記録がありません</div>';return;}
+  if(sessions.length===0){card.innerHTML='<div class="stats-empty">— NO DATA —</div>';return;}
   var userMap={};
   sessions.forEach(function(s){
     s.names.forEach(function(name,i){
@@ -499,7 +987,7 @@ function renderStats(){
 
 function renderHistory(){
   var sessions=getSessions(),container=document.getElementById('historyContainer');
-  if(sessions.length===0){container.innerHTML='<div class="hist-empty">📭<br>まだ記録がありません</div>';return;}
+  if(sessions.length===0){container.innerHTML='<div class="hist-empty">— NO RECORDS —</div>';return;}
   container.innerHTML=sessions.map(function(s){return buildSessionHtml(s);}).join('');
 }
 
@@ -529,19 +1017,22 @@ function deleteSession(id){
   showConfirmModal(target.date+' の記録を削除しますか？','この操作は取り消せません',function(){
     var d=JSON.parse(JSON.stringify(cachedData));
     d.sessions=d.sessions.filter(function(s){return s.id!==id;});
-    saveData(d,function(){if(editStates[id])delete editStates[id];renderHistory();showToast('🗑 削除しました');});
+    saveData(d,function(){if(editStates[id])delete editStates[id];renderHistory();showToast('🗑 DELETED');});
   });
 }
 
 function showConfirmModal(title,sub,onConfirm){
   var old=document.getElementById('confirmModal');if(old)old.remove();
   var modal=document.createElement('div');modal.id='confirmModal';modal.className='confirm-modal';
-  modal.innerHTML='<div class="confirm-backdrop"></div><div class="confirm-box"><div class="confirm-title">'+title+'</div><div class="confirm-sub">'+sub+'</div><div class="confirm-actions"><button type="button" class="confirm-cancel">キャンセル</button><button type="button" class="confirm-ok">削除</button></div></div>';
+  modal.innerHTML='<div class="confirm-backdrop"></div><div class="confirm-box"><div class="confirm-title">'+title+'</div><div class="confirm-sub">'+sub+'</div><div class="confirm-actions"><button type="button" class="confirm-cancel" id="confirmCancel">キャンセル</button><button type="button" class="confirm-ok" id="confirmOk">削除</button></div></div>';
   document.body.appendChild(modal);
   var close=function(){modal.remove();};
-  modal.querySelector('.confirm-backdrop').addEventListener('click',close);
-  modal.querySelector('.confirm-cancel').addEventListener('click',close);
-  modal.querySelector('.confirm-ok').addEventListener('click',function(){close();onConfirm();});
+  var backdrop=modal.querySelector('.confirm-backdrop');
+  var cancelBtn=modal.querySelector('.confirm-cancel');
+  var okBtn=modal.querySelector('.confirm-ok');
+  if(backdrop)backdrop.addEventListener('click',close);
+  if(cancelBtn)cancelBtn.addEventListener('click',close);
+  if(okBtn)okBtn.addEventListener('click',function(){close();onConfirm();});
 }
 
 function buildViewHtml(s){
@@ -556,7 +1047,7 @@ function buildViewHtml(s){
       var pt=pts[r-1],ptCls=pt>0?'pt-pos':pt<0?'pt-neg':'pt-zero';
       return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">'+r+'位</span><span class="hgp-pt '+ptCls+'">'+(pt>0?'+':'')+pt+'</span></div>';
     }).join('');
-    return'<div class="hist-game-item"><div class="hist-game-title">GAME '+(gi+1)+(g.customPoints?' <span style="font-size:.65rem;color:var(--accent)">カスタム配点</span>':'')+'</div><div class="hist-game-rows">'+rows+'</div></div>';
+    return'<div class="hist-game-item"><div class="hist-game-title">GAME '+(gi+1)+(g.customPoints?' <span style="font-size:.62rem;color:var(--accent)">CUSTOM</span>':'')+'</div><div class="hist-game-rows">'+rows+'</div></div>';
   }).join('');
   return'<div class="hist-view"><div class="hist-ranking">'+rankingHtml+'</div><div class="hist-games-label">ゲーム詳細</div>'+gamesHtml+'</div>';
 }
@@ -587,7 +1078,7 @@ function buildEditHtml(s){
       opts+='<option value="dnp"'+(r==='dnp'?' selected':'')+'>不参加</option>';
       rankHtml+='<div class="edit-rank-row"><span class="epname">'+getName(pi)+'</span><select class="edit-rank-select" onchange="editRank('+s.id+','+gi+','+pi+',this.value)">'+opts+'</select><span class="edit-pt-preview '+ptCls+'" id="epp-'+s.id+'-'+gi+'-'+pi+'">'+ptStr+'</span></div>';
     }
-    return'<div class="edit-game-block"><div class="edit-game-header"><span class="edit-game-num">GAME '+(gi+1)+'</span><button class="edit-pts-toggle'+(hasCustom?' active':'')+'" onclick="editToggleCustomPts('+s.id+','+gi+')">'+(hasCustom?'⚙ カスタム配点中':'⚙ 配点設定')+'</button></div><div class="edit-pts-area'+(hasCustom?' open':'')+'" id="epa-'+s.id+'-'+gi+'"><div class="edit-pts-grid">'+ptsHtml+'</div></div><div class="edit-rank-rows">'+rankHtml+'</div></div>';
+    return'<div class="edit-game-block"><div class="edit-game-header"><span class="edit-game-num">GAME '+(gi+1)+'</span><button class="edit-pts-toggle'+(hasCustom?' active':'')+'" onclick="editToggleCustomPts('+s.id+','+gi+')">'+(hasCustom?'⚙ CUSTOM':'⚙ POINTS')+'</button></div><div class="edit-pts-area'+(hasCustom?' open':'')+'" id="epa-'+s.id+'-'+gi+'"><div class="edit-pts-grid">'+ptsHtml+'</div></div><div class="edit-rank-rows">'+rankHtml+'</div></div>';
   }).join('');
   return'<div class="hist-edit"><div class="edit-section-label">プレイヤー名</div><div class="edit-names-grid">'+namesHtml+'</div><div class="edit-section-label">ゲーム結果</div>'+gamesHtml+'<button class="edit-save-btn" onclick="commitEdit('+s.id+')">✅ 変更を保存</button></div>';
 }
@@ -616,15 +1107,15 @@ function commitEdit(id){
   var n=d.sessions[idx].playerCount,totals=Array(n).fill(0);
   d.sessions[idx].games.forEach(function(g){var pts=g.customPoints||defaultPtsForCount(n);g.ranks.forEach(function(r,pi){if(r!==null&&r!=='dnp')totals[pi]+=(pts[r-1]||0);});});
   d.sessions[idx].totals=totals;
-  saveData(d,function(){delete editStates[id].draft;editStates[id].editMode=false;renderHistory();showToast('✅ 更新しました！');});
+  saveData(d,function(){delete editStates[id].draft;editStates[id].editMode=false;renderHistory();showToast('✅ UPDATED!');});
 }
 
 function resetAll(){if(games.length===0)return;if(!confirm('現在の入力をリセットしますか？\n（保存済み履歴は消えません）'))return;games=[];renderGames();renderTotals();}
 
 function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
 
-// 初期化
 loadData(function(){renderRoster();setCount(4);renderGames();renderTotals();});
 </script>
+
 </body>
 </html>
