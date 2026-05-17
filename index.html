@@ -488,6 +488,38 @@ header h1{
 .edit-save-btn{width:100%;padding:12px;background:rgba(255,238,0,0.15);border:2px solid #ffee00;border-radius:4px;color:#ffee00;font-family:'Orbitron','Courier New',monospace;font-size:.78rem;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:10px;text-transform:uppercase;transition:all .15s;}
 .edit-save-btn:active{background:rgba(255,238,0,0.28);}
 
+/* ===== MODE TOGGLE (個人戦/チーム戦) ===== */
+.mode-toggle{display:flex;gap:6px;padding:8px 14px;border-bottom:1px solid rgba(0,245,255,0.15);background:rgba(0,245,255,0.03);}
+.mode-btn{
+  flex:1;padding:7px;background:#08080f;
+  border:2px solid #1c1c30;border-radius:3px;
+  color:#6a6a8a;font-family:'Orbitron','Courier New',monospace;
+  font-size:.65rem;font-weight:700;letter-spacing:1px;
+  cursor:pointer;transition:all .15s;text-transform:uppercase;
+}
+.mode-btn.active{
+  border-color:#00f5ff;color:#00f5ff;background:rgba(0,245,255,0.1);
+  -webkit-filter:drop-shadow(0 0 3px rgba(0,245,255,0.6));
+  filter:drop-shadow(0 0 3px rgba(0,245,255,0.6));
+}
+.team-config{padding:10px 14px;border-bottom:1px solid #1c1c30;display:flex;flex-direction:column;gap:10px;background:rgba(191,0,255,0.03);}
+.team-count-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.team-count-row .tc-label{font-family:'Orbitron','Courier New',monospace;font-size:.62rem;color:#6a6a8a;letter-spacing:1px;margin-right:4px;}
+.team-count-btn{
+  background:#08080f;border:1px solid #1c1c30;border-radius:3px;
+  color:#6a6a8a;font-family:'Bebas Neue',Impact,sans-serif;font-size:1rem;
+  padding:3px 12px;cursor:pointer;letter-spacing:1px;transition:all .15s;
+}
+.team-count-btn.active{border-color:#ffee00;color:#ffee00;background:rgba(255,238,0,0.1);}
+.team-rank-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.team-rank-item{display:flex;align-items:center;gap:6px;background:#08080f;border:1px solid #1c1c30;border-radius:3px;padding:4px 8px;}
+.team-rank-item .tr-label{font-family:'Orbitron','Courier New',monospace;font-size:.7rem;color:#bf00ff;letter-spacing:1px;-webkit-filter:drop-shadow(0 0 3px rgba(191,0,255,0.6));filter:drop-shadow(0 0 3px rgba(191,0,255,0.6));}
+.team-rank-item select{background:#03030a;border:1px solid #1c1c30;border-radius:3px;color:#f0ede8;font-family:'Noto Sans JP',sans-serif;font-size:.78rem;font-weight:700;padding:4px 6px;outline:none;cursor:pointer;-webkit-appearance:none;}
+.team-rank-item select:focus{border-color:#bf00ff;}
+.game-mode-badge{font-family:'Orbitron','Courier New',monospace;font-size:.55rem;padding:1px 6px;border-radius:2px;letter-spacing:1px;margin-left:6px;}
+.game-mode-badge.individual{color:#00f5ff;border:1px solid rgba(0,245,255,0.5);background:rgba(0,245,255,0.05);}
+.game-mode-badge.team{color:#bf00ff;border:1px solid rgba(191,0,255,0.5);background:rgba(191,0,255,0.05);}
+
 /* ===== TOAST ===== */
 .toast{
   position:fixed;bottom:28px;left:50%;
@@ -666,7 +698,22 @@ function setCount(n){
   var sv=document.getElementById('stepValue'),sd=document.getElementById('stepDown'),su=document.getElementById('stepUp');
   if(sv)sv.textContent=n;if(sd)sd.disabled=(n<=MIN_PLAYERS);if(su)su.disabled=(n>=MAX_PLAYERS);
   selectedSlots=selectedSlots.slice(0,n);while(selectedSlots.length<n)selectedSlots.push('');
-  games=games.map(function(g){var r=g.ranks.slice(0,n);while(r.length<n)r.push(null);var cp=g.customPoints?g.customPoints.slice(0,n):null;if(cp)while(cp.length<n)cp.push(0);return{ranks:r,customPoints:cp};});
+  games=games.map(function(g){
+    var r=(g.ranks||[]).slice(0,n);while(r.length<n)r.push(null);
+    var cp=g.customPoints?g.customPoints.slice(0,n):null;
+    if(cp)while(cp.length<n)cp.push(0);
+    var ta=g.teamAssignments?g.teamAssignments.slice(0,n):null;
+    if(ta)while(ta.length<n)ta.push(null);
+    return{
+      mode:g.mode==='team'?'team':'individual',
+      ranks:r,
+      customPoints:cp,
+      teamCount:g.teamCount||2,
+      teamAssignments:ta,
+      teamRanks:g.teamRanks?g.teamRanks.slice():null,
+      teamCustomPoints:g.teamCustomPoints?g.teamCustomPoints.slice():null
+    };
+  });
   renderNameGrid();renderGames();renderTotals();
 }
 function renderNameGrid(){
@@ -687,10 +734,57 @@ function defaultPtsForCount(n){
   if(n<=1)return[0];if(n===2)return[5,-5];if(n===3)return[5,0,-5];if(n===4)return[5,3,-3,-5];if(n===5)return[5,3,0,-3,-5];
   var arr=Array(n).fill(0);arr[0]=5;arr[1]=3;arr[n-2]=-3;arr[n-1]=-5;return arr;
 }
+function defaultTeamPts(t){
+  if(t<=1)return[0];
+  if(t===2)return[5,-5];
+  if(t===3)return[5,0,-5];
+  if(t===4)return[5,3,-3,-5];
+  var a=Array(t).fill(0);a[0]=5;a[1]=3;a[t-2]=-3;a[t-1]=-5;return a;
+}
+var TEAM_LABELS=['A','B','C','D'];
+function getGameMode(g){return g&&g.mode==='team'?'team':'individual';}
+function calcPlayerPt(g,pi,n){
+  if(getGameMode(g)==='team'){
+    var ta=g.teamAssignments?g.teamAssignments[pi]:null;
+    if(ta==null||ta===''||ta==='dnp')return null;
+    var ti=parseInt(ta);
+    var tr=(g.teamRanks||[])[ti];
+    if(tr==null)return null;
+    var pts=g.teamCustomPoints||defaultTeamPts(g.teamCount||2);
+    return pts[tr-1]||0;
+  }
+  var r=g.ranks?g.ranks[pi]:null;
+  if(r==null||r==='dnp')return null;
+  var pts=g.customPoints||defaultPtsForCount(n);
+  return pts[r-1]||0;
+}
+function isGameComplete(g,n){
+  if(getGameMode(g)==='team'){
+    var ta=g.teamAssignments||[];
+    for(var pi=0;pi<n;pi++){
+      var v=ta[pi];
+      if(v==null||v==='')return false;
+      if(v==='dnp')continue;
+      var tr=(g.teamRanks||[])[parseInt(v)];
+      if(tr==null)return false;
+    }
+    return true;
+  }
+  return (g.ranks||[]).every(function(r){return r!==null;})&&(g.ranks||[]).length===n;
+}
 function getPts(gi){return games[gi].customPoints||defaultPtsForCount(playerCount);}
 function getPtByRank(gi,rank){var p=getPts(gi);return p[rank-1]!==undefined?p[rank-1]:0;}
 function addGame(){
-  games.push({ranks:Array(playerCount).fill(null),customPoints:null});renderGames();renderTotals();updateGameCount();
+  games.push({
+    mode:'individual',
+    ranks:Array(playerCount).fill(null),
+    customPoints:null,
+    teamCount:2,
+    teamAssignments:null,
+    teamRanks:null,
+    teamCustomPoints:null
+  });
+  renderGames();renderTotals();updateGameCount();
   setTimeout(function(){var c=document.getElementById('gamesContainer');if(c&&c.firstElementChild)c.firstElementChild.scrollIntoView({behavior:'smooth',block:'center'});},60);
 }
 function deleteGame(idx){games.splice(idx,1);renderGames();renderTotals();updateGameCount();}
@@ -699,9 +793,72 @@ function setRank(gi,pi,val){
   renderGameCard(gi);renderTotals();
 }
 function toggleCustomPts(gi){
-  var g=games[gi];g.customPoints=g.customPoints?null:defaultPtsForCount(playerCount).slice();renderGameCard(gi);renderTotals();
+  var g=games[gi];
+  if(getGameMode(g)==='team'){
+    g.teamCustomPoints=g.teamCustomPoints?null:defaultTeamPts(g.teamCount||2).slice();
+  }else{
+    g.customPoints=g.customPoints?null:defaultPtsForCount(playerCount).slice();
+  }
+  renderGameCard(gi);renderTotals();
 }
-function setCustomPt(gi,ri,val){games[gi].customPoints[ri]=parseInt(val)||0;renderGameCard(gi);renderTotals();}
+function setCustomPt(gi,ri,val){
+  var g=games[gi];
+  if(getGameMode(g)==='team'){
+    if(!g.teamCustomPoints)return;
+    g.teamCustomPoints[ri]=parseInt(val)||0;
+  }else{
+    if(!g.customPoints)return;
+    g.customPoints[ri]=parseInt(val)||0;
+  }
+  renderGameCard(gi);renderTotals();
+}
+function setGameMode(gi,mode){
+  var g=games[gi];
+  g.mode=mode;
+  if(mode==='team'){
+    if(!g.teamCount)g.teamCount=2;
+    if(!g.teamAssignments)g.teamAssignments=Array(playerCount).fill(null);
+    else{
+      g.teamAssignments=g.teamAssignments.slice(0,playerCount);
+      while(g.teamAssignments.length<playerCount)g.teamAssignments.push(null);
+    }
+    if(!g.teamRanks)g.teamRanks=Array(g.teamCount).fill(null);
+  }
+  renderGameCard(gi);renderTotals();
+}
+function setTeamCount(gi,n){
+  var g=games[gi];
+  g.teamCount=n;
+  if(!g.teamRanks)g.teamRanks=[];
+  g.teamRanks=g.teamRanks.slice(0,n);
+  while(g.teamRanks.length<n)g.teamRanks.push(null);
+  if(g.teamCustomPoints){
+    g.teamCustomPoints=g.teamCustomPoints.slice(0,n);
+    while(g.teamCustomPoints.length<n)g.teamCustomPoints.push(0);
+  }
+  if(g.teamAssignments){
+    g.teamAssignments=g.teamAssignments.map(function(t){
+      if(t==null||t==='dnp')return t;
+      var idx=parseInt(t);
+      return idx>=n?null:idx;
+    });
+  }
+  renderGameCard(gi);renderTotals();
+}
+function setTeamRank(gi,ti,val){
+  var g=games[gi];
+  if(!g.teamRanks)g.teamRanks=[];
+  g.teamRanks[ti]=val?parseInt(val):null;
+  renderGameCard(gi);renderTotals();
+}
+function setTeamAssign(gi,pi,val){
+  var g=games[gi];
+  if(!g.teamAssignments)g.teamAssignments=Array(playerCount).fill(null);
+  if(val==='dnp')g.teamAssignments[pi]='dnp';
+  else if(val==='')g.teamAssignments[pi]=null;
+  else g.teamAssignments[pi]=parseInt(val);
+  renderGameCard(gi);renderTotals();
+}
 function renderGames(){
   var c=document.getElementById('gamesContainer');c.innerHTML='';
   for(var gi=games.length-1;gi>=0;gi--)c.appendChild(createGameCard(gi));updateGameCount();
@@ -711,28 +868,77 @@ function renderGameCard(gi){
   if(c.children[domIdx])c.replaceChild(createGameCard(gi),c.children[domIdx]);
 }
 function createGameCard(gi){
-  var g=games[gi],hasCustom=!!g.customPoints,pts=getPts(gi);
-  var ranks=g.ranks.filter(function(r){return r!==null&&r!=='dnp';}),hasDup=ranks.length!==new Set(ranks).size;
+  var g=games[gi],mode=getGameMode(g);
+  var hasCustom,pts,nPts;
+  if(mode==='team'){hasCustom=!!g.teamCustomPoints;nPts=g.teamCount||2;pts=g.teamCustomPoints||defaultTeamPts(nPts);}
+  else{hasCustom=!!g.customPoints;nPts=playerCount;pts=g.customPoints||defaultPtsForCount(nPts);}
   var customHtml='';
-  for(var i=0;i<playerCount;i++)customHtml+='<div class="game-pts-item"><label>'+(i+1)+'位</label><input class="game-pts-input" type="number" value="'+pts[i]+'" onchange="setCustomPt('+gi+','+i+',this.value)"></div>';
+  for(var i=0;i<nPts;i++)customHtml+='<div class="game-pts-item"><label>'+(i+1)+'位</label><input class="game-pts-input" type="number" value="'+pts[i]+'" onchange="setCustomPt('+gi+','+i+',this.value)"></div>';
+  var modeHtml='<div class="mode-toggle"><button class="mode-btn'+(mode==='individual'?' active':'')+'" onclick="setGameMode('+gi+',\'individual\')">👤 個人戦</button><button class="mode-btn'+(mode==='team'?' active':'')+'" onclick="setGameMode('+gi+',\'team\')">👥 チーム戦</button></div>';
+  var teamConfigHtml='';
+  if(mode==='team'){
+    var tc=g.teamCount||2;
+    var teamCountHtml='<div class="team-count-row"><span class="tc-label">チーム数</span>';
+    [2,3,4].forEach(function(nn){teamCountHtml+='<button class="team-count-btn'+(tc===nn?' active':'')+'" onclick="setTeamCount('+gi+','+nn+')">'+nn+'</button>';});
+    teamCountHtml+='</div>';
+    var teamRanksHtml='<div class="team-rank-grid">';
+    for(var ti=0;ti<tc;ti++){
+      var tr=(g.teamRanks||[])[ti];
+      var trOpts='<option value=""'+(tr==null?' selected':'')+'>—</option>';
+      for(var nn=1;nn<=tc;nn++)trOpts+='<option value="'+nn+'"'+(tr===nn?' selected':'')+'>'+nn+'位</option>';
+      teamRanksHtml+='<div class="team-rank-item"><span class="tr-label">'+TEAM_LABELS[ti]+'チーム</span><select onchange="setTeamRank('+gi+','+ti+',this.value)">'+trOpts+'</select></div>';
+    }
+    teamRanksHtml+='</div>';
+    teamConfigHtml='<div class="team-config">'+teamCountHtml+teamRanksHtml+'</div>';
+  }
   var rowsHtml='';
   for(var pi=0;pi<playerCount;pi++){
-    var r=g.ranks[pi],ptCls,ptStr;
-    if(r==='dnp'){ptCls='pt-zero';ptStr='不参加';}
-    else if(r===null){ptCls='';ptStr='—';}
-    else{var ptVal=pts[r-1];ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=ptVal>0?'+'+ptVal:''+ptVal;}
-    var opts='<option value=""'+(r===null?' selected':'')+'>—</option>';
+    var pt=calcPlayerPt(g,pi,playerCount);
+    var ptCls,ptStr;
+    if(pt==null){
+      var dnpVal=mode==='team'?(g.teamAssignments||[])[pi]:g.ranks[pi];
+      if(dnpVal==='dnp'){ptCls='pt-zero';ptStr='不参加';}
+      else{ptCls='';ptStr='—';}
+    }else{
+      ptCls=pt>0?'pt-pos':pt<0?'pt-neg':'pt-zero';
+      ptStr=pt>0?'+'+pt:''+pt;
+    }
+    var opts;
+    if(mode==='team'){
+      var ta=(g.teamAssignments||[])[pi];
+      var taStr=(ta==null||ta==='')?'':(ta==='dnp'?'dnp':String(ta));
+      opts='<option value=""'+(taStr===''?' selected':'')+'>—</option>';
+      for(var ti2=0;ti2<(g.teamCount||2);ti2++)opts+='<option value="'+ti2+'"'+(taStr===String(ti2)?' selected':'')+'>'+TEAM_LABELS[ti2]+'チーム</option>';
+      opts+='<option value="dnp"'+(taStr==='dnp'?' selected':'')+'>不参加</option>';
+      rowsHtml+='<div class="rank-row"><span class="pname">'+dn(pi)+'</span><select class="rank-select" onchange="setTeamAssign('+gi+','+pi+',this.value)">'+opts+'</select><span class="pt-preview '+ptCls+'">'+ptStr+'</span></div>';
+      continue;
+    }
+    var r=g.ranks[pi];
+    opts='<option value=""'+(r===null?' selected':'')+'>—</option>';
     for(var n=1;n<=playerCount;n++)opts+='<option value="'+n+'"'+(r===n?' selected':'')+'>'+n+'位</option>';
     opts+='<option value="dnp"'+(r==='dnp'?' selected':'')+'>不参加</option>';
     rowsHtml+='<div class="rank-row"><span class="pname">'+dn(pi)+'</span><select class="rank-select" onchange="setRank('+gi+','+pi+',this.value)">'+opts+'</select><span class="pt-preview '+ptCls+'">'+ptStr+'</span></div>';
   }
+  var hasDup=false;
+  if(mode==='team'){
+    var trs=(g.teamRanks||[]).slice(0,g.teamCount||2).filter(function(x){return x!=null;});
+    hasDup=trs.length!==new Set(trs).size;
+  }else{
+    var ranksArr=g.ranks.filter(function(r){return r!==null&&r!=='dnp';});
+    hasDup=ranksArr.length!==new Set(ranksArr).size;
+  }
   var card=document.createElement('div');card.className='game-card';
-  card.innerHTML='<div class="game-card-header"><span class="game-num">GAME '+(gi+1)+'</span><div class="game-card-actions"><button class="pts-toggle-btn'+(hasCustom?' active':'')+'" onclick="toggleCustomPts('+gi+')">'+(hasCustom?'⚙ カスタム配点中':'⚙ 配点設定')+'</button><button class="del-btn" onclick="deleteGame('+gi+')">\u2715</button></div></div><div class="game-pts-area'+(hasCustom?' open':'')+'"><div class="game-pts-grid">'+customHtml+'</div></div><div class="rank-inputs">'+rowsHtml+'</div>'+(hasDup?'<div class="dup-warn">⚠ 同じ順位が重複しています</div>':'');
+  card.innerHTML='<div class="game-card-header"><span class="game-num">GAME '+(gi+1)+'</span><div class="game-card-actions"><button class="pts-toggle-btn'+(hasCustom?' active':'')+'" onclick="toggleCustomPts('+gi+')">'+(hasCustom?'⚙ カスタム配点中':'⚙ 配点設定')+'</button><button class="del-btn" onclick="deleteGame('+gi+')">\u2715</button></div></div>'+modeHtml+teamConfigHtml+'<div class="game-pts-area'+(hasCustom?' open':'')+'"><div class="game-pts-grid">'+customHtml+'</div></div><div class="rank-inputs">'+rowsHtml+'</div>'+(hasDup?'<div class="dup-warn">⚠ 同じ順位が重複しています</div>':'');
   return card;
 }
 function calcTotals(){
   var t=Array(playerCount).fill(0);
-  games.forEach(function(g,gi){g.ranks.forEach(function(r,pi){if(r!==null&&r!=='dnp')t[pi]+=getPtByRank(gi,r);});});
+  games.forEach(function(g){
+    for(var pi=0;pi<playerCount;pi++){
+      var pt=calcPlayerPt(g,pi,playerCount);
+      if(pt!=null)t[pi]+=pt;
+    }
+  });
   return t;
 }
 function renderTotals(){
@@ -740,17 +946,23 @@ function renderTotals(){
   var card=document.getElementById('totalCard');
   if(games.length===0){card.innerHTML='<div class="total-empty">— SCORES —</div>';}
   else{card.innerHTML=sorted.map(function(item,rank){var s=item.s,cls=rank<3?'rank-'+(rank+1):'',ptCls=s>0?'pt-pos':s<0?'pt-neg':'pt-zero';return'<div class="total-pill '+cls+'"><span class="pill-medal">'+(MEDALS[rank]||'')+'</span><span class="pill-name">'+dn(item.i)+'</span><span class="pill-score '+ptCls+'">'+(s>0?'+':'')+s+'</span></div>';}).join('');}
-  var completeGames=games.filter(function(g){return g.ranks.every(function(r){return r!==null;});});
+  var completeGames=games.filter(function(g){return isGameComplete(g,playerCount);});
   var bc=document.getElementById('balanceCard');
   if(completeGames.length===0){bc.innerHTML='';return;}
-  var sum=completeGames.reduce(function(acc,g){var gi=games.indexOf(g);return acc+g.ranks.reduce(function(a,r){return a+(r==='dnp'?0:getPtByRank(gi,r));},0);},0);
+  var sum=0;
+  completeGames.forEach(function(g){
+    for(var pi=0;pi<playerCount;pi++){
+      var pt=calcPlayerPt(g,pi,playerCount);
+      if(pt!=null)sum+=pt;
+    }
+  });
   var isOk=sum===0;
   bc.innerHTML='<div class="balance-card '+(isOk?'ok':'ng')+'"><div class="balance-left"><span class="balance-icon">'+(isOk?'✅':'⚠️')+'</span><div><div class="balance-title">'+(isOk?'BALANCE OK':'BALANCE ERROR')+'</div><div class="balance-sub">完全入力 '+completeGames.length+'ゲーム分の合計</div></div></div><span class="balance-num">'+(sum>0?'+':'')+sum+'</span></div>';
 }
 function updateGameCount(){document.getElementById('gameCount').textContent=games.length+' GAMES';}
 function saveSession(){
   if(games.length===0){showToast('ゲームがありません');return;}
-  var session={id:Date.now(),date:new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}),playerCount:playerCount,names:selectedSlots.slice(),games:games.map(function(g){return{ranks:g.ranks.slice(),customPoints:g.customPoints?g.customPoints.slice():null};}),totals:calcTotals()};
+  var session={id:Date.now(),date:new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}),playerCount:playerCount,names:selectedSlots.slice(),games:games.map(function(g){return{mode:getGameMode(g),ranks:g.ranks.slice(),customPoints:g.customPoints?g.customPoints.slice():null,teamCount:g.teamCount||null,teamAssignments:g.teamAssignments?g.teamAssignments.slice():null,teamRanks:g.teamRanks?g.teamRanks.slice():null,teamCustomPoints:g.teamCustomPoints?g.teamCustomPoints.slice():null};}),totals:calcTotals()};
   var d=JSON.parse(JSON.stringify(cachedData));if(!d.sessions)d.sessions=[];d.sessions.unshift(session);
   saveData(d,function(){showToast('💾 SAVED!');});
 }
@@ -758,7 +970,7 @@ function renderStats(){
   var sessions=getSessions(),card=document.getElementById('statsCard');
   if(sessions.length===0){card.innerHTML='<div class="stats-empty">— NO DATA —</div>';return;}
   var userMap={};
-  sessions.forEach(function(s){s.names.forEach(function(name,i){var nm=(name&&name.trim())?name.trim():'P'+(i+1);if(!userMap[nm])userMap[nm]={total:0,gameCount:0,sessionCount:0};userMap[nm].total+=s.totals[i];userMap[nm].sessionCount++;userMap[nm].gameCount+=s.games.filter(function(g){return g.ranks[i]!==null&&g.ranks[i]!=='dnp';}).length;});});
+  sessions.forEach(function(s){s.names.forEach(function(name,i){var nm=(name&&name.trim())?name.trim():'P'+(i+1);if(!userMap[nm])userMap[nm]={total:0,gameCount:0,sessionCount:0};userMap[nm].total+=s.totals[i];userMap[nm].sessionCount++;userMap[nm].gameCount+=s.games.filter(function(g){if(g.mode==='team'){var ta=(g.teamAssignments||[])[i];return ta!=null&&ta!==''&&ta!=='dnp';}return g.ranks[i]!==null&&g.ranks[i]!=='dnp';}).length;});});
   var sorted=Object.entries(userMap).map(function(e){return{name:e[0],total:e[1].total,gameCount:e[1].gameCount,sessionCount:e[1].sessionCount};}).sort(function(a,b){return b.total-a.total;});
   card.innerHTML=sorted.map(function(u,rank){
     var cls=rank<3?'stats-row rank-'+(rank+1):'stats-row',ptCls=u.total>0?'pt-pos':u.total<0?'pt-neg':'pt-zero',avg=u.gameCount>0?(u.total/u.gameCount).toFixed(1):'0.0';
@@ -798,20 +1010,39 @@ function buildViewHtml(s){
   var sorted=s.totals.map(function(sc,i){return{i:i,sc:sc};}).sort(function(a,b){return b.sc-a.sc;});
   var rankingHtml=sorted.map(function(item,rank){var sc=item.sc,ptCls=sc>0?'pt-pos':sc<0?'pt-neg':'pt-zero';return'<div class="hist-rank-row"><div class="hist-rank-left"><span class="hist-rank-medal">'+(MEDALS[rank]||'')+'</span><span class="hist-rank-name">'+getName(item.i)+'</span></div><span class="hist-rank-score '+ptCls+'">'+(sc>0?'+':'')+sc+'</span></div>';}).join('');
   var gamesHtml=s.games.map(function(g,gi){return{g:g,gi:gi};}).reverse().map(function(obj){
-    var g=obj.g,gi=obj.gi,pts=g.customPoints||defaultPtsForCount(s.playerCount);
-    var rows=g.ranks.map(function(r,pi){
-      if(r===null)return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">—</span><span class="hgp-pt">—</span></div>';
-      if(r==='dnp')return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">不参加</span><span class="hgp-pt pt-zero">—</span></div>';
-      var pt=pts[r-1],ptCls=pt>0?'pt-pos':pt<0?'pt-neg':'pt-zero';
-      return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">'+r+'位</span><span class="hgp-pt '+ptCls+'">'+(pt>0?'+':'')+pt+'</span></div>';
-    }).join('');
-    return'<div class="hist-game-item"><div class="hist-game-title">GAME '+(gi+1)+(g.customPoints?' <span style="font-size:.62rem;color:#ffee00">CUSTOM</span>':'')+'</div><div class="hist-game-rows">'+rows+'</div></div>';
+    var g=obj.g,gi=obj.gi,mode=getGameMode(g);
+    var modeBadge=mode==='team'?'<span class="game-mode-badge team">TEAM</span>':'<span class="game-mode-badge individual">INDIVIDUAL</span>';
+    var customFlag=mode==='team'?!!g.teamCustomPoints:!!g.customPoints;
+    var customLabel=customFlag?' <span style="font-size:.62rem;color:#ffee00">CUSTOM</span>':'';
+    var rows;
+    if(mode==='team'){
+      var tpts=g.teamCustomPoints||defaultTeamPts(g.teamCount||2);
+      var trs=g.teamRanks||[];
+      var ta=g.teamAssignments||[];
+      rows=ta.slice(0,s.playerCount).map(function(t,pi){
+        if(t==null||t==='')return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">—</span><span class="hgp-pt">—</span></div>';
+        if(t==='dnp')return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">不参加</span><span class="hgp-pt pt-zero">—</span></div>';
+        var ti=parseInt(t),tr=trs[ti];
+        if(tr==null)return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">'+TEAM_LABELS[ti]+'チーム</span><span class="hgp-pt">—</span></div>';
+        var pt=tpts[tr-1]||0,ptCls=pt>0?'pt-pos':pt<0?'pt-neg':'pt-zero';
+        return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">'+TEAM_LABELS[ti]+'チーム/'+tr+'位</span><span class="hgp-pt '+ptCls+'">'+(pt>0?'+':'')+pt+'</span></div>';
+      }).join('');
+    }else{
+      var pts=g.customPoints||defaultPtsForCount(s.playerCount);
+      rows=g.ranks.map(function(r,pi){
+        if(r===null)return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">—</span><span class="hgp-pt">—</span></div>';
+        if(r==='dnp')return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">不参加</span><span class="hgp-pt pt-zero">—</span></div>';
+        var pt=pts[r-1],ptCls=pt>0?'pt-pos':pt<0?'pt-neg':'pt-zero';
+        return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">'+r+'位</span><span class="hgp-pt '+ptCls+'">'+(pt>0?'+':'')+pt+'</span></div>';
+      }).join('');
+    }
+    return'<div class="hist-game-item"><div class="hist-game-title">GAME '+(gi+1)+modeBadge+customLabel+'</div><div class="hist-game-rows">'+rows+'</div></div>';
   }).join('');
   return'<div class="hist-view"><div class="hist-ranking">'+rankingHtml+'</div><div class="hist-games-label">ゲーム詳細</div>'+gamesHtml+'</div>';
 }
 function getEditDraft(s){
   if(!editStates[s.id])editStates[s.id]={open:true,editMode:true};
-  if(!editStates[s.id].draft)editStates[s.id].draft={names:s.names.slice(),games:s.games.map(function(g){return{ranks:g.ranks.slice(),customPoints:g.customPoints?g.customPoints.slice():null};})};
+  if(!editStates[s.id].draft)editStates[s.id].draft={names:s.names.slice(),games:s.games.map(function(g){return{mode:g.mode==='team'?'team':'individual',ranks:(g.ranks||Array(s.playerCount).fill(null)).slice(),customPoints:g.customPoints?g.customPoints.slice():null,teamCount:g.teamCount||2,teamAssignments:g.teamAssignments?g.teamAssignments.slice():null,teamRanks:g.teamRanks?g.teamRanks.slice():null,teamCustomPoints:g.teamCustomPoints?g.teamCustomPoints.slice():null};})};
   return editStates[s.id].draft;
 }
 function buildEditHtml(s){
@@ -823,18 +1054,57 @@ function buildEditHtml(s){
     return'<div class="edit-slot-wrap"><select class="edit-slot-select" onchange="editSlot('+s.id+','+i+',this.value)">'+opts+'</select><span class="edit-slot-arrow">▼</span></div>';
   }).join('');
   var gamesHtml=draft.games.map(function(g,gi){return{g:g,gi:gi};}).reverse().map(function(obj){
-    var g=obj.g,gi=obj.gi,hasCustom=!!g.customPoints,pts=g.customPoints||defaultPtsForCount(n);
-    var ptsHtml='';for(var i=0;i<n;i++)ptsHtml+='<div class="edit-pts-item"><label>'+(i+1)+'位</label><input class="edit-pts-input" type="number" value="'+pts[i]+'" onchange="editGamePt('+s.id+','+gi+','+i+',this.value)"></div>';
+    var g=obj.g,gi=obj.gi,mode=g.mode==='team'?'team':'individual';
+    var hasCustom,pts,nPts;
+    if(mode==='team'){hasCustom=!!g.teamCustomPoints;nPts=g.teamCount||2;pts=g.teamCustomPoints||defaultTeamPts(nPts);}
+    else{hasCustom=!!g.customPoints;nPts=n;pts=g.customPoints||defaultPtsForCount(nPts);}
+    var modeHtml='<div class="mode-toggle"><button class="mode-btn'+(mode==='individual'?' active':'')+'" onclick="editSetGameMode('+s.id+','+gi+',\'individual\')">👤 個人戦</button><button class="mode-btn'+(mode==='team'?' active':'')+'" onclick="editSetGameMode('+s.id+','+gi+',\'team\')">👥 チーム戦</button></div>';
+    var teamConfigHtml='';
+    if(mode==='team'){
+      var tc=g.teamCount||2;
+      var teamCountHtml='<div class="team-count-row"><span class="tc-label">チーム数</span>';
+      [2,3,4].forEach(function(nn){teamCountHtml+='<button class="team-count-btn'+(tc===nn?' active':'')+'" onclick="editSetTeamCount('+s.id+','+gi+','+nn+')">'+nn+'</button>';});
+      teamCountHtml+='</div>';
+      var teamRanksHtml='<div class="team-rank-grid">';
+      for(var ti=0;ti<tc;ti++){
+        var tr=(g.teamRanks||[])[ti];
+        var trOpts='<option value=""'+(tr==null?' selected':'')+'>—</option>';
+        for(var nn=1;nn<=tc;nn++)trOpts+='<option value="'+nn+'"'+(tr===nn?' selected':'')+'>'+nn+'位</option>';
+        teamRanksHtml+='<div class="team-rank-item"><span class="tr-label">'+TEAM_LABELS[ti]+'チーム</span><select onchange="editSetTeamRank('+s.id+','+gi+','+ti+',this.value)">'+trOpts+'</select></div>';
+      }
+      teamRanksHtml+='</div>';
+      teamConfigHtml='<div class="team-config">'+teamCountHtml+teamRanksHtml+'</div>';
+    }
+    var ptsHtml='';for(var i=0;i<nPts;i++)ptsHtml+='<div class="edit-pts-item"><label>'+(i+1)+'位</label><input class="edit-pts-input" type="number" value="'+pts[i]+'" onchange="editGamePt('+s.id+','+gi+','+i+',this.value)"></div>';
     var rankHtml='';
     for(var pi=0;pi<n;pi++){
-      var r=g.ranks[pi],ptCls,ptStr;
-      if(r==='dnp'){ptCls='pt-zero';ptStr='不参加';}else if(r===null){ptCls='';ptStr='—';}else{var ptVal=pts[r-1];ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=ptVal>0?'+'+ptVal:''+ptVal;}
-      var opts='<option value=""'+(r===null?' selected':'')+'>—</option>';
-      for(var nn=1;nn<=n;nn++)opts+='<option value="'+nn+'"'+(r===nn?' selected':'')+'>'+nn+'位</option>';
-      opts+='<option value="dnp"'+(r==='dnp'?' selected':'')+'>不参加</option>';
-      rankHtml+='<div class="edit-rank-row"><span class="epname">'+getName(pi)+'</span><select class="edit-rank-select" onchange="editRank('+s.id+','+gi+','+pi+',this.value)">'+opts+'</select><span class="edit-pt-preview '+ptCls+'" id="epp-'+s.id+'-'+gi+'-'+pi+'">'+ptStr+'</span></div>';
+      var pt=calcPlayerPt(g,pi,n);
+      var ptCls,ptStr;
+      if(pt==null){
+        var dnpVal=mode==='team'?(g.teamAssignments||[])[pi]:g.ranks[pi];
+        if(dnpVal==='dnp'){ptCls='pt-zero';ptStr='不参加';}
+        else{ptCls='';ptStr='—';}
+      }else{
+        ptCls=pt>0?'pt-pos':pt<0?'pt-neg':'pt-zero';
+        ptStr=pt>0?'+'+pt:''+pt;
+      }
+      var opts;
+      if(mode==='team'){
+        var ta=(g.teamAssignments||[])[pi];
+        var taStr=(ta==null||ta==='')?'':(ta==='dnp'?'dnp':String(ta));
+        opts='<option value=""'+(taStr===''?' selected':'')+'>—</option>';
+        for(var ti2=0;ti2<(g.teamCount||2);ti2++)opts+='<option value="'+ti2+'"'+(taStr===String(ti2)?' selected':'')+'>'+TEAM_LABELS[ti2]+'チーム</option>';
+        opts+='<option value="dnp"'+(taStr==='dnp'?' selected':'')+'>不参加</option>';
+        rankHtml+='<div class="edit-rank-row"><span class="epname">'+getName(pi)+'</span><select class="edit-rank-select" onchange="editSetTeamAssign('+s.id+','+gi+','+pi+',this.value)">'+opts+'</select><span class="edit-pt-preview '+ptCls+'" id="epp-'+s.id+'-'+gi+'-'+pi+'">'+ptStr+'</span></div>';
+      }else{
+        var r=g.ranks[pi];
+        opts='<option value=""'+(r===null?' selected':'')+'>—</option>';
+        for(var nn=1;nn<=n;nn++)opts+='<option value="'+nn+'"'+(r===nn?' selected':'')+'>'+nn+'位</option>';
+        opts+='<option value="dnp"'+(r==='dnp'?' selected':'')+'>不参加</option>';
+        rankHtml+='<div class="edit-rank-row"><span class="epname">'+getName(pi)+'</span><select class="edit-rank-select" onchange="editRank('+s.id+','+gi+','+pi+',this.value)">'+opts+'</select><span class="edit-pt-preview '+ptCls+'" id="epp-'+s.id+'-'+gi+'-'+pi+'">'+ptStr+'</span></div>';
+      }
     }
-    return'<div class="edit-game-block"><div class="edit-game-header"><span class="edit-game-num">GAME '+(gi+1)+'</span><button class="edit-pts-toggle'+(hasCustom?' active':'')+'" onclick="editToggleCustomPts('+s.id+','+gi+')">'+(hasCustom?'⚙ CUSTOM':'⚙ POINTS')+'</button></div><div class="edit-pts-area'+(hasCustom?' open':'')+'" id="epa-'+s.id+'-'+gi+'"><div class="edit-pts-grid">'+ptsHtml+'</div></div><div class="edit-rank-rows">'+rankHtml+'</div></div>';
+    return'<div class="edit-game-block"><div class="edit-game-header"><span class="edit-game-num">GAME '+(gi+1)+'</span><button class="edit-pts-toggle'+(hasCustom?' active':'')+'" onclick="editToggleCustomPts('+s.id+','+gi+')">'+(hasCustom?'⚙ CUSTOM':'⚙ POINTS')+'</button></div>'+modeHtml+teamConfigHtml+'<div class="edit-pts-area'+(hasCustom?' open':'')+'" id="epa-'+s.id+'-'+gi+'"><div class="edit-pts-grid">'+ptsHtml+'</div></div><div class="edit-rank-rows">'+rankHtml+'</div></div>';
   }).join('');
   return'<div class="hist-edit"><div class="edit-section-label">プレイヤー名</div><div class="edit-names-grid">'+namesHtml+'</div><div class="edit-section-label">ゲーム結果</div>'+gamesHtml+'<button class="edit-save-btn" onclick="commitEdit('+s.id+')">✅ 変更を保存</button></div>';
 }
@@ -847,17 +1117,86 @@ function editRank(id,gi,pi,val){
   if(r==='dnp'){ptCls='pt-zero';ptStr='不参加';}else if(r===null){ptCls='';ptStr='—';}else{var ptVal=pts[r-1];ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=ptVal>0?'+'+ptVal:''+ptVal;}
   var el=document.getElementById('epp-'+id+'-'+gi+'-'+pi);if(el){el.className='edit-pt-preview '+ptCls;el.textContent=ptStr;}
 }
-function editToggleCustomPts(id,gi){var s=getSessions().find(function(x){return x.id===id;});if(!s)return;var draft=getEditDraft(s);draft.games[gi].customPoints=draft.games[gi].customPoints?null:defaultPtsForCount(s.playerCount).slice();renderHistory();}
-function editGamePt(id,gi,ri,val){var s=getSessions().find(function(x){return x.id===id;});if(!s)return;var draft=getEditDraft(s);if(draft.games[gi].customPoints)draft.games[gi].customPoints[ri]=parseInt(val)||0;}
+function editToggleCustomPts(id,gi){
+  var s=getSessions().find(function(x){return x.id===id;});if(!s)return;
+  var draft=getEditDraft(s),g=draft.games[gi];
+  if(g.mode==='team'){
+    g.teamCustomPoints=g.teamCustomPoints?null:defaultTeamPts(g.teamCount||2).slice();
+  }else{
+    g.customPoints=g.customPoints?null:defaultPtsForCount(s.playerCount).slice();
+  }
+  renderHistory();
+}
+function editGamePt(id,gi,ri,val){
+  var s=getSessions().find(function(x){return x.id===id;});if(!s)return;
+  var draft=getEditDraft(s),g=draft.games[gi];
+  if(g.mode==='team'){
+    if(g.teamCustomPoints)g.teamCustomPoints[ri]=parseInt(val)||0;
+  }else{
+    if(g.customPoints)g.customPoints[ri]=parseInt(val)||0;
+  }
+}
+function editSetGameMode(id,gi,mode){
+  var s=getSessions().find(function(x){return x.id===id;});if(!s)return;
+  var draft=getEditDraft(s),g=draft.games[gi];
+  g.mode=mode;
+  if(mode==='team'){
+    if(!g.teamCount)g.teamCount=2;
+    if(!g.teamAssignments)g.teamAssignments=Array(s.playerCount).fill(null);
+    if(!g.teamRanks)g.teamRanks=Array(g.teamCount).fill(null);
+  }
+  renderHistory();
+}
+function editSetTeamCount(id,gi,n){
+  var s=getSessions().find(function(x){return x.id===id;});if(!s)return;
+  var draft=getEditDraft(s),g=draft.games[gi];
+  g.teamCount=n;
+  if(!g.teamRanks)g.teamRanks=[];
+  g.teamRanks=g.teamRanks.slice(0,n);
+  while(g.teamRanks.length<n)g.teamRanks.push(null);
+  if(g.teamCustomPoints){
+    g.teamCustomPoints=g.teamCustomPoints.slice(0,n);
+    while(g.teamCustomPoints.length<n)g.teamCustomPoints.push(0);
+  }
+  if(g.teamAssignments){
+    g.teamAssignments=g.teamAssignments.map(function(t){
+      if(t==null||t==='dnp')return t;
+      var idx=parseInt(t);
+      return idx>=n?null:idx;
+    });
+  }
+  renderHistory();
+}
+function editSetTeamRank(id,gi,ti,val){
+  var s=getSessions().find(function(x){return x.id===id;});if(!s)return;
+  var draft=getEditDraft(s),g=draft.games[gi];
+  if(!g.teamRanks)g.teamRanks=[];
+  g.teamRanks[ti]=val?parseInt(val):null;
+  renderHistory();
+}
+function editSetTeamAssign(id,gi,pi,val){
+  var s=getSessions().find(function(x){return x.id===id;});if(!s)return;
+  var draft=getEditDraft(s),g=draft.games[gi];
+  if(!g.teamAssignments)g.teamAssignments=Array(s.playerCount).fill(null);
+  if(val==='dnp')g.teamAssignments[pi]='dnp';
+  else if(val==='')g.teamAssignments[pi]=null;
+  else g.teamAssignments[pi]=parseInt(val);
+  renderHistory();
+}
 function commitEdit(id){
   var s=getSessions().find(function(x){return x.id===id;});if(!s||!editStates[id]||!editStates[id].draft)return;
   var draft=editStates[id].draft;
   document.querySelectorAll('#hsess-'+id+' .edit-slot-select').forEach(function(sel,i){draft.names[i]=sel.value;});
   var d=JSON.parse(JSON.stringify(cachedData)),idx=d.sessions.findIndex(function(x){return x.id===id;});if(idx===-1)return;
   d.sessions[idx].names=draft.names.slice();
-  d.sessions[idx].games=draft.games.map(function(g){return{ranks:g.ranks.slice(),customPoints:g.customPoints?g.customPoints.slice():null};});
+  d.sessions[idx].games=draft.games.map(function(g){return{mode:g.mode==='team'?'team':'individual',ranks:g.ranks.slice(),customPoints:g.customPoints?g.customPoints.slice():null,teamCount:g.teamCount||null,teamAssignments:g.teamAssignments?g.teamAssignments.slice():null,teamRanks:g.teamRanks?g.teamRanks.slice():null,teamCustomPoints:g.teamCustomPoints?g.teamCustomPoints.slice():null};});
   var n=d.sessions[idx].playerCount,totals=Array(n).fill(0);
-  d.sessions[idx].games.forEach(function(g){var pts=g.customPoints||defaultPtsForCount(n);g.ranks.forEach(function(r,pi){if(r!==null&&r!=='dnp')totals[pi]+=(pts[r-1]||0);});});
+  d.sessions[idx].games.forEach(function(g){
+    for(var pi=0;pi<n;pi++){
+      var pt=calcPlayerPt(g,pi,n);
+      if(pt!=null)totals[pi]+=pt;
+    }
+  });
   d.sessions[idx].totals=totals;
   saveData(d,function(){delete editStates[id].draft;editStates[id].editMode=false;renderHistory();showToast('✅ UPDATED!');});
 }
