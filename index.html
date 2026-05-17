@@ -970,11 +970,15 @@ function renderStats(){
   var sessions=getSessions(),card=document.getElementById('statsCard');
   if(sessions.length===0){card.innerHTML='<div class="stats-empty">— NO DATA —</div>';return;}
   var userMap={};
-  sessions.forEach(function(s){s.names.forEach(function(name,i){var nm=(name&&name.trim())?name.trim():'P'+(i+1);if(!userMap[nm])userMap[nm]={total:0,gameCount:0,sessionCount:0};userMap[nm].total+=s.totals[i];userMap[nm].sessionCount++;userMap[nm].gameCount+=s.games.filter(function(g){if(g.mode==='team'){var ta=(g.teamAssignments||[])[i];return ta!=null&&ta!==''&&ta!=='dnp';}return g.ranks[i]!==null&&g.ranks[i]!=='dnp';}).length;});});
-  var sorted=Object.entries(userMap).map(function(e){return{name:e[0],total:e[1].total,gameCount:e[1].gameCount,sessionCount:e[1].sessionCount};}).sort(function(a,b){return b.total-a.total;});
+  sessions.forEach(function(s){s.names.forEach(function(name,i){var nm=(name&&name.trim())?name.trim():'P'+(i+1);if(!userMap[nm])userMap[nm]={total:0,gameCount:0,sessionCount:0,scores:[]};userMap[nm].total+=s.totals[i];userMap[nm].sessionCount++;s.games.forEach(function(g){var pt=calcPlayerPt(g,i,s.playerCount);if(pt!=null){userMap[nm].gameCount++;userMap[nm].scores.push(pt);}});});});
+  var sorted=Object.entries(userMap).map(function(e){return{name:e[0],total:e[1].total,gameCount:e[1].gameCount,sessionCount:e[1].sessionCount,scores:e[1].scores};}).sort(function(a,b){return b.total-a.total;});
   card.innerHTML=sorted.map(function(u,rank){
-    var cls=rank<3?'stats-row rank-'+(rank+1):'stats-row',ptCls=u.total>0?'pt-pos':u.total<0?'pt-neg':'pt-zero',avg=u.gameCount>0?(u.total/u.gameCount).toFixed(1):'0.0';
-    return'<div class="'+cls+'"><div class="stats-left"><span class="stats-medal">'+(MEDALS[rank]||'')+'</span><div><div class="stats-name">'+u.name+'</div><div class="stats-sub">'+u.sessionCount+'回参加 / '+u.gameCount+'ゲーム / 平均'+(avg>0?'+':'')+avg+'</div></div></div><div class="stats-right"><div class="stats-total '+ptCls+'">'+(u.total>0?'+':'')+u.total+'</div></div></div>';
+    var cls=rank<3?'stats-row rank-'+(rank+1):'stats-row',ptCls=u.total>0?'pt-pos':u.total<0?'pt-neg':'pt-zero';
+    var hi=u.scores.slice().sort(function(a,b){return b-a;}).slice(0,3);
+    var lo=u.scores.slice().sort(function(a,b){return a-b;}).slice(0,3);
+    var fmt=function(arr){return arr.length?arr.map(function(v){return(v>0?'+':'')+v;}).join(' '):'—';};
+    var hiLo='High Game <span style="color:#39ff14">'+fmt(hi)+'</span> / Low Game <span style="color:#ff0080">'+fmt(lo)+'</span>';
+    return'<div class="'+cls+'"><div class="stats-left"><span class="stats-medal">'+(MEDALS[rank]||'')+'</span><div><div class="stats-name">'+u.name+'</div><div class="stats-sub">'+u.sessionCount+'回参加 / '+u.gameCount+'ゲーム / '+hiLo+'</div></div></div><div class="stats-right"><div class="stats-total '+ptCls+'">'+(u.total>0?'+':'')+u.total+'</div></div></div>';
   }).join('');
 }
 function renderHistory(){
