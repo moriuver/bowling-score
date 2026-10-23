@@ -2,560 +2,271 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="color-scheme" content="dark">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>STRIKE ZONE🎳 — ボウリング スコア</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap">
+<title>🎳 ボウリング スコア</title>
 <style>
-/* ===== SVG NEON FILTERS ===== */
-/* Using SVG filters for iOS Safari compatible glow */
-
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;700;900&display=swap');
+:root{--bg:#0f0f14;--surface:#1a1a24;--card:#22222e;--accent:#f0c040;--accent2:#e05a2b;--green:#3ecf6e;--text:#f0ede8;--border:#2e2e3e;--goriyaku:#c07aff}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-
-html,body{
-  background:#03030a;
-  min-height:100vh;
-}
-body{
-  color:#f0ede8;
-  font-family:'Noto Sans JP','Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic UI','Meiryo',sans-serif;
-  padding-bottom:80px;
-  /* Neon background glow using gradient */
-  background-image:
-    radial-gradient(ellipse 60% 35% at 10% 5%, rgba(255,0,128,0.15) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 90% 90%, rgba(0,245,255,0.12) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 50% at 50% 50%, rgba(191,0,255,0.08) 0%, transparent 65%);
-  background-color:#03030a;
-}
-
-/* SCANLINES overlay */
-body::before{
-  content:'';position:fixed;inset:0;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px);
-  pointer-events:none;z-index:9999;
-}
-
-/* ===== NEON GLOW CLASSES ===== */
-/* filter:drop-shadow works reliably on iOS Safari */
-.neon-yellow{
-  color:#ffee00;
-  -webkit-filter:drop-shadow(0 0 4px #ffee00) drop-shadow(0 0 10px rgba(255,238,0,0.8)) drop-shadow(0 0 20px rgba(255,238,0,0.5));
-  filter:drop-shadow(0 0 4px #ffee00) drop-shadow(0 0 10px rgba(255,238,0,0.8)) drop-shadow(0 0 20px rgba(255,238,0,0.5));
-}
-.neon-pink{
-  color:#ff0080;
-  -webkit-filter:drop-shadow(0 0 4px #ff0080) drop-shadow(0 0 10px rgba(255,0,128,0.7));
-  filter:drop-shadow(0 0 4px #ff0080) drop-shadow(0 0 10px rgba(255,0,128,0.7));
-}
-.neon-cyan{
-  color:#00f5ff;
-  -webkit-filter:drop-shadow(0 0 4px #00f5ff) drop-shadow(0 0 10px rgba(0,245,255,0.7));
-  filter:drop-shadow(0 0 4px #00f5ff) drop-shadow(0 0 10px rgba(0,245,255,0.7));
-}
-.neon-green{
-  color:#39ff14;
-  -webkit-filter:drop-shadow(0 0 4px #39ff14) drop-shadow(0 0 10px rgba(57,255,20,0.7));
-  filter:drop-shadow(0 0 4px #39ff14) drop-shadow(0 0 10px rgba(57,255,20,0.7));
-}
-.neon-purple{
-  color:#bf00ff;
-  -webkit-filter:drop-shadow(0 0 4px #bf00ff) drop-shadow(0 0 10px rgba(191,0,255,0.7));
-  filter:drop-shadow(0 0 4px #bf00ff) drop-shadow(0 0 10px rgba(191,0,255,0.7));
-}
-
-/* ===== HEADER ===== */
-header{
-  background:rgba(3,3,10,0.97);
-  border-bottom:2px solid #ffee00;
-  padding:12px 16px 10px;
-  display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:200;
-  /* Box shadow for header glow - works on all browsers */
-  -webkit-box-shadow:0 0 20px rgba(255,238,0,0.3), 0 2px 8px rgba(255,238,0,0.2);
-  box-shadow:0 0 20px rgba(255,238,0,0.3), 0 2px 8px rgba(255,238,0,0.2);
-}
-header h1{
-  font-family:'Bebas Neue',Impact,'Arial Narrow',Arial,sans-serif;
-  font-size:1.9rem;letter-spacing:5px;
-  text-transform:uppercase;
-  color:#ffee00;
-  white-space:nowrap;
-  -webkit-filter:drop-shadow(0 0 6px #ffee00) drop-shadow(0 0 12px rgba(255,238,0,0.8));
-  filter:drop-shadow(0 0 6px #ffee00) drop-shadow(0 0 12px rgba(255,238,0,0.8));
-  animation:flickerH 9s infinite;
-}
-@keyframes flickerH{0%,91%,93%,100%{opacity:1}92%{opacity:.6}}
-
-.game-count{
-  background:rgba(255,0,128,0.2);
-  border:2px solid #ff0080;
-  color:#ff0080;
-  font-family:'Orbitron','Courier New',monospace;
-  font-size:.62rem;font-weight:700;
-  padding:4px 10px;border-radius:3px;letter-spacing:2px;
-  -webkit-filter:drop-shadow(0 0 4px #ff0080);
-  filter:drop-shadow(0 0 4px #ff0080);
-}
-.sync-status{
-  font-family:'Orbitron','Courier New',monospace;
-  font-size:.58rem;font-weight:700;
-  padding:3px 8px;border-radius:3px;letter-spacing:1px;
-}
-.sync-status.ok{
-  background:rgba(57,255,20,.15);color:#39ff14;
-  border:2px solid #39ff14;
-  -webkit-filter:drop-shadow(0 0 4px #39ff14);
-  filter:drop-shadow(0 0 4px #39ff14);
-}
-.sync-status.ng{
-  background:rgba(255,0,128,.15);color:#ff0080;
-  border:2px solid #ff0080;
-}
-.sync-status.loading{
-  background:rgba(255,238,0,.12);color:#ffee00;
-  border:2px solid rgba(255,238,0,.5);
-  animation:syncPulse 1.2s ease-in-out infinite;
-}
-@keyframes syncPulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* ===== TABS ===== */
-.tab-bar{
-  display:flex;
-  background:rgba(3,3,10,0.98);
-  border-bottom:1px solid rgba(255,238,0,0.3);
-  position:sticky;top:58px;z-index:190;
-}
-.tab{
-  flex:1;padding:11px 2px;text-align:center;
-  font-family:'Orbitron','Courier New',monospace;
-  font-size:.58rem;font-weight:700;letter-spacing:1px;
-  color:#6a6a8a;cursor:pointer;
-  border-bottom:3px solid transparent;transition:all .15s;
-  text-transform:uppercase;
-}
-.tab.active{
-  color:#ffee00;
-  border-bottom-color:#ffee00;
-  background:rgba(255,238,0,0.05);
-  -webkit-filter:drop-shadow(0 0 3px rgba(255,238,0,0.5));
-  filter:drop-shadow(0 0 3px rgba(255,238,0,0.5));
-}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;padding-bottom:80px}
+header{background:var(--surface);border-bottom:2px solid var(--accent);padding:14px 16px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+header h1{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;color:var(--accent)}
+.game-count{background:var(--accent2);color:#fff;font-weight:900;font-size:.7rem;padding:4px 10px;border-radius:20px;letter-spacing:1px}
+.sync-status{font-size:.65rem;padding:3px 8px;border-radius:20px;font-weight:700}
+.sync-status.ok{background:rgba(62,207,110,.15);color:var(--green)}
+.sync-status.ng{background:rgba(224,90,43,.15);color:var(--accent2)}
+.sync-status.loading{background:rgba(240,192,64,.15);color:var(--accent)}
+.tab-bar{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:58px;z-index:190}
+.tab{flex:1;padding:11px 2px;text-align:center;font-size:.7rem;font-weight:700;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .panel{display:none}.panel.active{display:block}
-
-/* ===== SECTION LABELS ===== */
 .section{margin:14px 14px 0}
-.section-label{
-  font-family:'Orbitron','Courier New',monospace;
-  font-size:.58rem;color:#00f5ff;
-  text-transform:uppercase;letter-spacing:3px;margin-bottom:8px;
-  -webkit-filter:drop-shadow(0 0 4px rgba(0,245,255,0.8));
-  filter:drop-shadow(0 0 4px rgba(0,245,255,0.8));
-  display:flex;align-items:center;gap:8px;
-}
-.section-label::after{
-  content:'';flex:1;height:1px;
-  background:linear-gradient(90deg,rgba(0,245,255,0.5),transparent);
-}
+.section-label{font-size:.63rem;color:#777;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.pt-pos{color:var(--green)}.pt-neg{color:var(--accent2)}.pt-zero{color:#555}
+.count-stepper{display:flex;align-items:center;justify-content:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px}
+.step-btn{width:42px;height:42px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--accent);font-family:'Bebas Neue',sans-serif;font-size:1.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1}
+.step-btn:active{background:var(--accent);color:var(--bg)}
+.step-btn:disabled{color:#444;cursor:not-allowed}
+.step-display{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--accent);letter-spacing:2px;min-width:80px;text-align:center}
+.step-display .unit{font-size:1rem;color:#888;margin-left:4px}
+.roster-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.roster-row{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 12px}
+.roster-row .rname{flex:1;font-size:.88rem;font-weight:700}
+.roster-del{background:none;border:none;color:#444;font-size:.95rem;cursor:pointer;padding:2px 6px;transition:color .15s}
+.roster-del:active{color:var(--accent2)}
+.roster-add-row{display:flex;gap:8px}
+.roster-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.88rem;font-weight:700;outline:none;transition:border-color .15s}
+.roster-input:focus{border-color:var(--accent)}
+.roster-input::placeholder{color:#444;font-weight:400}
+.roster-add-btn{background:var(--accent);color:var(--bg);border:none;border-radius:10px;padding:10px 16px;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.roster-add-btn:active{opacity:.7}
+.name-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.slot-wrap{position:relative}
+.slot-select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 32px 10px 12px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.88rem;font-weight:700;outline:none;cursor:pointer;-webkit-appearance:none;transition:border-color .15s}
+.slot-select:focus{border-color:var(--accent)}
+.slot-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:.7rem;color:#666;pointer-events:none}
+.game-section{margin:14px 14px 0}
+.game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.game-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--accent);letter-spacing:2px}
+.add-game-btn{background:var(--accent);color:var(--bg);border:none;border-radius:20px;padding:7px 14px;font-family:'Noto Sans JP',sans-serif;font-size:.78rem;font-weight:900;cursor:pointer;transition:opacity .15s}
+.add-game-btn:active{opacity:.7}
+.game-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.game-card-header{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(77,216,240,.06);border-bottom:1px solid rgba(77,216,240,.18)}
+.game-num{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:#4dd8f0;letter-spacing:2px;filter:drop-shadow(0 0 4px rgba(77,216,240,.55))}
+.game-card-actions{display:flex;gap:6px;align-items:center}
+.pts-toggle-btn{background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.35);border-radius:6px;color:#f0c040;font-size:.65rem;font-weight:700;padding:3px 8px;cursor:pointer;transition:all .15s}
+.pts-toggle-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(240,192,64,.18)}
+.del-btn{background:rgba(224,90,43,.08);border:1px solid rgba(224,90,43,.3);border-radius:6px;color:#e05a2b;font-size:.85rem;cursor:pointer;padding:3px 8px;transition:all .15s}
+.del-btn:active{color:var(--accent2)}
+.game-pts-area{padding:10px 14px;border-bottom:1px solid rgba(240,192,64,.25);background:rgba(240,192,64,.06);display:none}
+.game-pts-area.open{display:block}
+.game-pts-grid{display:flex;flex-wrap:wrap;gap:8px}
+.game-pts-item{display:flex;align-items:center;gap:5px}
+.game-pts-item label{font-size:.7rem;color:var(--accent);font-weight:700;min-width:22px}
+.game-pts-input{background:var(--surface);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1rem;padding:5px 8px;width:62px;outline:none;text-align:center;transition:border-color .15s}
+.game-pts-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(240,192,64,.2)}
+.rank-inputs{padding:10px 14px 12px;display:flex;flex-direction:column;gap:8px}
+.rank-row{display:flex;align-items:center;gap:10px}
+.rank-row .pname{flex:1;font-size:.85rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-select{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.83rem;font-weight:700;padding:7px 8px;outline:none;width:80px;cursor:pointer;transition:border-color .15s;-webkit-appearance:none;text-align:center}
+.rank-select:focus{border-color:var(--accent)}
+.pt-preview{min-width:42px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px}
+.dup-warn{font-size:.7rem;color:var(--accent2);padding:0 14px 10px}
+#panel-record .total-sticky{position:sticky;top:94px;z-index:50;background:var(--bg);padding:10px 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.total-sticky-inner{display:flex;gap:6px;overflow-x:auto;padding:0 14px;scrollbar-width:none}
+.total-sticky-inner::-webkit-scrollbar{display:none}
+.total-pill{flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 10px;display:flex;align-items:center;gap:6px;min-width:max-content}
+.total-pill.rank-1{background:rgba(240,192,64,.1);border-color:rgba(240,192,64,.4)}
+.total-pill.rank-2{background:rgba(176,176,192,.06);border-color:rgba(176,176,192,.3)}
+.total-pill.rank-3{background:rgba(205,127,50,.06);border-color:rgba(205,127,50,.3)}
+.total-pill .pill-medal{font-size:.85rem}
+.total-pill .pill-name{font-size:.72rem;font-weight:700;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.total-pill .pill-score{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.5px;line-height:1}
+.total-empty{color:#444;font-size:.72rem;padding:6px 14px;text-align:center;width:100%}
+.balance-section{margin:10px 14px 0}
+.balance-card{border-radius:12px;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;border:1px solid}
+.balance-card.ok{background:rgba(62,207,110,.07);border-color:var(--green)}
+.balance-card.ng{background:rgba(224,90,43,.07);border-color:var(--accent2)}
+.balance-left{display:flex;align-items:center;gap:10px}
+.balance-icon{font-size:1.4rem}
+.balance-title{font-size:.78rem;font-weight:900;margin-bottom:2px}
+.balance-sub{font-size:.68rem;color:#777}
+.balance-num{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:1px}
+.balance-card.ok .balance-num{color:var(--green)}
+.balance-card.ng .balance-num{color:var(--accent2)}
+/* ご祝儀セクション */
+.goriyaku-section{margin:14px 14px 0}
+.goriyaku-card{background:var(--card);border:1px solid var(--goriyaku);border-radius:12px;overflow:hidden}
+.goriyaku-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(192,122,255,.08);border-bottom:1px solid rgba(192,122,255,.2)}
+.goriyaku-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--goriyaku);letter-spacing:2px}
+.goriyaku-threshold-row{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.goriyaku-threshold-label{font-size:.75rem;color:#aaa;white-space:nowrap}
+.goriyaku-threshold-input{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1.1rem;padding:6px 10px;width:80px;outline:none;text-align:center;transition:border-color .15s}
+.goriyaku-threshold-input:focus{border-color:var(--goriyaku)}
+.goriyaku-threshold-unit{font-size:.75rem;color:#888}
+.goriyaku-players{padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+.goriyaku-empty{padding:14px;text-align:center;font-size:.75rem;color:#555}
+.goriyaku-player-row{display:flex;align-items:center;gap:10px}
+.goriyaku-player-name{flex:1;font-size:.85rem;font-weight:700}
+.goriyaku-player-score{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--goriyaku);min-width:50px}
+.goriyaku-amount-wrap{display:flex;align-items:center;gap:4px}
+.goriyaku-amount-input{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1rem;padding:6px 8px;width:80px;outline:none;text-align:center;transition:border-color .15s}
+.goriyaku-amount-input:focus{border-color:var(--goriyaku)}
+.goriyaku-amount-unit{font-size:.72rem;color:#888}
+.goriyaku-total-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--border);background:rgba(192,122,255,.05)}
+.goriyaku-total-label{font-size:.75rem;color:#aaa}
+.goriyaku-total-num{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--goriyaku);letter-spacing:1px}
+/* ゲームカード内ご祝儀 */
+.goriyaku-toggle-btn{background:rgba(192,122,255,.08);border:1px solid rgba(192,122,255,.3);border-radius:6px;color:#c07aff;font-size:.65rem;font-weight:700;padding:3px 8px;cursor:pointer;transition:all .15s}
+.goriyaku-toggle-btn.active{background:rgba(192,122,255,.22);border-color:var(--goriyaku);color:var(--goriyaku)}
+.game-goriyaku-area{padding:10px 14px;border-bottom:1px solid rgba(192,122,255,.2);background:rgba(192,122,255,.04);display:none}
+.game-goriyaku-area.open{display:block}
+.game-goriyaku-form{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.game-goriyaku-select{flex:1;min-width:0;background:var(--surface);border:1px solid rgba(192,122,255,.3);border-radius:8px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.8rem;font-weight:700;padding:7px 10px;outline:none;cursor:pointer;-webkit-appearance:none;transition:border-color .15s}
+.game-goriyaku-select:focus{border-color:var(--goriyaku)}
+.game-goriyaku-amount{background:var(--surface);border:1px solid rgba(192,122,255,.3);border-radius:8px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1rem;padding:7px 8px;width:80px;outline:none;text-align:center;transition:border-color .15s}
+.game-goriyaku-amount:focus{border-color:var(--goriyaku)}
+.game-goriyaku-add-btn{background:var(--goriyaku);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-family:'Noto Sans JP',sans-serif;font-size:.75rem;font-weight:900;cursor:pointer;white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.game-goriyaku-add-btn:active{opacity:.7}
+.game-goriyaku-items{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.game-goriyaku-item{display:flex;align-items:center;gap:6px;background:rgba(192,122,255,.08);border-radius:6px;padding:5px 8px;font-size:.8rem}
+.game-goriyaku-item-name{flex:1;font-weight:700}
+.game-goriyaku-item-amount{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--goriyaku)}
+.game-goriyaku-item-del{background:none;border:none;color:#666;font-size:.8rem;cursor:pointer;padding:1px 5px;transition:color .15s;flex-shrink:0}
+.game-goriyaku-item-del:active{color:var(--accent2)}
 
-/* ===== STEPPER ===== */
-.count-stepper{
-  display:flex;align-items:center;justify-content:center;gap:14px;
-  background:#0d0d1a;
-  border:2px solid rgba(255,238,0,0.4);
-  border-radius:4px;padding:10px;
-  -webkit-box-shadow:0 0 15px rgba(255,238,0,0.08),inset 0 0 20px rgba(0,0,0,0.5);
-  box-shadow:0 0 15px rgba(255,238,0,0.08),inset 0 0 20px rgba(0,0,0,0.5);
-}
-.step-btn{
-  width:44px;height:44px;border-radius:3px;
-  background:#08080f;
-  border:2px solid rgba(255,238,0,0.5);
-  color:#ffee00;
-  font-family:'Bebas Neue',Impact,Arial,sans-serif;font-size:1.8rem;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:all .15s;line-height:1;
-  -webkit-filter:drop-shadow(0 0 4px rgba(255,238,0,0.5));
-  filter:drop-shadow(0 0 4px rgba(255,238,0,0.5));
-}
-.step-btn:active{
-  background:#ffee00;color:#03030a;
-  -webkit-filter:drop-shadow(0 0 8px #ffee00);
-  filter:drop-shadow(0 0 8px #ffee00);
-}
-.step-btn:disabled{color:#2a2a3a;border-color:#1a1a2e;-webkit-filter:none;filter:none;cursor:not-allowed;}
-.step-display{
-  font-family:'Bebas Neue',Impact,Arial,sans-serif;font-size:2.4rem;
-  color:#ffee00;letter-spacing:3px;
-  min-width:80px;text-align:center;
-  -webkit-filter:drop-shadow(0 0 8px rgba(255,238,0,0.9));
-  filter:drop-shadow(0 0 8px rgba(255,238,0,0.9));
-}
-.step-display .unit{font-size:1rem;color:#6a6a8a;margin-left:4px;-webkit-filter:none;filter:none;font-family:'Noto Sans JP',sans-serif;}
-
-/* ===== ROSTER ===== */
-.roster-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
-.roster-row{
-  display:flex;align-items:center;gap:8px;
-  background:#0d0d1a;border:1px solid #1c1c30;
-  border-radius:4px;padding:8px 12px;transition:border-color .2s;
-}
-.roster-row:hover{border-color:rgba(255,238,0,0.3);}
-.roster-row .rname{flex:1;font-size:.88rem;font-weight:700;}
-.roster-del{
-  background:none;border:1px solid #2a2a3a;border-radius:3px;
-  color:#555;font-size:.85rem;cursor:pointer;padding:3px 8px;transition:all .15s;
-}
-.roster-del:active{color:#ff0080;border-color:#ff0080;}
-.roster-add-row{display:flex;gap:8px;}
-.roster-input{
-  flex:1;background:#0d0d1a;border:2px solid #1c1c30;
-  border-radius:4px;padding:10px 12px;
-  color:#f0ede8;font-family:'Noto Sans JP',sans-serif;
-  font-size:.88rem;font-weight:700;outline:none;transition:border-color .15s;
-}
-.roster-input:focus{
-  border-color:#ffee00;
-  -webkit-box-shadow:0 0 8px rgba(255,238,0,0.2);
-  box-shadow:0 0 8px rgba(255,238,0,0.2);
-}
-.roster-input::placeholder{color:#333;font-weight:400;}
-.roster-add-btn{
-  background:rgba(255,238,0,0.15);border:2px solid #ffee00;
-  border-radius:4px;padding:10px 16px;
-  color:#ffee00;font-family:'Orbitron','Courier New',monospace;
-  font-size:.72rem;font-weight:700;letter-spacing:1px;
-  cursor:pointer;white-space:nowrap;
-  -webkit-filter:drop-shadow(0 0 4px rgba(255,238,0,0.5));
-  filter:drop-shadow(0 0 4px rgba(255,238,0,0.5));
-  transition:all .15s;
-}
-.roster-add-btn:active{background:rgba(255,238,0,0.3);}
-
-/* ===== NAME GRID ===== */
-.name-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.slot-wrap{position:relative;}
-.slot-select{
-  width:100%;background:#0d0d1a;
-  border:2px solid rgba(0,245,255,0.35);
-  border-radius:4px;padding:10px 32px 10px 12px;
-  color:#f0ede8;font-family:'Noto Sans JP',sans-serif;
-  font-size:.88rem;font-weight:700;
-  outline:none;cursor:pointer;-webkit-appearance:none;transition:border-color .15s;
-}
-.slot-select:focus{
-  border-color:#00f5ff;
-  -webkit-box-shadow:0 0 8px rgba(0,245,255,0.2);
-  box-shadow:0 0 8px rgba(0,245,255,0.2);
-}
-.slot-arrow{
-  position:absolute;right:10px;top:50%;transform:translateY(-50%);
-  font-size:.6rem;color:#00f5ff;pointer-events:none;
-}
-
-/* ===== TOTALS ===== */
-#panel-record .total-sticky{
-  position:sticky;top:94px;z-index:50;
-  background:#03030a;padding:8px 0 6px;
-  border-bottom:1px solid #1c1c30;margin-bottom:4px;
-}
-.total-sticky-inner{display:flex;gap:6px;overflow-x:auto;padding:0 14px;scrollbar-width:none;}
-.total-sticky-inner::-webkit-scrollbar{display:none;}
-.total-pill{
-  flex-shrink:0;background:#0d0d1a;
-  border:1px solid #1c1c30;
-  border-radius:4px;padding:6px 12px;
-  display:flex;align-items:center;gap:7px;min-width:max-content;
-}
-.total-pill.rank-1{background:rgba(255,238,0,0.1);border:2px solid rgba(255,238,0,0.7);}
-.total-pill.rank-2{background:rgba(192,192,192,0.07);border:2px solid rgba(192,192,192,0.4);}
-.total-pill.rank-3{background:rgba(205,127,50,0.07);border:2px solid rgba(205,127,50,0.4);}
-.total-pill .pill-medal{font-size:.85rem;}
-.total-pill .pill-name{font-size:.72rem;font-weight:700;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.total-pill .pill-score{font-family:'Bebas Neue',Impact,sans-serif;font-size:1.1rem;letter-spacing:.5px;line-height:1;}
-.total-empty{color:#333;font-size:.72rem;padding:6px 14px;text-align:center;width:100%;font-family:'Orbitron','Courier New',monospace;letter-spacing:2px;}
-
-/* ===== POINT COLORS ===== */
-.pt-pos{
-  color:#39ff14;
-  -webkit-filter:drop-shadow(0 0 4px rgba(57,255,20,0.8));
-  filter:drop-shadow(0 0 4px rgba(57,255,20,0.8));
-}
-.pt-neg{
-  color:#ff0080;
-  -webkit-filter:drop-shadow(0 0 4px rgba(255,0,128,0.8));
-  filter:drop-shadow(0 0 4px rgba(255,0,128,0.8));
-}
-.pt-zero{color:#333;}
-
-/* ===== GAME SECTION ===== */
-.game-section{margin:14px 14px 0;}
-.game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.game-title{
-  font-family:'Bebas Neue',Impact,Arial,sans-serif;font-size:1.5rem;
-  color:#ffee00;letter-spacing:5px;text-transform:uppercase;
-  -webkit-filter:drop-shadow(0 0 6px rgba(255,238,0,0.9));
-  filter:drop-shadow(0 0 6px rgba(255,238,0,0.9));
-}
-.add-game-btn{
-  background:rgba(255,238,0,0.12);
-  border:2px solid #ffee00;
-  border-radius:3px;padding:7px 16px;
-  color:#ffee00;font-family:'Orbitron','Courier New',monospace;
-  font-size:.68rem;font-weight:700;letter-spacing:2px;
-  cursor:pointer;
-  -webkit-filter:drop-shadow(0 0 4px rgba(255,238,0,0.5));
-  filter:drop-shadow(0 0 4px rgba(255,238,0,0.5));
-  transition:all .15s;
-}
-.add-game-btn:active{background:rgba(255,238,0,0.25);}
-
-/* ===== GAME CARD ===== */
-.game-card{
-  background:#0d0d1a;
-  border:2px solid rgba(191,0,255,0.4);
-  border-radius:4px;margin-bottom:10px;overflow:hidden;
-  -webkit-box-shadow:0 0 15px rgba(191,0,255,0.1);
-  box-shadow:0 0 15px rgba(191,0,255,0.1);
-}
-.game-card-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:9px 14px;
-  background:rgba(191,0,255,0.1);
-  border-bottom:1px solid rgba(191,0,255,0.3);
-}
-.game-num{
-  font-family:'Orbitron','Courier New',monospace;font-size:.78rem;font-weight:700;
-  color:#bf00ff;letter-spacing:3px;text-transform:uppercase;
-  -webkit-filter:drop-shadow(0 0 5px rgba(191,0,255,0.9));
-  filter:drop-shadow(0 0 5px rgba(191,0,255,0.9));
-}
-.game-card-actions{display:flex;gap:6px;align-items:center;}
-.pts-toggle-btn{
-  background:none;border:1px solid #1c1c30;
-  border-radius:3px;color:#6a6a8a;
-  font-family:'Orbitron','Courier New',monospace;font-size:.58rem;font-weight:700;
-  padding:3px 8px;cursor:pointer;letter-spacing:1px;transition:all .15s;
-}
-.pts-toggle-btn.active{border-color:#ffee00;color:#ffee00;background:rgba(255,238,0,0.08);}
-.del-btn{
-  background:none;border:1px solid #1e1e2e;border-radius:3px;
-  color:#555;font-size:1rem;cursor:pointer;padding:2px 8px;transition:all .15s;
-}
-.del-btn:active{color:#ff0080;border-color:#ff0080;}
-.game-pts-area{padding:10px 14px;border-bottom:1px solid #1c1c30;background:rgba(255,238,0,0.02);display:none;}
-.game-pts-area.open{display:block;}
-.game-pts-grid{display:flex;flex-wrap:wrap;gap:8px;}
-.game-pts-item{display:flex;align-items:center;gap:5px;}
-.game-pts-item label{font-family:'Orbitron','Courier New',monospace;font-size:.6rem;color:#6a6a8a;min-width:22px;}
-.game-pts-input{
-  background:#08080f;border:1px solid #1c1c30;
-  border-radius:3px;color:#f0ede8;
-  font-family:'Bebas Neue',Impact,sans-serif;font-size:1rem;
-  padding:5px 8px;width:62px;outline:none;text-align:center;transition:border-color .15s;
-}
-.game-pts-input:focus{border-color:#ffee00;}
-.rank-inputs{padding:10px 14px 12px;display:flex;flex-direction:column;gap:8px;}
-.rank-row{display:flex;align-items:center;gap:10px;}
-.rank-row .pname{flex:1;font-size:.85rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.rank-select{
-  background:#08080f;border:1px solid #1c1c30;
-  border-radius:3px;color:#f0ede8;
-  font-family:'Noto Sans JP',sans-serif;font-size:.83rem;font-weight:700;
-  padding:7px 8px;outline:none;width:80px;cursor:pointer;
-  -webkit-appearance:none;text-align:center;transition:border-color .15s;
-}
-.rank-select:focus{border-color:#00f5ff;}
-.pt-preview{min-width:46px;text-align:right;font-family:'Bebas Neue',Impact,sans-serif;font-size:1.15rem;letter-spacing:1px;}
-.dup-warn{font-family:'Orbitron','Courier New',monospace;font-size:.65rem;color:#ff0080;padding:0 14px 10px;letter-spacing:1px;}
-
-/* ===== BALANCE ===== */
-.balance-section{margin:10px 14px 0;}
-.balance-card{border-radius:4px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border:2px solid;}
-.balance-card.ok{background:rgba(57,255,20,0.07);border-color:#39ff14;-webkit-box-shadow:0 0 15px rgba(57,255,20,0.1);box-shadow:0 0 15px rgba(57,255,20,0.1);}
-.balance-card.ng{background:rgba(255,0,128,0.07);border-color:#ff0080;-webkit-box-shadow:0 0 15px rgba(255,0,128,0.1);box-shadow:0 0 15px rgba(255,0,128,0.1);}
-.balance-left{display:flex;align-items:center;gap:10px;}
-.balance-icon{font-size:1.4rem;}
-.balance-title{font-family:'Orbitron','Courier New',monospace;font-size:.72rem;font-weight:700;margin-bottom:2px;letter-spacing:1px;text-transform:uppercase;}
-.balance-sub{font-size:.65rem;color:#6a6a8a;}
-.balance-num{font-family:'Bebas Neue',Impact,sans-serif;font-size:1.65rem;letter-spacing:2px;}
-.balance-card.ok .balance-num{color:#39ff14;-webkit-filter:drop-shadow(0 0 5px rgba(57,255,20,0.8));filter:drop-shadow(0 0 5px rgba(57,255,20,0.8));}
-.balance-card.ng .balance-num{color:#ff0080;-webkit-filter:drop-shadow(0 0 5px rgba(255,0,128,0.8));filter:drop-shadow(0 0 5px rgba(255,0,128,0.8));}
-
-/* ===== BUTTONS ===== */
-.action-row{display:flex;gap:10px;margin:14px 14px 0;}
-.save-btn{
-  flex:2;padding:14px;
-  background:rgba(255,238,0,0.15);
-  border:2px solid #ffee00;
-  border-radius:4px;
-  color:#ffee00;font-family:'Orbitron','Courier New',monospace;
-  font-size:.78rem;font-weight:700;letter-spacing:2px;
-  cursor:pointer;text-transform:uppercase;
-  -webkit-filter:drop-shadow(0 0 4px rgba(255,238,0,0.5));
-  filter:drop-shadow(0 0 4px rgba(255,238,0,0.5));
-  transition:all .15s;
-}
-.save-btn:active{background:rgba(255,238,0,0.28);}
-.reset-btn{
-  flex:1;padding:14px;
-  background:none;border:1px solid #252530;
-  border-radius:4px;color:#555;
-  font-family:'Orbitron','Courier New',monospace;font-size:.75rem;
-  cursor:pointer;transition:all .15s;
-}
-.reset-btn:active{border-color:#ff0080;color:#ff0080;}
-
-/* ===== STATS ===== */
-.stats-card{background:#0d0d1a;border:1px solid #1c1c30;border-radius:4px;overflow:hidden;margin:14px 14px 0;}
-.stats-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #1c1c30;}
-.stats-row:last-child{border-bottom:none;}
-.stats-row.rank-1{background:rgba(255,238,0,0.07);}
-.stats-row.rank-2{background:rgba(192,192,192,0.04);}
-.stats-row.rank-3{background:rgba(205,127,50,0.04);}
-.stats-left{display:flex;align-items:center;gap:10px;}
-.stats-medal{font-size:1.2rem;min-width:26px;text-align:center;}
-.stats-name{font-size:.92rem;font-weight:700;}
-.stats-right{text-align:right;}
-.stats-total{font-family:'Bebas Neue',Impact,sans-serif;font-size:1.7rem;letter-spacing:1px;}
-.stats-sub{font-size:.62rem;color:#6a6a8a;margin-top:1px;}
-.stats-empty{padding:30px 16px;text-align:center;color:#444;font-size:.82rem;font-family:'Orbitron','Courier New',monospace;letter-spacing:2px;}
-
-/* ===== HISTORY ===== */
-.hist-empty{text-align:center;padding:50px 20px;color:#444;font-size:.82rem;line-height:2.5;font-family:'Orbitron','Courier New',monospace;letter-spacing:2px;}
-.hist-session{
-  background:#0d0d1a;border:2px solid rgba(0,245,255,0.3);
-  border-radius:4px;margin:14px 14px 0;overflow:hidden;
-  -webkit-box-shadow:0 0 12px rgba(0,245,255,0.06);
-  box-shadow:0 0 12px rgba(0,245,255,0.06);
-}
-.hist-session-header{display:flex;align-items:center;justify-content:space-between;background:rgba(0,245,255,0.06);border-bottom:1px solid rgba(0,245,255,0.2);}
-.hist-session-info{flex:1;padding:12px 14px;cursor:pointer;min-width:0;}
-.hist-chevron{font-size:.65rem;color:#00f5ff;margin-left:6px;}
-.hist-date{
-  font-family:'Bebas Neue',Impact,sans-serif;font-size:1.15rem;color:#00f5ff;letter-spacing:3px;
-  -webkit-filter:drop-shadow(0 0 4px rgba(0,245,255,0.8));
-  filter:drop-shadow(0 0 4px rgba(0,245,255,0.8));
-}
-.hist-meta{font-size:.68rem;color:#6a6a8a;margin-top:2px;}
-.hist-header-actions{display:flex;gap:6px;align-items:center;padding:8px 14px 8px 0;flex-shrink:0;position:relative;z-index:10;}
-.hist-edit-btn{background:#08080f;border:1px solid #1c1c30;border-radius:3px;color:#888;font-size:.95rem;padding:8px 12px;cursor:pointer;transition:all .15s;min-width:44px;min-height:40px;}
-.hist-edit-btn:active,.hist-edit-btn.active{border-color:#ffee00;color:#ffee00;background:rgba(255,238,0,0.08);}
-.hist-del-btn{background:#08080f;border:1px solid #1c1c30;border-radius:3px;color:#888;font-size:.95rem;cursor:pointer;padding:8px 12px;transition:all .15s;min-width:44px;min-height:40px;}
-.hist-del-btn:active{color:#ff0080;border-color:#ff0080;}
+/* ご祝儀 追加フォーム */
+.goriyaku-add-form{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.goriyaku-add-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.goriyaku-select{flex:1;min-width:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.8rem;font-weight:700;padding:8px 10px;outline:none;cursor:pointer;-webkit-appearance:none;transition:border-color .15s}
+.goriyaku-select:focus{border-color:var(--goriyaku)}
+.goriyaku-add-amount{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1rem;padding:7px 10px;width:90px;outline:none;text-align:center;transition:border-color .15s}
+.goriyaku-add-amount:focus{border-color:var(--goriyaku)}
+.goriyaku-add-btn{background:var(--goriyaku);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-family:'Noto Sans JP',sans-serif;font-size:.78rem;font-weight:900;cursor:pointer;white-space:nowrap;transition:opacity .15s;flex-shrink:0}
+.goriyaku-add-btn:active{opacity:.7}
+/* ご祝儀 追加済みリスト */
+.goriyaku-list{padding:8px 14px;display:flex;flex-direction:column;gap:6px}
+.goriyaku-list-empty{padding:12px;text-align:center;font-size:.75rem;color:#555}
+.goriyaku-item{display:flex;align-items:center;gap:8px;background:rgba(192,122,255,.06);border:1px solid rgba(192,122,255,.15);border-radius:8px;padding:8px 10px}
+.goriyaku-item-game{font-size:.65rem;color:var(--goriyaku);font-family:'Bebas Neue',sans-serif;letter-spacing:1px;min-width:52px}
+.goriyaku-item-name{flex:1;font-size:.82rem;font-weight:700}
+.goriyaku-item-amount{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--goriyaku);min-width:70px;text-align:right}
+.goriyaku-item-del{background:none;border:none;color:#444;font-size:.85rem;cursor:pointer;padding:2px 6px;transition:color .15s;flex-shrink:0}
+.goriyaku-item-del:active{color:var(--accent2)}
+/* 履歴のご祝儀表示 */
+.hist-goriyaku-block{margin-top:8px;padding:8px 10px;background:rgba(192,122,255,.07);border:1px solid rgba(192,122,255,.2);border-radius:8px}
+.hist-goriyaku-label{font-size:.63rem;color:var(--goriyaku);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px}
+.hist-goriyaku-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;font-size:.78rem}
+.hist-goriyaku-name{font-weight:700}
+.hist-goriyaku-amount{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--goriyaku)}
+.action-row{display:flex;gap:10px;margin:14px 14px 0}
+.save-btn{flex:2;padding:14px;background:var(--accent);border:none;border-radius:12px;color:var(--bg);font-family:'Noto Sans JP',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer;transition:opacity .15s}
+.save-btn:active{opacity:.7}
+.reset-btn{flex:1;padding:14px;background:none;border:1px solid #333;border-radius:12px;color:#555;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;cursor:pointer;transition:all .15s}
+.reset-btn:active{border-color:var(--accent2);color:var(--accent2)}
+.stats-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin:14px 14px 0}
+.stats-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border)}
+.stats-row:last-child{border-bottom:none}
+.stats-row.rank-1{background:rgba(240,192,64,.07)}
+.stats-row.rank-2{background:rgba(176,176,192,.04)}
+.stats-row.rank-3{background:rgba(205,127,50,.04)}
+.stats-left{display:flex;align-items:center;gap:10px}
+.stats-medal{font-size:1.2rem;min-width:26px;text-align:center}
+.stats-name{font-size:.92rem;font-weight:900}
+.stats-right{text-align:right}
+.stats-total{font-family:'Bebas Neue',sans-serif;font-size:1.65rem;letter-spacing:1px}
+.stats-sub{font-size:.65rem;color:#777;margin-top:1px}
+.stats-empty{padding:30px 16px;text-align:center;color:#555;font-size:.82rem}
+.hist-empty{text-align:center;padding:50px 20px;color:#555;font-size:.85rem;line-height:2}
+.hist-session{background:var(--card);border:1px solid var(--border);border-radius:14px;margin:14px 14px 0;overflow:hidden}
+.hist-session-header{display:flex;align-items:center;justify-content:space-between;padding:0;background:rgba(255,255,255,.025);border-bottom:1px solid var(--border)}
+.hist-session-info{flex:1;padding:12px 14px;cursor:pointer;min-width:0}
+.hist-chevron{font-size:.7rem;color:#666;margin-left:4px}
+.hist-date{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent);letter-spacing:2px}
+.hist-meta{font-size:.7rem;color:#666;margin-top:2px}
+.hist-header-actions{display:flex;gap:6px;align-items:center;padding:8px 14px 8px 0;flex-shrink:0;position:relative;z-index:10}
+.hist-edit-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#aaa;font-size:1rem;font-weight:700;padding:8px 12px;cursor:pointer;transition:all .15s;min-width:44px;min-height:40px}
+.hist-edit-btn:active,.hist-edit-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(240,192,64,.1)}
+.hist-del-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:#aaa;font-size:1rem;cursor:pointer;padding:8px 12px;transition:all .15s;min-width:44px;min-height:40px}
+.hist-del-btn:active{color:var(--accent2);border-color:var(--accent2);background:rgba(224,90,43,.1)}
 .hist-body{display:none}.hist-body.open{display:block}
-.hist-view{padding:12px 16px;}
-.hist-ranking{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
-.hist-rank-row{display:flex;align-items:center;justify-content:space-between;}
-.hist-rank-left{display:flex;align-items:center;gap:8px;}
-.hist-rank-medal{font-size:1.1rem;min-width:22px;}
-.hist-rank-name{font-size:.85rem;font-weight:700;}
-.hist-rank-score{font-family:'Bebas Neue',Impact,sans-serif;font-size:1.35rem;letter-spacing:1px;}
-.hist-games-label{font-family:'Orbitron','Courier New',monospace;font-size:.58rem;color:#6a6a8a;text-transform:uppercase;letter-spacing:2px;margin:8px 0 6px;}
-.hist-game-item{border:1px solid #1c1c30;border-radius:4px;padding:8px 10px;margin-bottom:6px;font-size:.75rem;}
-.hist-game-title{font-family:'Bebas Neue',Impact,sans-serif;font-size:.88rem;color:#6a6a8a;letter-spacing:2px;margin-bottom:5px;}
-.hist-game-rows{display:flex;flex-direction:column;gap:3px;}
-.hist-game-prow{display:flex;align-items:center;justify-content:space-between;color:#666;}
-.hist-game-prow .hgp-name{font-weight:700;color:#f0ede8;font-size:.78rem;}
-.hist-game-prow .hgp-rank{color:#555;font-size:.72rem;}
-.hist-game-prow .hgp-pt{font-family:'Bebas Neue',Impact,sans-serif;font-size:.95rem;}
-.hist-edit{padding:12px 16px;}
-.edit-section-label{font-family:'Orbitron','Courier New',monospace;font-size:.58rem;color:#ffee00;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px;}
-.edit-names-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;}
-.edit-slot-wrap{position:relative;}
-.edit-slot-select{width:100%;background:#08080f;border:1px solid #1c1c30;border-radius:3px;padding:8px 28px 8px 10px;color:#f0ede8;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;font-weight:700;outline:none;cursor:pointer;-webkit-appearance:none;transition:border-color .15s;}
-.edit-slot-select:focus{border-color:#ffee00;}
-.edit-slot-arrow{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.6rem;color:#6a6a8a;pointer-events:none;}
-.edit-game-block{border:1px solid #1c1c30;border-radius:4px;overflow:hidden;margin-bottom:8px;}
-.edit-game-header{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:rgba(255,255,255,.02);border-bottom:1px solid #1c1c30;}
-.edit-game-num{font-family:'Orbitron','Courier New',monospace;font-size:.75rem;color:#6a6a8a;letter-spacing:2px;}
-.edit-pts-toggle{background:none;border:1px solid #1c1c30;border-radius:3px;color:#555;font-family:'Orbitron','Courier New',monospace;font-size:.58rem;font-weight:700;padding:2px 7px;cursor:pointer;transition:all .15s;letter-spacing:1px;}
-.edit-pts-toggle.active{border-color:#ffee00;color:#ffee00;}
-.edit-pts-area{padding:8px 12px;border-bottom:1px solid #1c1c30;background:rgba(255,238,0,0.02);display:none;}
-.edit-pts-area.open{display:block;}
-.edit-pts-grid{display:flex;flex-wrap:wrap;gap:6px;}
-.edit-pts-item{display:flex;align-items:center;gap:4px;}
-.edit-pts-item label{font-family:'Orbitron','Courier New',monospace;font-size:.6rem;color:#555;min-width:20px;}
-.edit-pts-input{background:#03030a;border:1px solid #1c1c30;border-radius:3px;color:#f0ede8;font-family:'Bebas Neue',Impact,sans-serif;font-size:.95rem;padding:4px 6px;width:55px;outline:none;text-align:center;transition:border-color .15s;}
-.edit-pts-input:focus{border-color:#ffee00;}
-.edit-rank-rows{padding:8px 12px;display:flex;flex-direction:column;gap:6px;}
-.edit-rank-row{display:flex;align-items:center;gap:8px;}
-.edit-rank-row .epname{flex:1;font-size:.8rem;font-weight:700;color:#888;}
-.edit-rank-select{background:#03030a;border:1px solid #1c1c30;border-radius:3px;color:#f0ede8;font-family:'Noto Sans JP',sans-serif;font-size:.78rem;font-weight:700;padding:5px 6px;outline:none;width:72px;cursor:pointer;-webkit-appearance:none;text-align:center;transition:border-color .15s;}
-.edit-rank-select:focus{border-color:#ffee00;}
-.edit-pt-preview{min-width:38px;text-align:right;font-family:'Bebas Neue',Impact,sans-serif;font-size:1rem;}
-.edit-save-btn{width:100%;padding:12px;background:rgba(255,238,0,0.15);border:2px solid #ffee00;border-radius:4px;color:#ffee00;font-family:'Orbitron','Courier New',monospace;font-size:.78rem;font-weight:700;letter-spacing:2px;cursor:pointer;margin-top:10px;text-transform:uppercase;transition:all .15s;}
-.edit-save-btn:active{background:rgba(255,238,0,0.28);}
-
-/* ===== MODE TOGGLE (個人戦/チーム戦) ===== */
-.mode-toggle{display:flex;gap:6px;padding:8px 14px;border-bottom:1px solid rgba(0,245,255,0.15);background:rgba(0,245,255,0.03);}
-.mode-btn{
-  flex:1;padding:7px;background:#08080f;
-  border:2px solid #1c1c30;border-radius:3px;
-  color:#6a6a8a;font-family:'Orbitron','Courier New',monospace;
-  font-size:.65rem;font-weight:700;letter-spacing:1px;
-  cursor:pointer;transition:all .15s;text-transform:uppercase;
-}
-.mode-btn.active{
-  border-color:#00f5ff;color:#00f5ff;background:rgba(0,245,255,0.1);
-  -webkit-filter:drop-shadow(0 0 3px rgba(0,245,255,0.6));
-  filter:drop-shadow(0 0 3px rgba(0,245,255,0.6));
-}
-.team-config{padding:10px 14px;border-bottom:1px solid #1c1c30;display:flex;flex-direction:column;gap:10px;background:rgba(191,0,255,0.03);}
-.team-count-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.team-count-row .tc-label{font-family:'Orbitron','Courier New',monospace;font-size:.62rem;color:#6a6a8a;letter-spacing:1px;margin-right:4px;}
-.team-count-btn{
-  background:#08080f;border:1px solid #1c1c30;border-radius:3px;
-  color:#6a6a8a;font-family:'Bebas Neue',Impact,sans-serif;font-size:1rem;
-  padding:3px 12px;cursor:pointer;letter-spacing:1px;transition:all .15s;
-}
-.team-count-btn.active{border-color:#ffee00;color:#ffee00;background:rgba(255,238,0,0.1);}
-.team-rank-grid{display:flex;flex-wrap:wrap;gap:6px;}
-.team-rank-item{display:flex;align-items:center;gap:6px;background:#08080f;border:1px solid #1c1c30;border-radius:3px;padding:4px 8px;}
-.team-rank-item .tr-label{font-family:'Orbitron','Courier New',monospace;font-size:.7rem;color:#bf00ff;letter-spacing:1px;-webkit-filter:drop-shadow(0 0 3px rgba(191,0,255,0.6));filter:drop-shadow(0 0 3px rgba(191,0,255,0.6));}
-.team-rank-item select{background:#03030a;border:1px solid #1c1c30;border-radius:3px;color:#f0ede8;font-family:'Noto Sans JP',sans-serif;font-size:.78rem;font-weight:700;padding:4px 6px;outline:none;cursor:pointer;-webkit-appearance:none;}
-.team-rank-item select:focus{border-color:#bf00ff;}
-.game-mode-badge{font-family:'Orbitron','Courier New',monospace;font-size:.55rem;padding:1px 6px;border-radius:2px;letter-spacing:1px;margin-left:6px;}
-.game-mode-badge.individual{color:#00f5ff;border:1px solid rgba(0,245,255,0.5);background:rgba(0,245,255,0.05);}
-.game-mode-badge.team{color:#bf00ff;border:1px solid rgba(191,0,255,0.5);background:rgba(191,0,255,0.05);}
-
-/* ===== TOAST ===== */
-.toast{
-  position:fixed;bottom:28px;left:50%;
-  transform:translateX(-50%) translateY(16px);
-  background:#39ff14;color:#030a03;
-  font-family:'Orbitron','Courier New',monospace;font-weight:700;font-size:.75rem;
-  padding:10px 22px;border-radius:3px;letter-spacing:2px;
-  opacity:0;transition:all .28s;pointer-events:none;z-index:9998;white-space:nowrap;
-  -webkit-box-shadow:0 0 20px rgba(57,255,20,0.6);
-  box-shadow:0 0 20px rgba(57,255,20,0.6);
-  text-transform:uppercase;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* ===== CONFIRM MODAL ===== */
-.confirm-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
-.confirm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.8);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);}
-.confirm-box{
-  position:relative;background:#08080f;
-  border:2px solid rgba(255,0,128,0.6);
-  border-radius:6px;padding:24px 22px 18px;max-width:320px;width:100%;
-  -webkit-box-shadow:0 0 40px rgba(255,0,128,0.2);
-  box-shadow:0 0 40px rgba(255,0,128,0.2);
-}
-.confirm-title{font-family:'Orbitron','Courier New',monospace;font-size:.88rem;font-weight:700;color:#f0ede8;margin-bottom:6px;line-height:1.5;letter-spacing:1px;}
-.confirm-sub{font-size:.75rem;color:#666;margin-bottom:20px;line-height:1.6;}
-.confirm-actions{display:flex;gap:10px;}
-.confirm-cancel{flex:1;padding:11px;background:#0d0d1a;border:1px solid #1c1c30;border-radius:4px;color:#666;font-family:'Orbitron','Courier New',monospace;font-size:.75rem;font-weight:700;cursor:pointer;letter-spacing:1px;}
-.confirm-ok{flex:1;padding:11px;background:rgba(255,0,128,0.2);border:2px solid #ff0080;border-radius:4px;color:#ff0080;font-family:'Orbitron','Courier New',monospace;font-size:.75rem;font-weight:700;cursor:pointer;letter-spacing:1px;}
+.hist-view{padding:12px 16px}
+.hist-ranking{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.hist-rank-row{display:flex;align-items:center;justify-content:space-between}
+.hist-rank-left{display:flex;align-items:center;gap:8px}
+.hist-rank-medal{font-size:1.1rem;min-width:22px}
+.hist-rank-name{font-size:.85rem;font-weight:700}
+.hist-rank-score{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px}
+.hist-games-label{font-size:.63rem;color:#666;text-transform:uppercase;letter-spacing:1.5px;margin:8px 0 6px}
+.hist-game-item{border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:.75rem}
+.hist-game-title{font-family:'Bebas Neue',sans-serif;font-size:.85rem;color:#777;letter-spacing:1px;margin-bottom:5px}
+.hist-game-rows{display:flex;flex-direction:column;gap:3px}
+.hist-game-prow{display:flex;align-items:center;justify-content:space-between;color:#999}
+.hist-game-prow .hgp-name{font-weight:700;color:var(--text);font-size:.78rem}
+.hist-game-prow .hgp-rank{color:#777;font-size:.72rem}
+.hist-game-prow .hgp-pt{font-family:'Bebas Neue',sans-serif;font-size:.95rem}
+.hist-edit{padding:12px 16px}
+.edit-section-label{font-size:.63rem;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.edit-names-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.edit-slot-wrap{position:relative}
+.edit-slot-select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 28px 8px 10px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.82rem;font-weight:700;outline:none;cursor:pointer;-webkit-appearance:none;transition:border-color .15s}
+.edit-slot-select:focus{border-color:var(--accent)}
+.edit-slot-arrow{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:.65rem;color:#666;pointer-events:none}
+.edit-game-block{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:8px}
+.edit-game-header{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:rgba(77,216,240,.06);border-bottom:1px solid rgba(77,216,240,.18)}
+.edit-game-num{font-family:'Bebas Neue',sans-serif;font-size:.88rem;color:#4dd8f0;letter-spacing:2px;filter:drop-shadow(0 0 3px rgba(77,216,240,.45))}
+.edit-pts-toggle{background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.35);border-radius:5px;color:#f0c040;font-size:.62rem;font-weight:700;padding:2px 6px;cursor:pointer;transition:all .15s}
+.edit-pts-toggle.active{border-color:var(--accent);color:var(--accent)}
+.edit-pts-area{padding:8px 12px;border-bottom:1px solid rgba(240,192,64,.25);background:rgba(240,192,64,.06);display:none}
+.edit-pts-area.open{display:block}
+.edit-pts-grid{display:flex;flex-wrap:wrap;gap:6px}
+.edit-pts-item{display:flex;align-items:center;gap:4px}
+.edit-pts-item label{font-size:.68rem;color:var(--accent);font-weight:700;min-width:20px}
+.edit-pts-input{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:.95rem;padding:4px 6px;width:55px;outline:none;text-align:center;transition:border-color .15s}
+.edit-pts-input:focus{border-color:var(--accent)}
+.edit-rank-rows{padding:8px 12px;display:flex;flex-direction:column;gap:6px}
+.edit-rank-row{display:flex;align-items:center;gap:8px}
+.edit-rank-row .epname{flex:1;font-size:.8rem;font-weight:700;color:#aaa}
+.edit-rank-select{background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.78rem;font-weight:700;padding:5px 6px;outline:none;width:72px;cursor:pointer;-webkit-appearance:none;text-align:center;transition:border-color .15s}
+.edit-rank-select:focus{border-color:var(--accent)}
+.edit-pt-preview{min-width:38px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1rem}
+.edit-goriyaku-form{display:flex;gap:5px;align-items:center;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid rgba(192,122,255,.15)}
+.edit-goriyaku-game-sel,.edit-goriyaku-player-sel{flex:1;min-width:80px;background:var(--surface);border:1px solid rgba(192,122,255,.3);border-radius:7px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:.75rem;font-weight:700;padding:6px 8px;outline:none;-webkit-appearance:none;cursor:pointer}
+.edit-goriyaku-amount{background:var(--surface);border:1px solid rgba(192,122,255,.3);border-radius:7px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:.95rem;padding:6px 8px;width:72px;outline:none;text-align:center}
+.edit-goriyaku-add-btn{background:var(--goriyaku);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:.82rem;font-weight:900;cursor:pointer;transition:opacity .15s;flex-shrink:0}
+.edit-goriyaku-add-btn:active{opacity:.7}
+.edit-goriyaku-empty{padding:8px 12px;font-size:.72rem;color:#555;text-align:center}
+.edit-goriyaku-item{display:flex;align-items:center;gap:6px;padding:5px 12px;border-bottom:1px solid rgba(192,122,255,.08);font-size:.8rem}
+.edit-goriyaku-game{font-family:'Bebas Neue',sans-serif;font-size:.72rem;color:var(--goriyaku);min-width:48px}
+.edit-goriyaku-name{flex:1;font-weight:700}
+.edit-goriyaku-amt{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--goriyaku);min-width:60px;text-align:right}
+.edit-goriyaku-del{background:none;border:none;color:#555;font-size:.8rem;cursor:pointer;padding:2px 5px;transition:color .15s}
+.edit-goriyaku-del:active{color:var(--accent2)}
+.edit-add-game-btn{width:100%;padding:10px;background:rgba(77,216,240,.1);border:1px solid rgba(77,216,240,.35);border-radius:10px;color:#4dd8f0;font-family:'Noto Sans JP',sans-serif;font-size:.82rem;font-weight:900;cursor:pointer;margin-bottom:8px;transition:all .15s}
+.edit-add-game-btn:active{opacity:.7}
+.edit-del-game-btn{background:rgba(224,90,43,.1);border:1px solid rgba(224,90,43,.3);border-radius:6px;color:#e05a2b;font-size:.75rem;font-weight:700;padding:3px 8px;cursor:pointer;transition:all .15s;flex-shrink:0}
+.edit-del-game-btn:active{opacity:.7}
+.edit-save-btn{width:100%;padding:12px;background:var(--accent);border:none;border-radius:10px;color:var(--bg);font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer;margin-top:10px;transition:opacity .15s}
+.edit-save-btn:active{opacity:.7}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--green);color:#0f1a14;font-weight:900;font-size:.82rem;padding:10px 20px;border-radius:20px;opacity:0;transition:all .28s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.confirm-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.confirm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px)}
+.confirm-box{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 22px 16px;max-width:320px;width:100%}
+.confirm-title{font-size:1rem;font-weight:900;color:var(--text);margin-bottom:6px;line-height:1.4}
+.confirm-sub{font-size:.78rem;color:#888;margin-bottom:18px;line-height:1.5}
+.confirm-actions{display:flex;gap:10px}
+.confirm-cancel{flex:1;padding:11px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:#aaa;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer}
+.confirm-ok{flex:1;padding:11px;background:var(--accent2);border:none;border-radius:10px;color:#fff;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer}
+html,body{overscroll-behavior-y:contain}
+.save-btn:disabled{opacity:.5;pointer-events:none}
 </style>
 </head>
 <body>
 <header>
-  <h1>STRIKE ZONE🎳</h1>
+  <h1>🎳 BOWLING</h1>
   <div style="display:flex;align-items:center;gap:8px">
-    <span class="sync-status loading" id="syncStatus">⟳ SYNC</span>
+    <span class="sync-status loading" id="syncStatus">⟳ 接続中</span>
     <div class="game-count" id="gameCount">0 GAMES</div>
   </div>
 </header>
@@ -587,6 +298,22 @@ header h1{
     <div id="gamesContainer"></div>
   </div>
   <div class="balance-section"><div id="balanceCard"></div></div>
+  <!-- ご祝儀セクション -->
+  <div class="goriyaku-section">
+    <div class="goriyaku-card">
+      <div class="goriyaku-header">
+        <span class="goriyaku-title">🎁 ご祝儀 集計</span>
+        <span style="font-size:.68rem;color:#aaa;">各ゲームから追加</span>
+      </div>
+      <div id="goriyakuList" class="goriyaku-list">
+        <div class="goriyaku-list-empty">ご祝儀はまだありません</div>
+      </div>
+      <div class="goriyaku-total-row">
+        <span class="goriyaku-total-label">ご祝儀 合計</span>
+        <span class="goriyaku-total-num" id="goriyakuTotal">¥ 0</span>
+      </div>
+    </div>
+  </div>
   <div class="action-row">
     <button class="save-btn" onclick="saveSession()">💾 この日の記録を保存</button>
     <button class="reset-btn" onclick="resetAll()">🗑 リセット</button>
@@ -595,7 +322,7 @@ header h1{
 <div class="panel" id="panel-stats">
   <div class="section" style="margin-bottom:4px;"><div class="section-label">全履歴 通算ランキング</div></div>
   <div class="stats-card" id="statsCard"></div>
-  <div style="margin:10px 14px 0;font-family:'Orbitron','Courier New',monospace;font-size:.58rem;color:#444;letter-spacing:1px;">※ 保存済みの全履歴から集計</div>
+  <div style="margin:10px 14px 0;font-size:.68rem;color:#555;">※ 保存済みの全履歴から集計</div>
 </div>
 <div class="panel" id="panel-history"><div id="historyContainer"></div></div>
 <div class="panel" id="panel-users">
@@ -610,603 +337,810 @@ header h1{
       <button class="roster-add-btn" onclick="addRosterUser()">＋ 追加</button>
     </div>
   </div>
-  <div style="margin:12px 14px 0;font-family:'Orbitron','Courier New',monospace;font-size:.6rem;color:#333;line-height:2;letter-spacing:1px;">
+  <div style="margin:12px 14px 0;font-size:.68rem;color:#555;line-height:1.6;">
     💡 ここで登録したユーザーは記録・履歴の編集時にプルダウンから選べます<br>
     💡 ユーザーを削除しても過去の履歴は残ります
   </div>
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onerror="window._fbFailed=true"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js" onerror="window._fbFailed=true"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-var db;
-var _useLocal=false;
-try{
-  if(window._fbFailed||typeof firebase==='undefined')throw new Error('Firebase not loaded');
-  firebase.initializeApp({databaseURL:"https://bowling-score-c7380-default-rtdb.firebaseio.com/"});
-  db=firebase.database();
-}catch(e){
-  _useLocal=true;
-  db={ref:function(path){return{get:function(){return Promise.resolve({exists:function(){return!!localStorage.getItem('bowling_data');},val:function(){var s=localStorage.getItem('bowling_data');return s?JSON.parse(s):null;}});},set:function(data){try{localStorage.setItem('bowling_data',JSON.stringify(data));}catch(e2){}return Promise.resolve();},on:function(ev,cb){var s=localStorage.getItem('bowling_data');if(s){try{cb({exists:function(){return true;},val:function(){return JSON.parse(s);}});}catch(e2){}}}};}};
-}
+firebase.initializeApp({databaseURL:"https://bowling-score-c7380-default-rtdb.firebaseio.com/"});
+var db=firebase.database();
 var MEDALS=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'];
 var MIN_PLAYERS=2,MAX_PLAYERS=12;
 var playerCount=4,selectedSlots=['','','',''],games=[];
 var cachedData={roster:[],sessions:[]};
 var editStates={};
+// ご祝儀データ（記録中のみ、保存時にセッションへ含める）
+var goriyakuItems=[];  // [{gameIdx, playerIdx, playerName, amount}]
+
+var currentSessionId=null;   // 保存済みセッションID（2回目以降の保存は上書き）
+var isDirty=false;           // 前回保存後に変更があるか
+var isConnected=true;
+var isSaving=false;
+var DRAFT_KEY='bowling_draft_v1';
+
+// HTMLエスケープ（名前に " < & などが入っても画面が壊れないように）
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 function setSyncStatus(state){
-  var el=document.getElementById('syncStatus');
-  if(_useLocal){el.textContent='💾 LOCAL';el.className='sync-status ok';return;}
-  if(state==='ok'){el.textContent='✓ SYNCED';el.className='sync-status ok';}
-  else if(state==='ng'){el.textContent='✗ OFFLINE';el.className='sync-status ng';}
-  else{el.textContent='⟳ SYNC';el.className='sync-status loading';}
+  var el=document.getElementById('syncStatus');if(!el)return;
+  if(state==='ok'&&!isConnected)state='ng';
+  if(state==='ok'){el.textContent='✓ 同期済';el.className='sync-status ok';}
+  else if(state==='ng'){el.textContent='✗ オフライン';el.className='sync-status ng';}
+  else{el.textContent='⟳ 同期中';el.className='sync-status loading';}
 }
+
+// ------------------------------------------------------
+// Firebaseは配列内のnullや空配列を消してしまうため、読み込むたびに形を整える
+// ------------------------------------------------------
+function toArr(v){
+  if(Array.isArray(v))return v.slice();
+  if(v&&typeof v==='object'){var a=[];Object.keys(v).forEach(function(k){var i=parseInt(k);if(!isNaN(i))a[i]=v[k];});return a;}
+  return[];
+}
+function normalizeSession(s){
+  if(!s||typeof s!=='object')return null;
+  var n=parseInt(s.playerCount)||0;
+  var names=toArr(s.names);
+  if(n<names.length)n=names.length;
+  var games=toArr(s.games).filter(function(g){return g!=null;}).map(function(g){
+    var r=toArr(g.ranks);
+    for(var i=0;i<n;i++){var v=r[i];r[i]=(v==='dnp')?'dnp':(v==null||v===''||isNaN(parseInt(v))||parseInt(v)<1||parseInt(v)>n)?null:parseInt(v);}
+    r.length=n;
+    var cp=g.customPoints?toArr(g.customPoints):null;
+    if(cp){for(var j=0;j<n;j++)cp[j]=parseInt(cp[j])||0;cp.length=n;}
+    return{ranks:r,customPoints:cp};
+  });
+  for(var k=0;k<n;k++)names[k]=names[k]==null?'':String(names[k]);
+  names.length=n;
+  var totals=Array(n).fill(0);
+  games.forEach(function(g){var pts=g.customPoints||defaultPtsForCount(n);g.ranks.forEach(function(r,pi){if(r!==null&&r!=='dnp')totals[pi]+=(pts[r-1]||0);});});
+  var out={id:s.id,date:s.date||'',playerCount:n,names:names,games:games,totals:totals};
+  if(s.goriyaku){
+    var items=toArr(s.goriyaku.items).filter(function(it){return it&&typeof it==='object';}).map(function(it){
+      return{gameIdx:parseInt(it.gameIdx)||0,playerIdx:parseInt(it.playerIdx)||0,playerName:it.playerName||'',amount:parseInt(it.amount)||0};
+    });
+    if(items.length>0)out.goriyaku={items:items};
+  }
+  return out;
+}
+function normalizeData(d){
+  d=(d&&typeof d==='object')?d:{};
+  var roster=toArr(d.roster).filter(function(x){return typeof x==='string'&&x.trim()!=='';});
+  var sessions=toArr(d.sessions).map(normalizeSession).filter(function(s){return s&&s.id!=null;});
+  return{roster:roster,sessions:sessions};
+}
+
 function loadData(cb){
   setSyncStatus('loading');
   db.ref('bowling').get().then(function(snap){
-    if(snap.exists()){cachedData=snap.val();if(!cachedData.roster)cachedData.roster=[];if(!cachedData.sessions)cachedData.sessions=[];}
-    setSyncStatus('ok');if(cb)cb();
+    cachedData=normalizeData(snap.val());
+    setSyncStatus('ok');
+    if(cb)cb();
   }).catch(function(e){setSyncStatus('ng');console.error(e);if(cb)cb();});
 }
-function saveData(d,cb){
-  cachedData=d;setSyncStatus('loading');
-  db.ref('bowling').set(d).then(function(){setSyncStatus('ok');if(cb)cb();}).catch(function(e){setSyncStatus('ng');console.error(e);});
+
+// ------------------------------------------------------
+// 保存はトランザクションで「サーバー上の最新データ」に対して変更を適用する
+// （他の端末がほぼ同時に保存しても、互いの記録を消さない）
+// mutator(data) は data を書き換える関数。false を返すと中止。
+// ------------------------------------------------------
+function updateData(mutator,onDone,onFail){
+  setSyncStatus('loading');
+  if(!isConnected)showToast('📡 オフラインです。接続が戻ると保存されます');
+  db.ref('bowling').transaction(function(cur){
+    var d=normalizeData(cur);
+    if(mutator(d)===false)return;   // undefined を返すと中止
+    return d;
+  }).then(function(res){
+    setSyncStatus('ok');
+    if(res&&res.committed){
+      cachedData=normalizeData(res.snapshot.val());
+      if(onDone)onDone();
+    }else if(onFail)onFail();
+  }).catch(function(e){
+    setSyncStatus('ng');console.error(e);
+    showToast('⚠ 保存に失敗しました。通信状況を確認して再度お試しください');
+    if(onFail)onFail(e);
+  });
+}
+
+// ------------------------------------------------------
+// 記録中データの端末内バックアップ（iPhoneでタブが破棄・リロードされても復元）
+// ------------------------------------------------------
+function hasInProgressData(){
+  return games.length>0||goriyakuItems.length>0||selectedSlots.some(function(s){return s!=='';});
+}
+function persistDraft(){
+  try{
+    if(!hasInProgressData()&&!currentSessionId){localStorage.removeItem(DRAFT_KEY);return;}
+    localStorage.setItem(DRAFT_KEY,JSON.stringify({v:1,ts:Date.now(),playerCount:playerCount,selectedSlots:selectedSlots,games:games,goriyakuItems:goriyakuItems,currentSessionId:currentSessionId,isDirty:isDirty}));
+  }catch(e){console.warn('draft save failed',e);}
+}
+function markDirty(){isDirty=true;persistDraft();}
+function restoreDraft(){
+  try{
+    var raw=localStorage.getItem(DRAFT_KEY);if(!raw)return false;
+    var d=JSON.parse(raw);if(!d||d.v!==1)return false;
+    var n=Math.max(MIN_PLAYERS,Math.min(MAX_PLAYERS,parseInt(d.playerCount)||4));
+    playerCount=n;
+    selectedSlots=toArr(d.selectedSlots).map(function(s){return s?String(s):'';});
+    selectedSlots.length=n;for(var i=0;i<n;i++)if(selectedSlots[i]==null)selectedSlots[i]='';
+    games=toArr(d.games).map(function(g){
+      var r=toArr(g&&g.ranks);for(var j=0;j<n;j++){var v=r[j];r[j]=v==='dnp'?'dnp':(v==null||isNaN(parseInt(v))?null:Math.min(parseInt(v),n));}r.length=n;
+      var cp=g&&g.customPoints?toArr(g.customPoints):null;if(cp){for(var k=0;k<n;k++)cp[k]=parseInt(cp[k])||0;cp.length=n;}
+      return{ranks:r,customPoints:cp};
+    });
+    goriyakuItems=toArr(d.goriyakuItems).filter(function(it){return it&&it.gameIdx<games.length&&it.playerIdx<n;}).map(function(it){
+      return{gameIdx:parseInt(it.gameIdx)||0,playerIdx:parseInt(it.playerIdx)||0,playerName:it.playerName||'',amount:parseInt(it.amount)||0};
+    });
+    currentSessionId=d.currentSessionId||null;
+    isDirty=!!d.isDirty;
+    return hasInProgressData();
+  }catch(e){console.warn('draft restore failed',e);return false;}
+}
+
+// ======================================================
+// リアルタイム同期（記録中のデータを絶対に上書きしない！）
+// ======================================================
+var appReady=false;
+// 履歴画面で編集中のセッションがあるか（あれば再描画しない＝入力途中の値を守る）
+function isEditingHistory(){
+  return Object.keys(editStates).some(function(k){return editStates[k]&&editStates[k].editMode;});
+}
+function refreshActivePanel(){
+  var activePanel=document.querySelector('.panel.active');if(!activePanel)return;
+  var pid=activePanel.id;
+  if(pid==='panel-stats')renderStats();
+  if(pid==='panel-history'&&!isEditingHistory())renderHistory();
+  if(pid==='panel-users')renderRoster();
 }
 db.ref('bowling').on('value',function(snap){
-  if(snap.exists()){
-    var newData=snap.val();
-    if(!newData.roster)newData.roster=[];if(!newData.sessions)newData.sessions=[];
-    cachedData=newData;setSyncStatus('ok');
-    var activePanel=document.querySelector('.panel.active');
-    if(activePanel){var id=activePanel.id;if(id==='panel-stats')renderStats();if(id==='panel-history')renderHistory();if(id==='panel-users')renderRoster();}
-    renderNameGrid();
-  }
+  // roster と sessions だけ更新（記録中のgames/selectedSlots/ご祝儀には絶対触れない）
+  cachedData=normalizeData(snap.val());
+  setSyncStatus('ok');
+  if(!appReady)return;
+  refreshActivePanel();
+  // 名前の選択は壊さずに選択肢だけ静かに更新
+  updateNameGridOptions();
+},function(err){console.error(err);setSyncStatus('ng');});
+
+// 接続状態の監視（起動直後の一瞬の未接続は表示しない）
+var connTimer=null;
+db.ref('.info/connected').on('value',function(snap){
+  clearTimeout(connTimer);
+  if(snap.val()===true){isConnected=true;setSyncStatus('ok');}
+  else{connTimer=setTimeout(function(){isConnected=false;setSyncStatus('ng');},3000);}
 });
+
+// 既存の選択を保持しつつ選択肢（ユーザー一覧）だけ更新する
+function slotOptionsHtml(currentVal){
+  var roster=getRoster();
+  var opts='<option value="">— 選択 —</option>';
+  // ユーザー一覧から削除された名前でも、選択中なら残す
+  if(currentVal&&roster.indexOf(currentVal)===-1)opts+='<option value="'+esc(currentVal)+'" selected>'+esc(currentVal)+'</option>';
+  roster.forEach(function(name){opts+='<option value="'+esc(name)+'"'+(currentVal===name?' selected':'')+'>'+esc(name)+'</option>';});
+  return opts;
+}
+function updateNameGridOptions(){
+  var selects=document.querySelectorAll('#nameGrid .slot-select');
+  if(selects.length!==playerCount){renderNameGrid();return;}
+  selects.forEach(function(sel,i){
+    if(document.activeElement===sel)return;  // 操作中のプルダウンは触らない
+    var currentVal=selectedSlots[i]||'';
+    sel.innerHTML=slotOptionsHtml(currentVal);
+    sel.value=currentVal;
+  });
+}
+
 function getRoster(){return cachedData.roster||[];}
 function getSessions(){return cachedData.sessions||[];}
+
 function switchTab(tab){
-  document.querySelectorAll('.tab').forEach(function(t,i){t.classList.toggle('active',['record','stats','history','users'][i]===tab);});
+  document.querySelectorAll('.tab').forEach(function(t,i){
+    t.classList.toggle('active',['record','stats','history','users'][i]===tab);
+  });
   document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
   document.getElementById('panel-'+tab).classList.add('active');
-  if(tab==='stats')renderStats();if(tab==='history')renderHistory();if(tab==='users')renderRoster();
+  if(tab==='stats')renderStats();
+  if(tab==='history')renderHistory();
+  if(tab==='users')renderRoster();
 }
+
 function renderRoster(){
   var roster=getRoster(),list=document.getElementById('rosterList');
-  if(roster.length===0){list.innerHTML='<div style="font-family:\'Orbitron\',\'Courier New\',monospace;font-size:.68rem;color:#333;padding:4px 0;letter-spacing:2px;">まだユーザーがいません</div>';return;}
-  list.innerHTML=roster.map(function(name){return'<div class="roster-row"><span class="rname">'+name+'</span><button class="roster-del" onclick="deleteRosterUser(\''+name.replace(/'/g,"\\'")+'\')">\u2715</button></div>';}).join('');
+  if(roster.length===0){list.innerHTML='<div style="font-size:.75rem;color:#555;padding:4px 0;">まだユーザーがいません</div>';return;}
+  list.innerHTML=roster.map(function(name,i){
+    return '<div class="roster-row"><span class="rname">'+esc(name)+'</span><button class="roster-del" onclick="deleteRosterUser('+i+')">✕</button></div>';
+  }).join('');
 }
+
 function addRosterUser(){
-  var inp=document.getElementById('rosterInput'),name=inp.value.trim();
+  var inp=document.getElementById('rosterInput'),name=inp.value.trim().slice(0,20);
   if(!name)return;
-  var d=JSON.parse(JSON.stringify(cachedData));
-  if(!d.roster)d.roster=[];
-  if(d.roster.includes(name)){showToast('同じ名前が既にあります');return;}
-  d.roster.push(name);
-  saveData(d,function(){inp.value='';renderRoster();renderNameGrid();});
+  if(getRoster().indexOf(name)!==-1){showToast('同じ名前が既にあります');return;}
+  updateData(function(d){
+    if(d.roster.indexOf(name)!==-1)return false;
+    d.roster.push(name);
+  },function(){inp.value='';renderRoster();updateNameGridOptions();showToast('👤 追加しました');});
 }
-function deleteRosterUser(name){
-  if(!confirm('「'+name+'」を削除しますか？'))return;
-  var d=JSON.parse(JSON.stringify(cachedData));
-  d.roster=d.roster.filter(function(r){return r!==name;});
-  saveData(d,function(){selectedSlots=selectedSlots.map(function(s){return s===name?'':s;});renderRoster();renderNameGrid();});
+
+function deleteRosterUser(i){
+  var name=getRoster()[i];if(name==null)return;
+  if(!confirm('「'+name+'」を削除しますか？\n（過去の記録は消えません）'))return;
+  // 記録中の選択はそのまま残す（記録途中で名前が消えないように）
+  updateData(function(d){
+    d.roster=d.roster.filter(function(r){return r!==name;});
+  },function(){renderRoster();updateNameGridOptions();});
 }
-function changeCount(delta){setCount(playerCount+delta);}
+
+function changeCount(delta){
+  var n=Math.max(MIN_PLAYERS,Math.min(MAX_PLAYERS,playerCount+delta));
+  if(n===playerCount)return;
+  if(n<playerCount){
+    // 減らすと消えてしまう入力があれば確認
+    var lostRank=games.some(function(g){return g.ranks.slice(n).some(function(r){return r!==null;})||g.ranks.some(function(r){return r!==null&&r!=='dnp'&&r>n;});});
+    var lostGor=goriyakuItems.some(function(it){return it.playerIdx>=n;});
+    var lostName=selectedSlots.slice(n).some(function(s){return s!=='';});
+    if((lostRank||lostGor||lostName)&&!confirm(playerCount+'人目（'+dn(playerCount-1)+'）の入力内容が消えます。\n人数を減らしますか？'))return;
+  }
+  setCount(n);markDirty();
+}
+
 function setCount(n){
-  n=Math.max(MIN_PLAYERS,Math.min(MAX_PLAYERS,n));playerCount=n;
+  n=Math.max(MIN_PLAYERS,Math.min(MAX_PLAYERS,n));
+  playerCount=n;
   var sv=document.getElementById('stepValue'),sd=document.getElementById('stepDown'),su=document.getElementById('stepUp');
-  if(sv)sv.textContent=n;if(sd)sd.disabled=(n<=MIN_PLAYERS);if(su)su.disabled=(n>=MAX_PLAYERS);
-  selectedSlots=selectedSlots.slice(0,n);while(selectedSlots.length<n)selectedSlots.push('');
+  if(sv)sv.textContent=n;
+  if(sd)sd.disabled=(n<=MIN_PLAYERS);
+  if(su)su.disabled=(n>=MAX_PLAYERS);
+  selectedSlots=selectedSlots.slice(0,n);
+  while(selectedSlots.length<n)selectedSlots.push('');
   games=games.map(function(g){
-    var r=(g.ranks||[]).slice(0,n);while(r.length<n)r.push(null);
-    var cp=g.customPoints?g.customPoints.slice(0,n):null;
-    if(cp)while(cp.length<n)cp.push(0);
-    var ta=g.teamAssignments?g.teamAssignments.slice(0,n):null;
-    if(ta)while(ta.length<n)ta.push(null);
-    return{
-      mode:g.mode==='team'?'team':'individual',
-      ranks:r,
-      customPoints:cp,
-      teamCount:g.teamCount||2,
-      teamAssignments:ta,
-      teamRanks:g.teamRanks?g.teamRanks.slice():null,
-      teamCustomPoints:g.teamCustomPoints?g.teamCustomPoints.slice():null
-    };
+    // 人数を超える順位（例：3人なのに4位）は未入力に戻す
+    var r=g.ranks.slice(0,n).map(function(x){return(x!==null&&x!=='dnp'&&x>n)?null:x;});while(r.length<n)r.push(null);
+    var cp=g.customPoints?g.customPoints.slice(0,n):null;if(cp)while(cp.length<n)cp.push(0);
+    return{ranks:r,customPoints:cp};
   });
-  renderNameGrid();renderGames();renderTotals();
+  goriyakuItems=goriyakuItems.filter(function(it){return it.playerIdx<n;});
+  renderNameGrid();renderGames();renderTotals();renderGoriyaku();
 }
+
 function renderNameGrid(){
-  var roster=getRoster(),grid=document.getElementById('nameGrid');grid.innerHTML='';
+  var grid=document.getElementById('nameGrid');
+  grid.innerHTML='';
   for(var i=0;i<playerCount;i++){
     var wrap=document.createElement('div');wrap.className='slot-wrap';
     var sel=document.createElement('select');sel.className='slot-select';
-    var opts='<option value="">— 選択 —</option>';
-    roster.forEach(function(name){opts+='<option value="'+name+'"'+(selectedSlots[i]===name?' selected':'')+'>'+name+'</option>';});
-    sel.innerHTML=opts;
-    (function(idx){sel.addEventListener('change',function(e){selectedSlots[idx]=e.target.value;renderGames();renderTotals();});})(i);
+    sel.innerHTML=slotOptionsHtml(selectedSlots[i]||'');
+    (function(idx){
+      sel.addEventListener('change',function(e){
+        var v=e.target.value;
+        // 同じ人を2枠に選ばない
+        if(v&&selectedSlots.some(function(s,j){return j!==idx&&s===v;})){
+          showToast('「'+v+'」は既に選択されています');
+          e.target.value=selectedSlots[idx]||'';return;
+        }
+        selectedSlots[idx]=v;renderGames();renderTotals();renderGoriyaku();markDirty();
+      });
+    })(i);
     var arrow=document.createElement('span');arrow.className='slot-arrow';arrow.textContent='▼';
     wrap.appendChild(sel);wrap.appendChild(arrow);grid.appendChild(wrap);
   }
 }
+
 function dn(i){return selectedSlots[i]||'P'+(i+1);}
+
 function defaultPtsForCount(n){
-  if(n<=1)return[0];if(n===2)return[5,-5];if(n===3)return[5,0,-5];if(n===4)return[5,3,-3,-5];if(n===5)return[5,3,0,-3,-5];
+  if(n<=1)return[0];if(n===2)return[5,-5];if(n===3)return[5,0,-5];
+  if(n===4)return[5,3,-3,-5];if(n===5)return[5,3,0,-3,-5];
   var arr=Array(n).fill(0);arr[0]=5;arr[1]=3;arr[n-2]=-3;arr[n-1]=-5;return arr;
 }
-function defaultTeamPts(t){
-  if(t<=1)return[0];
-  if(t===2)return[5,-5];
-  if(t===3)return[5,0,-5];
-  if(t===4)return[5,3,-3,-5];
-  var a=Array(t).fill(0);a[0]=5;a[1]=3;a[t-2]=-3;a[t-1]=-5;return a;
-}
-var TEAM_LABELS=['A','B','C','D'];
-function getGameMode(g){return g&&g.mode==='team'?'team':'individual';}
-function calcPlayerPt(g,pi,n){
-  if(getGameMode(g)==='team'){
-    var ta=g.teamAssignments?g.teamAssignments[pi]:null;
-    if(ta==null||ta===''||ta==='dnp')return null;
-    var ti=parseInt(ta);
-    var tr=(g.teamRanks||[])[ti];
-    if(tr==null)return null;
-    var pts=g.teamCustomPoints||defaultTeamPts(g.teamCount||2);
-    return pts[tr-1]||0;
-  }
-  var r=g.ranks?g.ranks[pi]:null;
-  if(r==null||r==='dnp')return null;
-  var pts=g.customPoints||defaultPtsForCount(n);
-  return pts[r-1]||0;
-}
-function isGameComplete(g,n){
-  if(getGameMode(g)==='team'){
-    var ta=g.teamAssignments||[];
-    for(var pi=0;pi<n;pi++){
-      var v=ta[pi];
-      if(v==null||v==='')return false;
-      if(v==='dnp')continue;
-      var tr=(g.teamRanks||[])[parseInt(v)];
-      if(tr==null)return false;
-    }
-    return true;
-  }
-  return (g.ranks||[]).every(function(r){return r!==null;})&&(g.ranks||[]).length===n;
-}
+
 function getPts(gi){return games[gi].customPoints||defaultPtsForCount(playerCount);}
 function getPtByRank(gi,rank){var p=getPts(gi);return p[rank-1]!==undefined?p[rank-1]:0;}
+
 function addGame(){
-  games.push({
-    mode:'individual',
-    ranks:Array(playerCount).fill(null),
-    customPoints:null,
-    teamCount:2,
-    teamAssignments:null,
-    teamRanks:null,
-    teamCustomPoints:null
-  });
-  renderGames();renderTotals();updateGameCount();
+  games.push({ranks:Array(playerCount).fill(null),customPoints:null});
+  renderGames();renderTotals();renderGoriyaku();updateGameCount();markDirty();
   setTimeout(function(){var c=document.getElementById('gamesContainer');if(c&&c.firstElementChild)c.firstElementChild.scrollIntoView({behavior:'smooth',block:'center'});},60);
 }
-function deleteGame(idx){games.splice(idx,1);renderGames();renderTotals();updateGameCount();}
+
+// ご祝儀のゲーム番号を、ゲーム削除に合わせてずらす
+function shiftGoriyakuAfterDelete(items,idx){
+  return items.filter(function(it){return it.gameIdx!==idx;}).map(function(it){
+    return it.gameIdx>idx?{gameIdx:it.gameIdx-1,playerIdx:it.playerIdx,playerName:it.playerName,amount:it.amount}:it;
+  });
+}
+
+function deleteGame(idx){
+  if(!games[idx])return;
+  var g=games[idx];
+  var hasInput=g.ranks.some(function(r){return r!==null;})||goriyakuItems.some(function(it){return it.gameIdx===idx;});
+  if(hasInput&&!confirm('GAME '+(idx+1)+' を削除しますか？\n（このゲームのご祝儀も削除されます）'))return;
+  games.splice(idx,1);
+  goriyakuItems=shiftGoriyakuAfterDelete(goriyakuItems,idx);
+  var newOpen={};Object.keys(gameGoriyakuOpen).forEach(function(k){var i=parseInt(k);if(i<idx)newOpen[i]=gameGoriyakuOpen[k];else if(i>idx)newOpen[i-1]=gameGoriyakuOpen[k];});
+  gameGoriyakuOpen=newOpen;
+  renderGames();renderTotals();renderGoriyaku();updateGameCount();markDirty();
+}
+
 function setRank(gi,pi,val){
-  if(val==='dnp')games[gi].ranks[pi]='dnp';else games[gi].ranks[pi]=val?parseInt(val):null;
-  renderGameCard(gi);renderTotals();
+  if(!games[gi])return;
+  if(val==='dnp')games[gi].ranks[pi]='dnp';
+  else games[gi].ranks[pi]=val?parseInt(val):null;
+  renderGameCard(gi);renderTotals();renderGoriyaku();markDirty();
 }
+
+var gameGoriyakuOpen={};  // ゲームカードのご祝儀エリア開閉状態
+
+function toggleGameGoriyaku(gi){
+  gameGoriyakuOpen[gi]=!gameGoriyakuOpen[gi];
+  renderGameCard(gi);
+}
+
+function addGameGoriyakuItem(gi){
+  var playerSel=document.getElementById('ggSel'+gi);
+  var amountEl=document.getElementById('ggAmt'+gi);
+  if(!playerSel||!amountEl||!games[gi])return;
+  var pi=playerSel.value;
+  var amt=Math.round(Number(amountEl.value));
+  if(pi===''){showToast('受取人を選択してください');return;}
+  if(!isFinite(amt)||amt<=0){showToast('金額を入力してください');return;}
+  if(amt>1000000){showToast('金額が大きすぎます');return;}
+  goriyakuItems.push({gameIdx:gi,playerIdx:parseInt(pi),playerName:dn(parseInt(pi)),amount:amt});
+  gameGoriyakuOpen[gi]=true;
+  renderGameCard(gi);
+  renderGoriyaku();markDirty();
+}
+
 function toggleCustomPts(gi){
-  var g=games[gi];
-  if(getGameMode(g)==='team'){
-    g.teamCustomPoints=g.teamCustomPoints?null:defaultTeamPts(g.teamCount||2).slice();
-  }else{
-    g.customPoints=g.customPoints?null:defaultPtsForCount(playerCount).slice();
-  }
-  renderGameCard(gi);renderTotals();
+  var g=games[gi];if(!g)return;
+  g.customPoints=g.customPoints?null:defaultPtsForCount(playerCount).slice();
+  renderGameCard(gi);renderTotals();renderGoriyaku();markDirty();
 }
-function setCustomPt(gi,ri,val){
-  var g=games[gi];
-  if(getGameMode(g)==='team'){
-    if(!g.teamCustomPoints)return;
-    g.teamCustomPoints[ri]=parseInt(val)||0;
-  }else{
-    if(!g.customPoints)return;
-    g.customPoints[ri]=parseInt(val)||0;
-  }
-  renderGameCard(gi);renderTotals();
-}
-function setGameMode(gi,mode){
-  var g=games[gi];
-  g.mode=mode;
-  if(mode==='team'){
-    if(!g.teamCount)g.teamCount=2;
-    if(!g.teamAssignments)g.teamAssignments=Array(playerCount).fill(null);
-    else{
-      g.teamAssignments=g.teamAssignments.slice(0,playerCount);
-      while(g.teamAssignments.length<playerCount)g.teamAssignments.push(null);
-    }
-    if(!g.teamRanks)g.teamRanks=Array(g.teamCount).fill(null);
-  }
-  renderGameCard(gi);renderTotals();
-}
-function setTeamCount(gi,n){
-  var g=games[gi];
-  g.teamCount=n;
-  if(!g.teamRanks)g.teamRanks=[];
-  g.teamRanks=g.teamRanks.slice(0,n);
-  while(g.teamRanks.length<n)g.teamRanks.push(null);
-  if(g.teamCustomPoints){
-    g.teamCustomPoints=g.teamCustomPoints.slice(0,n);
-    while(g.teamCustomPoints.length<n)g.teamCustomPoints.push(0);
-  }
-  if(g.teamAssignments){
-    g.teamAssignments=g.teamAssignments.map(function(t){
-      if(t==null||t==='dnp')return t;
-      var idx=parseInt(t);
-      return idx>=n?null:idx;
-    });
-  }
-  renderGameCard(gi);renderTotals();
-}
-function setTeamRank(gi,ti,val){
-  var g=games[gi];
-  if(!g.teamRanks)g.teamRanks=[];
-  g.teamRanks[ti]=val?parseInt(val):null;
-  renderGameCard(gi);renderTotals();
-}
-function setTeamAssign(gi,pi,val){
-  var g=games[gi];
-  if(!g.teamAssignments)g.teamAssignments=Array(playerCount).fill(null);
-  if(val==='dnp')g.teamAssignments[pi]='dnp';
-  else if(val==='')g.teamAssignments[pi]=null;
-  else g.teamAssignments[pi]=parseInt(val);
-  renderGameCard(gi);renderTotals();
-}
+
+function setCustomPt(gi,ri,val){if(!games[gi]||!games[gi].customPoints)return;games[gi].customPoints[ri]=parseInt(val)||0;renderGameCard(gi);renderTotals();renderGoriyaku();markDirty();}
+
 function renderGames(){
   var c=document.getElementById('gamesContainer');c.innerHTML='';
-  for(var gi=games.length-1;gi>=0;gi--)c.appendChild(createGameCard(gi));updateGameCount();
+  for(var gi=games.length-1;gi>=0;gi--)c.appendChild(createGameCard(gi));
+  updateGameCount();
 }
+
 function renderGameCard(gi){
   var c=document.getElementById('gamesContainer'),domIdx=games.length-1-gi;
   if(c.children[domIdx])c.replaceChild(createGameCard(gi),c.children[domIdx]);
 }
+
 function createGameCard(gi){
-  var g=games[gi],mode=getGameMode(g);
-  var hasCustom,pts,nPts;
-  if(mode==='team'){hasCustom=!!g.teamCustomPoints;nPts=g.teamCount||2;pts=g.teamCustomPoints||defaultTeamPts(nPts);}
-  else{hasCustom=!!g.customPoints;nPts=playerCount;pts=g.customPoints||defaultPtsForCount(nPts);}
+  var g=games[gi],hasCustom=!!g.customPoints,pts=getPts(gi);
+  var ranks=g.ranks.filter(function(r){return r!==null&&r!=='dnp';}),hasDup=ranks.length!==new Set(ranks).size;
   var customHtml='';
-  for(var i=0;i<nPts;i++)customHtml+='<div class="game-pts-item"><label>'+(i+1)+'位</label><input class="game-pts-input" type="number" value="'+pts[i]+'" onchange="setCustomPt('+gi+','+i+',this.value)"></div>';
-  var modeHtml='<div class="mode-toggle"><button class="mode-btn'+(mode==='individual'?' active':'')+'" onclick="setGameMode('+gi+',\'individual\')">👤 個人戦</button><button class="mode-btn'+(mode==='team'?' active':'')+'" onclick="setGameMode('+gi+',\'team\')">👥 チーム戦</button></div>';
-  var teamConfigHtml='';
-  if(mode==='team'){
-    var tc=g.teamCount||2;
-    var teamCountHtml='<div class="team-count-row"><span class="tc-label">チーム数</span>';
-    [2,3,4].forEach(function(nn){teamCountHtml+='<button class="team-count-btn'+(tc===nn?' active':'')+'" onclick="setTeamCount('+gi+','+nn+')">'+nn+'</button>';});
-    teamCountHtml+='</div>';
-    var teamRanksHtml='<div class="team-rank-grid">';
-    for(var ti=0;ti<tc;ti++){
-      var tr=(g.teamRanks||[])[ti];
-      var trOpts='<option value=""'+(tr==null?' selected':'')+'>—</option>';
-      for(var nn=1;nn<=tc;nn++)trOpts+='<option value="'+nn+'"'+(tr===nn?' selected':'')+'>'+nn+'位</option>';
-      teamRanksHtml+='<div class="team-rank-item"><span class="tr-label">'+TEAM_LABELS[ti]+'チーム</span><select onchange="setTeamRank('+gi+','+ti+',this.value)">'+trOpts+'</select></div>';
-    }
-    teamRanksHtml+='</div>';
-    teamConfigHtml='<div class="team-config">'+teamCountHtml+teamRanksHtml+'</div>';
-  }
+  for(var i=0;i<playerCount;i++)customHtml+='<div class="game-pts-item"><label>'+(i+1)+'位</label><input class="game-pts-input" type="number" inputmode="numeric" value="'+(pts[i]||0)+'" onchange="setCustomPt('+gi+','+i+',this.value)"></div>';
   var rowsHtml='';
   for(var pi=0;pi<playerCount;pi++){
-    var pt=calcPlayerPt(g,pi,playerCount);
-    var ptCls,ptStr;
-    if(pt==null){
-      var dnpVal=mode==='team'?(g.teamAssignments||[])[pi]:g.ranks[pi];
-      if(dnpVal==='dnp'){ptCls='pt-zero';ptStr='不参加';}
-      else{ptCls='';ptStr='—';}
-    }else{
-      ptCls=pt>0?'pt-pos':pt<0?'pt-neg':'pt-zero';
-      ptStr=pt>0?'+'+pt:''+pt;
-    }
-    var opts;
-    if(mode==='team'){
-      var ta=(g.teamAssignments||[])[pi];
-      var taStr=(ta==null||ta==='')?'':(ta==='dnp'?'dnp':String(ta));
-      opts='<option value=""'+(taStr===''?' selected':'')+'>—</option>';
-      for(var ti2=0;ti2<(g.teamCount||2);ti2++)opts+='<option value="'+ti2+'"'+(taStr===String(ti2)?' selected':'')+'>'+TEAM_LABELS[ti2]+'チーム</option>';
-      opts+='<option value="dnp"'+(taStr==='dnp'?' selected':'')+'>不参加</option>';
-      rowsHtml+='<div class="rank-row"><span class="pname">'+dn(pi)+'</span><select class="rank-select" onchange="setTeamAssign('+gi+','+pi+',this.value)">'+opts+'</select><span class="pt-preview '+ptCls+'">'+ptStr+'</span></div>';
-      continue;
-    }
-    var r=g.ranks[pi];
-    opts='<option value=""'+(r===null?' selected':'')+'>—</option>';
+    var r=g.ranks[pi],ptCls,ptStr;
+    if(r==='dnp'){ptCls='pt-zero';ptStr='不参加';}
+    else if(r===null){ptCls='';ptStr='—';}
+    else{var ptVal=pts[r-1]||0;ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=fmtYen(ptVal);}
+    var opts='<option value=""'+(r===null?' selected':'')+'>—</option>';
     for(var n=1;n<=playerCount;n++)opts+='<option value="'+n+'"'+(r===n?' selected':'')+'>'+n+'位</option>';
     opts+='<option value="dnp"'+(r==='dnp'?' selected':'')+'>不参加</option>';
-    rowsHtml+='<div class="rank-row"><span class="pname">'+dn(pi)+'</span><select class="rank-select" onchange="setRank('+gi+','+pi+',this.value)">'+opts+'</select><span class="pt-preview '+ptCls+'">'+ptStr+'</span></div>';
+    rowsHtml+='<div class="rank-row"><span class="pname">'+esc(dn(pi))+'</span><select class="rank-select" onchange="setRank('+gi+','+pi+',this.value)">'+opts+'</select><span class="pt-preview '+ptCls+'">'+ptStr+'</span></div>';
   }
-  var hasDup=false;
-  if(mode==='team'){
-    var trs=(g.teamRanks||[]).slice(0,g.teamCount||2).filter(function(x){return x!=null;});
-    hasDup=trs.length!==new Set(trs).size;
-  }else{
-    var ranksArr=g.ranks.filter(function(r){return r!==null&&r!=='dnp';});
-    hasDup=ranksArr.length!==new Set(ranksArr).size;
-  }
+  // ゲームのご祝儀エントリー取得
+  var gameGoriyaku=goriyakuItems.filter(function(it){return it.gameIdx===gi;});
+  var hasGoriyaku=gameGoriyaku.length>0;
+  var goriyakuItemsHtml=gameGoriyaku.map(function(item){
+    var realIdx=goriyakuItems.indexOf(item);
+    return'<div class="game-goriyaku-item"><span class="game-goriyaku-item-name">'+esc(dn(item.playerIdx))+'</span><span class="game-goriyaku-item-amount">¥ '+item.amount.toLocaleString()+'</span><button class="game-goriyaku-item-del" onclick="deleteGoriyakuItem('+realIdx+')">✕</button></div>';
+  }).join('');
+  var goriyakuOpen=gameGoriyakuOpen[gi]||hasGoriyaku;
+  var playerOptsHtml='<option value="">受取人</option>';
+  for(var pi2=0;pi2<playerCount;pi2++)playerOptsHtml+='<option value="'+pi2+'">'+esc(dn(pi2))+'</option>';
   var card=document.createElement('div');card.className='game-card';
-  card.innerHTML='<div class="game-card-header"><span class="game-num">GAME '+(gi+1)+'</span><div class="game-card-actions"><button class="pts-toggle-btn'+(hasCustom?' active':'')+'" onclick="toggleCustomPts('+gi+')">'+(hasCustom?'⚙ カスタム配点中':'⚙ 配点設定')+'</button><button class="del-btn" onclick="deleteGame('+gi+')">\u2715</button></div></div>'+modeHtml+teamConfigHtml+'<div class="game-pts-area'+(hasCustom?' open':'')+'"><div class="game-pts-grid">'+customHtml+'</div></div><div class="rank-inputs">'+rowsHtml+'</div>'+(hasDup?'<div class="dup-warn">⚠ 同じ順位が重複しています</div>':'');
+  card.innerHTML='<div class="game-card-header"><span class="game-num">GAME '+(gi+1)+'</span><div class="game-card-actions"><button class="pts-toggle-btn'+(hasCustom?' active':'')+'" onclick="toggleCustomPts('+gi+')">'+(hasCustom?'⚙ カスタム配点中':'⚙ 配点設定')+'</button><button class="goriyaku-toggle-btn'+(hasGoriyaku?' active':'')+'" onclick="toggleGameGoriyaku('+gi+')">'+(hasGoriyaku?'🎁 ご祝儀中':'🎁 ご祝儀')+'</button><button class="del-btn" onclick="deleteGame('+gi+')">✕</button></div></div><div class="game-pts-area'+(hasCustom?' open':'')+'"><div class="game-pts-grid">'+customHtml+'</div></div><div class="game-goriyaku-area'+(goriyakuOpen?' open':'')+'"><div class="game-goriyaku-form"><select class="game-goriyaku-select" id="ggSel'+gi+'">'+playerOptsHtml+'</select><span style="font-size:.72rem;color:#c07aff;margin:0 2px;">¥</span><input class="game-goriyaku-amount" type="number" inputmode="numeric" id="ggAmt'+gi+'" placeholder="0" min="0" step="100"><button class="game-goriyaku-add-btn" onclick="addGameGoriyakuItem('+gi+')">＋ 追加</button></div>'+(goriyakuItemsHtml?'<div class="game-goriyaku-items">'+goriyakuItemsHtml+'</div>':'')+'</div><div class="rank-inputs">'+rowsHtml+'</div>'+(hasDup?'<div class="dup-warn">⚠ 同じ順位が重複しています</div>':'');
   return card;
 }
+
+function ptToYen(pt){return pt*100;}
+function fmtYen(pt){var y=ptToYen(pt);return(y>0?'+':'')+y.toLocaleString()+'円';}
+function fmtYenAbs(pt){return Math.abs(ptToYen(pt)).toLocaleString()+'円';}
+
 function calcTotals(){
   var t=Array(playerCount).fill(0);
-  games.forEach(function(g){
-    for(var pi=0;pi<playerCount;pi++){
-      var pt=calcPlayerPt(g,pi,playerCount);
-      if(pt!=null)t[pi]+=pt;
-    }
-  });
+  games.forEach(function(g,gi){g.ranks.forEach(function(r,pi){if(r!==null&&r!=='dnp')t[pi]+=getPtByRank(gi,r);});});
   return t;
 }
+
 function renderTotals(){
   var totals=calcTotals(),sorted=totals.map(function(s,i){return{i:i,s:s};}).sort(function(a,b){return b.s-a.s;});
   var card=document.getElementById('totalCard');
-  if(games.length===0){card.innerHTML='<div class="total-empty">— SCORES —</div>';}
-  else{card.innerHTML=sorted.map(function(item,rank){var s=item.s,cls=rank<3?'rank-'+(rank+1):'',ptCls=s>0?'pt-pos':s<0?'pt-neg':'pt-zero';return'<div class="total-pill '+cls+'"><span class="pill-medal">'+(MEDALS[rank]||'')+'</span><span class="pill-name">'+dn(item.i)+'</span><span class="pill-score '+ptCls+'">'+(s>0?'+':'')+s+'</span></div>';}).join('');}
-  var completeGames=games.filter(function(g){return isGameComplete(g,playerCount);});
+  if(games.length===0){card.innerHTML='<div class="total-empty">合計スコアはここに表示されます</div>';}
+  else{card.innerHTML=sorted.map(function(item,rank){var s=item.s,cls=rank<3?'rank-'+(rank+1):'',ptCls=s>0?'pt-pos':s<0?'pt-neg':'pt-zero';return'<div class="total-pill '+cls+'"><span class="pill-medal">'+(MEDALS[rank]||'')+'</span><span class="pill-name">'+esc(dn(item.i))+'</span><span class="pill-score '+ptCls+'">'+fmtYen(s)+'</span></div>';}).join('');}
+  var completeGames=games.filter(function(g){return g.ranks.every(function(r){return r!==null;});});
   var bc=document.getElementById('balanceCard');
   if(completeGames.length===0){bc.innerHTML='';return;}
-  var sum=0;
-  completeGames.forEach(function(g){
-    for(var pi=0;pi<playerCount;pi++){
-      var pt=calcPlayerPt(g,pi,playerCount);
-      if(pt!=null)sum+=pt;
-    }
-  });
+  var sum=completeGames.reduce(function(acc,g){var gi=games.indexOf(g);return acc+g.ranks.reduce(function(a,r){return a+(r==='dnp'?0:getPtByRank(gi,r));},0);},0);
   var isOk=sum===0;
-  bc.innerHTML='<div class="balance-card '+(isOk?'ok':'ng')+'"><div class="balance-left"><span class="balance-icon">'+(isOk?'✅':'⚠️')+'</span><div><div class="balance-title">'+(isOk?'BALANCE OK':'BALANCE ERROR')+'</div><div class="balance-sub">完全入力 '+completeGames.length+'ゲーム分の合計</div></div></div><span class="balance-num">'+(sum>0?'+':'')+sum+'</span></div>';
+  bc.innerHTML='<div class="balance-card '+(isOk?'ok':'ng')+'"><div class="balance-left"><span class="balance-icon">'+(isOk?'✅':'⚠️')+'</span><div><div class="balance-title">'+(isOk?'バランス OK':'バランスが合いません')+'</div><div class="balance-sub">完全入力 '+completeGames.length+'ゲーム分の合計</div></div></div><span class="balance-num">'+fmtYen(sum)+'</span></div>';
 }
+
 function updateGameCount(){document.getElementById('gameCount').textContent=games.length+' GAMES';}
+
 function saveSession(){
+  if(isSaving)return;   // 連打で二重保存しない
   if(games.length===0){showToast('ゲームがありません');return;}
-  var session={id:Date.now(),date:new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}),playerCount:playerCount,names:selectedSlots.slice(),games:games.map(function(g){return{mode:getGameMode(g),ranks:g.ranks.slice(),customPoints:g.customPoints?g.customPoints.slice():null,teamCount:g.teamCount||null,teamAssignments:g.teamAssignments?g.teamAssignments.slice():null,teamRanks:g.teamRanks?g.teamRanks.slice():null,teamCustomPoints:g.teamCustomPoints?g.teamCustomPoints.slice():null};}),totals:calcTotals()};
-  var d=JSON.parse(JSON.stringify(cachedData));if(!d.sessions)d.sessions=[];d.sessions.unshift(session);
-  saveData(d,function(){showToast('💾 SAVED!');});
+  if(currentSessionId&&!isDirty){showToast('✓ 保存済みです（変更なし）');return;}
+  // 入力チェック（警告のみ。OKならそのまま保存できる）
+  var warns=[];
+  var incomplete=[],dup=[];
+  games.forEach(function(g,gi){
+    if(g.ranks.some(function(r){return r===null;}))incomplete.push(gi+1);
+    var rk=g.ranks.filter(function(r){return r!==null&&r!=='dnp';});
+    if(rk.length!==new Set(rk).size)dup.push(gi+1);
+  });
+  if(incomplete.length)warns.push('・順位が未入力：GAME '+incomplete.join(', '));
+  if(dup.length)warns.push('・順位が重複：GAME '+dup.join(', '));
+  var unnamed=[];for(var i=0;i<playerCount;i++)if(!selectedSlots[i])unnamed.push('P'+(i+1));
+  if(unnamed.length)warns.push('・名前が未選択：'+unnamed.join(', '));
+  if(warns.length&&!confirm('次の項目を確認してください。\n\n'+warns.join('\n')+'\n\nこのまま保存しますか？'))return;
+
+  var isUpdate=!!currentSessionId;
+  var sid=currentSessionId||Date.now();
+  var session={
+    id:sid,
+    date:new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}),
+    playerCount:playerCount,
+    names:selectedSlots.slice(),
+    games:games.map(function(g){return{ranks:g.ranks.slice(),customPoints:g.customPoints?g.customPoints.slice():null};}),
+    totals:calcTotals()
+  };
+  if(goriyakuItems.length>0){
+    // 受取人の名前は保存時点の名前で確定させる
+    session.goriyaku={items:goriyakuItems.map(function(it){return{gameIdx:it.gameIdx,playerIdx:it.playerIdx,playerName:dn(it.playerIdx),amount:it.amount};})};
+  }
+  isSaving=true;
+  var btn=document.querySelector('.save-btn');if(btn)btn.disabled=true;
+  var done=function(){isSaving=false;if(btn)btn.disabled=false;};
+  updateData(function(d){
+    var idx=d.sessions.findIndex(function(x){return x.id===sid;});
+    if(idx>=0){session.date=d.sessions[idx].date||session.date;d.sessions[idx]=session;}
+    else d.sessions.unshift(session);
+  },function(){
+    done();
+    currentSessionId=sid;isDirty=false;persistDraft();
+    showToast(isUpdate?'💾 上書き保存しました！':'💾 保存しました！');
+  },function(){done();});
 }
+
 function renderStats(){
   var sessions=getSessions(),card=document.getElementById('statsCard');
-  if(sessions.length===0){card.innerHTML='<div class="stats-empty">— NO DATA —</div>';return;}
+  if(sessions.length===0){card.innerHTML='<div class="stats-empty">📭 まだ記録がありません</div>';return;}
   var userMap={};
-  sessions.forEach(function(s){s.names.forEach(function(name,i){var nm=(name&&name.trim())?name.trim():'P'+(i+1);if(!userMap[nm])userMap[nm]={total:0,gameCount:0,sessionCount:0,scores:[]};userMap[nm].total+=s.totals[i];userMap[nm].sessionCount++;s.games.forEach(function(g){var pt=calcPlayerPt(g,i,s.playerCount);if(pt!=null){userMap[nm].gameCount++;userMap[nm].scores.push(pt);}});});});
-  var sorted=Object.entries(userMap).map(function(e){return{name:e[0],total:e[1].total,gameCount:e[1].gameCount,sessionCount:e[1].sessionCount,scores:e[1].scores};}).sort(function(a,b){return b.total-a.total;});
+  sessions.forEach(function(s){
+    s.names.forEach(function(name,i){
+      var nm=(name&&name.trim())?name.trim():'P'+(i+1);
+      if(!userMap[nm])userMap[nm]={total:0,gameCount:0,sessionCount:0};
+      var played=s.games.filter(function(g){return g.ranks[i]!==null&&g.ranks[i]!=='dnp';}).length;
+      userMap[nm].total+=(s.totals[i]||0);
+      if(played>0)userMap[nm].sessionCount++;
+      userMap[nm].gameCount+=played;
+    });
+  });
+  var sorted=Object.entries(userMap).map(function(e){return{name:e[0],total:e[1].total,gameCount:e[1].gameCount,sessionCount:e[1].sessionCount};}).sort(function(a,b){return b.total-a.total;});
   card.innerHTML=sorted.map(function(u,rank){
-    var cls=rank<3?'stats-row rank-'+(rank+1):'stats-row',ptCls=u.total>0?'pt-pos':u.total<0?'pt-neg':'pt-zero';
-    var hi=u.scores.slice().sort(function(a,b){return b-a;}).slice(0,3);
-    var lo=u.scores.slice().sort(function(a,b){return a-b;}).slice(0,3);
-    var fmt=function(arr){return arr.length?arr.map(function(v){return(v>0?'+':'')+v;}).join(' '):'—';};
-    var hiLo='High Game <span style="color:#39ff14">'+fmt(hi)+'</span> / Low Game <span style="color:#ff0080">'+fmt(lo)+'</span>';
-    return'<div class="'+cls+'"><div class="stats-left"><span class="stats-medal">'+(MEDALS[rank]||'')+'</span><div><div class="stats-name">'+u.name+'</div><div class="stats-sub">'+u.sessionCount+'回参加 / '+u.gameCount+'ゲーム / '+hiLo+'</div></div></div><div class="stats-right"><div class="stats-total '+ptCls+'">'+(u.total>0?'+':'')+u.total+'</div></div></div>';
+    var cls=rank<3?'stats-row rank-'+(rank+1):'stats-row',ptCls=u.total>0?'pt-pos':u.total<0?'pt-neg':'pt-zero',avgYen=u.gameCount>0?Math.round(ptToYen(u.total)/u.gameCount):0;
+    return'<div class="'+cls+'"><div class="stats-left"><span class="stats-medal">'+(MEDALS[rank]||'')+'</span><div><div class="stats-name">'+esc(u.name)+'</div><div class="stats-sub">'+u.sessionCount+'回参加 / '+u.gameCount+'ゲーム / 平均'+(avgYen>0?'+':'')+avgYen.toLocaleString()+'円</div></div></div><div class="stats-right"><div class="stats-total '+ptCls+'">'+fmtYen(u.total)+'</div></div></div>';
   }).join('');
 }
+
 function renderHistory(){
   var sessions=getSessions(),container=document.getElementById('historyContainer');
-  if(sessions.length===0){container.innerHTML='<div class="hist-empty">— NO RECORDS —</div>';return;}
+  if(sessions.length===0){container.innerHTML='<div class="hist-empty">📭<br>まだ記録がありません</div>';return;}
   container.innerHTML=sessions.map(function(s){return buildSessionHtml(s);}).join('');
 }
+
 function buildSessionHtml(s){
   var es=editStates[s.id]||{open:false,editMode:false};
   var bodyHtml=es.open?(es.editMode?buildEditHtml(s):buildViewHtml(s)):'';
-  return'<div class="hist-session" id="hsess-'+s.id+'" data-id="'+s.id+'"><div class="hist-session-header"><div class="hist-session-info" onclick="toggleHistOpen('+s.id+')"><div class="hist-date">'+s.date+' <span class="hist-chevron">'+(es.open?'▲':'▼')+'</span></div><div class="hist-meta">'+s.playerCount+'人 / '+s.games.length+'ゲーム</div></div><div class="hist-header-actions"><button type="button" class="hist-edit-btn'+(es.editMode?' active':'')+'" onclick="toggleHistEdit('+s.id+')">'+(es.editMode?'✕':'✏')+'</button><button type="button" class="hist-del-btn" onclick="deleteSession('+s.id+')">🗑</button></div></div><div class="hist-body'+(es.open?' open':'')+'" id="hbody-'+s.id+'">'+bodyHtml+'</div></div>';
+  return'<div class="hist-session" id="hsess-'+s.id+'" data-id="'+s.id+'"><div class="hist-session-header"><div class="hist-session-info" onclick="toggleHistOpen('+s.id+')"><div class="hist-date">'+esc(s.date)+' <span class="hist-chevron">'+(es.open?'▲':'▼')+'</span></div><div class="hist-meta">'+s.playerCount+'人 / '+s.games.length+'ゲーム'+(s.goriyaku?' / 🎁ご祝儀あり':'')+'</div></div><div class="hist-header-actions"><button type="button" class="hist-edit-btn'+(es.editMode?' active':'')+'" onclick="toggleHistEdit('+s.id+')">'+(es.editMode?'✕':'✏')+'</button><button type="button" class="hist-del-btn" onclick="deleteSession('+s.id+')">🗑</button></div></div><div class="hist-body'+(es.open?' open':'')+'" id="hbody-'+s.id+'">'+bodyHtml+'</div></div>';
 }
-function toggleHistOpen(id){if(!editStates[id])editStates[id]={open:false,editMode:false};editStates[id].open=!editStates[id].open;if(!editStates[id].open)editStates[id].editMode=false;renderHistory();}
-function toggleHistEdit(id){if(!editStates[id])editStates[id]={open:true,editMode:false};editStates[id].editMode=!editStates[id].editMode;editStates[id].open=true;if(!editStates[id].editMode&&editStates[id].draft)delete editStates[id].draft;renderHistory();}
+
+// 編集内容が元の記録から変わっているか
+function isDraftChanged(id){
+  var es=editStates[id];if(!es||!es.draft)return false;
+  var s=getSessions().find(function(x){return x.id===id;});if(!s)return false;
+  var orig={names:s.names,games:s.games.map(function(g){return{ranks:g.ranks,customPoints:g.customPoints||null};}),goriyakuItems:(s.goriyaku&&s.goriyaku.items)||[]};
+  var cur={names:es.draft.names,games:es.draft.games.map(function(g){return{ranks:g.ranks,customPoints:g.customPoints||null};}),goriyakuItems:es.draft.goriyakuItems};
+  return JSON.stringify(orig)!==JSON.stringify(cur);
+}
+
+function toggleHistOpen(id){
+  if(!editStates[id])editStates[id]={open:false,editMode:false};
+  if(editStates[id].open&&editStates[id].editMode&&isDraftChanged(id)&&!confirm('編集中の内容を破棄して閉じますか？'))return;
+  editStates[id].open=!editStates[id].open;
+  if(!editStates[id].open){editStates[id].editMode=false;delete editStates[id].draft;}
+  renderHistory();
+}
+
+function toggleHistEdit(id){
+  if(!editStates[id])editStates[id]={open:true,editMode:false};
+  if(editStates[id].editMode&&isDraftChanged(id)&&!confirm('編集中の内容を破棄しますか？'))return;
+  editStates[id].editMode=!editStates[id].editMode;
+  editStates[id].open=true;
+  if(!editStates[id].editMode&&editStates[id].draft)delete editStates[id].draft;
+  renderHistory();
+}
+
 function deleteSession(id){
   var target=getSessions().find(function(s){return s.id===id;});if(!target)return;
-  showConfirmModal(target.date+' の記録を削除しますか？','この操作は取り消せません',function(){
-    var d=JSON.parse(JSON.stringify(cachedData));d.sessions=d.sessions.filter(function(s){return s.id!==id;});
-    saveData(d,function(){if(editStates[id])delete editStates[id];renderHistory();showToast('🗑 DELETED');});
+  showConfirmModal(esc(target.date)+' の記録を削除しますか？','この操作は取り消せません',function(){
+    updateData(function(d){
+      d.sessions=d.sessions.filter(function(s){return s.id!==id;});
+    },function(){
+      if(editStates[id])delete editStates[id];
+      // 記録画面で保存中のセッションを消した場合、次の保存は新規として扱う
+      if(currentSessionId===id){currentSessionId=null;isDirty=true;persistDraft();}
+      renderHistory();showToast('🗑 削除しました');
+    });
   });
 }
+
 function showConfirmModal(title,sub,onConfirm){
   var old=document.getElementById('confirmModal');if(old)old.remove();
   var modal=document.createElement('div');modal.id='confirmModal';modal.className='confirm-modal';
-  modal.innerHTML='<div class="confirm-backdrop"></div><div class="confirm-box"><div class="confirm-title">'+title+'</div><div class="confirm-sub">'+sub+'</div><div class="confirm-actions"><button type="button" class="confirm-cancel" id="confirmCancel">キャンセル</button><button type="button" class="confirm-ok" id="confirmOk">削除</button></div></div>';
+  modal.innerHTML='<div class="confirm-backdrop"></div><div class="confirm-box"><div class="confirm-title">'+title+'</div><div class="confirm-sub">'+sub+'</div><div class="confirm-actions"><button type="button" class="confirm-cancel">キャンセル</button><button type="button" class="confirm-ok">削除</button></div></div>';
   document.body.appendChild(modal);
   var close=function(){modal.remove();};
-  var backdrop=modal.querySelector('.confirm-backdrop'),cancelBtn=modal.querySelector('.confirm-cancel'),okBtn=modal.querySelector('.confirm-ok');
-  if(backdrop)backdrop.addEventListener('click',close);if(cancelBtn)cancelBtn.addEventListener('click',close);if(okBtn)okBtn.addEventListener('click',function(){close();onConfirm();});
+  modal.querySelector('.confirm-backdrop').addEventListener('click',close);
+  modal.querySelector('.confirm-cancel').addEventListener('click',close);
+  modal.querySelector('.confirm-ok').addEventListener('click',function(){close();onConfirm();});
 }
+
 function buildViewHtml(s){
   var getName=function(i){return(s.names[i]&&s.names[i].trim())?s.names[i].trim():'P'+(i+1);};
   var sorted=s.totals.map(function(sc,i){return{i:i,sc:sc};}).sort(function(a,b){return b.sc-a.sc;});
-  var rankingHtml=sorted.map(function(item,rank){var sc=item.sc,ptCls=sc>0?'pt-pos':sc<0?'pt-neg':'pt-zero';return'<div class="hist-rank-row"><div class="hist-rank-left"><span class="hist-rank-medal">'+(MEDALS[rank]||'')+'</span><span class="hist-rank-name">'+getName(item.i)+'</span></div><span class="hist-rank-score '+ptCls+'">'+(sc>0?'+':'')+sc+'</span></div>';}).join('');
+  var rankingHtml=sorted.map(function(item,rank){var sc=item.sc,ptCls=sc>0?'pt-pos':sc<0?'pt-neg':'pt-zero';return'<div class="hist-rank-row"><div class="hist-rank-left"><span class="hist-rank-medal">'+(MEDALS[rank]||'')+'</span><span class="hist-rank-name">'+esc(getName(item.i))+'</span></div><span class="hist-rank-score '+ptCls+'">'+fmtYen(sc)+'</span></div>';}).join('');
   var gamesHtml=s.games.map(function(g,gi){return{g:g,gi:gi};}).reverse().map(function(obj){
-    var g=obj.g,gi=obj.gi,mode=getGameMode(g);
-    var modeBadge=mode==='team'?'<span class="game-mode-badge team">TEAM</span>':'<span class="game-mode-badge individual">INDIVIDUAL</span>';
-    var customFlag=mode==='team'?!!g.teamCustomPoints:!!g.customPoints;
-    var customLabel=customFlag?' <span style="font-size:.62rem;color:#ffee00">CUSTOM</span>':'';
-    var rows;
-    if(mode==='team'){
-      var tpts=g.teamCustomPoints||defaultTeamPts(g.teamCount||2);
-      var trs=g.teamRanks||[];
-      var ta=g.teamAssignments||[];
-      rows=ta.slice(0,s.playerCount).map(function(t,pi){
-        if(t==null||t==='')return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">—</span><span class="hgp-pt">—</span></div>';
-        if(t==='dnp')return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">不参加</span><span class="hgp-pt pt-zero">—</span></div>';
-        var ti=parseInt(t),tr=trs[ti];
-        if(tr==null)return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">'+TEAM_LABELS[ti]+'チーム</span><span class="hgp-pt">—</span></div>';
-        var pt=tpts[tr-1]||0,ptCls=pt>0?'pt-pos':pt<0?'pt-neg':'pt-zero';
-        return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">'+TEAM_LABELS[ti]+'チーム/'+tr+'位</span><span class="hgp-pt '+ptCls+'">'+(pt>0?'+':'')+pt+'</span></div>';
-      }).join('');
-    }else{
-      var pts=g.customPoints||defaultPtsForCount(s.playerCount);
-      rows=g.ranks.map(function(r,pi){
-        if(r===null)return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">—</span><span class="hgp-pt">—</span></div>';
-        if(r==='dnp')return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">不参加</span><span class="hgp-pt pt-zero">—</span></div>';
-        var pt=pts[r-1],ptCls=pt>0?'pt-pos':pt<0?'pt-neg':'pt-zero';
-        return'<div class="hist-game-prow"><span class="hgp-name">'+getName(pi)+'</span><span class="hgp-rank">'+r+'位</span><span class="hgp-pt '+ptCls+'">'+(pt>0?'+':'')+pt+'</span></div>';
-      }).join('');
-    }
-    return'<div class="hist-game-item"><div class="hist-game-title">GAME '+(gi+1)+modeBadge+customLabel+'</div><div class="hist-game-rows">'+rows+'</div></div>';
+    var g=obj.g,gi=obj.gi,pts=g.customPoints||defaultPtsForCount(s.playerCount);
+    var rows=g.ranks.map(function(r,pi){
+      if(r===null)return'<div class="hist-game-prow"><span class="hgp-name">'+esc(getName(pi))+'</span><span class="hgp-rank">—</span><span class="hgp-pt">—</span></div>';
+      if(r==='dnp')return'<div class="hist-game-prow"><span class="hgp-name">'+esc(getName(pi))+'</span><span class="hgp-rank">不参加</span><span class="hgp-pt pt-zero">—</span></div>';
+      var pt=pts[r-1]||0,ptCls=pt>0?'pt-pos':pt<0?'pt-neg':'pt-zero';
+      return'<div class="hist-game-prow"><span class="hgp-name">'+esc(getName(pi))+'</span><span class="hgp-rank">'+r+'位</span><span class="hgp-pt '+ptCls+'">'+fmtYen(pt)+'</span></div>';
+    }).join('');
+    return'<div class="hist-game-item"><div class="hist-game-title">GAME '+(gi+1)+(g.customPoints?' <span style="font-size:.65rem;color:var(--accent)">カスタム配点</span>':'')+'</div><div class="hist-game-rows">'+rows+'</div></div>';
   }).join('');
-  return'<div class="hist-view"><div class="hist-ranking">'+rankingHtml+'</div><div class="hist-games-label">ゲーム詳細</div>'+gamesHtml+'</div>';
+  // ご祝儀表示
+  var goriyakuHtml='';
+  if(s.goriyaku&&s.goriyaku.items&&s.goriyaku.items.length>0){
+    var gitems=s.goriyaku.items;
+    var gTotal=0;
+    var gRows=gitems.map(function(item){gTotal+=item.amount;return'<div class="hist-goriyaku-row"><span class="goriyaku-item-game" style="font-size:.7rem;background:rgba(192,122,255,.18);border-radius:4px;padding:1px 5px;margin-right:4px;">GAME '+(item.gameIdx+1)+'</span><span class="hist-goriyaku-name">'+esc(item.playerName||getName(item.playerIdx))+'</span><span class="hist-goriyaku-amount">¥ '+item.amount.toLocaleString()+'</span></div>';}).join('');
+    goriyakuHtml='<div class="hist-goriyaku-block"><div class="hist-goriyaku-label">🎁 ご祝儀</div>'+gRows+'<div class="hist-goriyaku-row" style="margin-top:4px;border-top:1px solid rgba(192,122,255,.2);padding-top:4px;"><span style="font-size:.72rem;color:#aaa;">合計</span><span class="hist-goriyaku-amount">¥ '+gTotal.toLocaleString()+'</span></div></div>';
+  }
+  return'<div class="hist-view"><div class="hist-ranking">'+rankingHtml+'</div>'+goriyakuHtml+'<div class="hist-games-label">ゲーム詳細</div>'+gamesHtml+'</div>';
 }
+
 function getEditDraft(s){
   if(!editStates[s.id])editStates[s.id]={open:true,editMode:true};
-  if(!editStates[s.id].draft)editStates[s.id].draft={names:s.names.slice(),games:s.games.map(function(g){return{mode:g.mode==='team'?'team':'individual',ranks:(g.ranks||Array(s.playerCount).fill(null)).slice(),customPoints:g.customPoints?g.customPoints.slice():null,teamCount:g.teamCount||2,teamAssignments:g.teamAssignments?g.teamAssignments.slice():null,teamRanks:g.teamRanks?g.teamRanks.slice():null,teamCustomPoints:g.teamCustomPoints?g.teamCustomPoints.slice():null};})};
+  if(!editStates[s.id].draft)editStates[s.id].draft={names:s.names.slice(),games:s.games.map(function(g){return{ranks:g.ranks.slice(),customPoints:g.customPoints?g.customPoints.slice():null};}),goriyakuItems:(s.goriyaku&&s.goriyaku.items)?s.goriyaku.items.slice():[]};
   return editStates[s.id].draft;
 }
+
 function buildEditHtml(s){
-  var draft=getEditDraft(s),n=s.playerCount,roster=getRoster();
+  var draft=getEditDraft(s),n=s.playerCount;
   var getName=function(i){return(draft.names[i]&&draft.names[i].trim())?draft.names[i].trim():'P'+(i+1);};
   var namesHtml=draft.names.map(function(nm,i){
-    var opts='<option value="">— 選択 —</option>';
-    roster.forEach(function(name){opts+='<option value="'+name+'"'+(nm===name?' selected':'')+'>'+name+'</option>';});
-    return'<div class="edit-slot-wrap"><select class="edit-slot-select" onchange="editSlot('+s.id+','+i+',this.value)">'+opts+'</select><span class="edit-slot-arrow">▼</span></div>';
+    // ユーザー一覧から消えた名前でも選択肢に残す（保存時に名前が消えないように）
+    return'<div class="edit-slot-wrap"><select class="edit-slot-select" onchange="editSlot('+s.id+','+i+',this)">'+slotOptionsHtml(nm||'')+'</select><span class="edit-slot-arrow">▼</span></div>';
   }).join('');
   var gamesHtml=draft.games.map(function(g,gi){return{g:g,gi:gi};}).reverse().map(function(obj){
-    var g=obj.g,gi=obj.gi,mode=g.mode==='team'?'team':'individual';
-    var hasCustom,pts,nPts;
-    if(mode==='team'){hasCustom=!!g.teamCustomPoints;nPts=g.teamCount||2;pts=g.teamCustomPoints||defaultTeamPts(nPts);}
-    else{hasCustom=!!g.customPoints;nPts=n;pts=g.customPoints||defaultPtsForCount(nPts);}
-    var modeHtml='<div class="mode-toggle"><button class="mode-btn'+(mode==='individual'?' active':'')+'" onclick="editSetGameMode('+s.id+','+gi+',\'individual\')">👤 個人戦</button><button class="mode-btn'+(mode==='team'?' active':'')+'" onclick="editSetGameMode('+s.id+','+gi+',\'team\')">👥 チーム戦</button></div>';
-    var teamConfigHtml='';
-    if(mode==='team'){
-      var tc=g.teamCount||2;
-      var teamCountHtml='<div class="team-count-row"><span class="tc-label">チーム数</span>';
-      [2,3,4].forEach(function(nn){teamCountHtml+='<button class="team-count-btn'+(tc===nn?' active':'')+'" onclick="editSetTeamCount('+s.id+','+gi+','+nn+')">'+nn+'</button>';});
-      teamCountHtml+='</div>';
-      var teamRanksHtml='<div class="team-rank-grid">';
-      for(var ti=0;ti<tc;ti++){
-        var tr=(g.teamRanks||[])[ti];
-        var trOpts='<option value=""'+(tr==null?' selected':'')+'>—</option>';
-        for(var nn=1;nn<=tc;nn++)trOpts+='<option value="'+nn+'"'+(tr===nn?' selected':'')+'>'+nn+'位</option>';
-        teamRanksHtml+='<div class="team-rank-item"><span class="tr-label">'+TEAM_LABELS[ti]+'チーム</span><select onchange="editSetTeamRank('+s.id+','+gi+','+ti+',this.value)">'+trOpts+'</select></div>';
-      }
-      teamRanksHtml+='</div>';
-      teamConfigHtml='<div class="team-config">'+teamCountHtml+teamRanksHtml+'</div>';
-    }
-    var ptsHtml='';for(var i=0;i<nPts;i++)ptsHtml+='<div class="edit-pts-item"><label>'+(i+1)+'位</label><input class="edit-pts-input" type="number" value="'+pts[i]+'" onchange="editGamePt('+s.id+','+gi+','+i+',this.value)"></div>';
+    var g=obj.g,gi=obj.gi,hasCustom=!!g.customPoints,pts=g.customPoints||defaultPtsForCount(n);
+    var ptsHtml='';for(var i=0;i<n;i++)ptsHtml+='<div class="edit-pts-item"><label>'+(i+1)+'位</label><input class="edit-pts-input" type="number" inputmode="numeric" value="'+(pts[i]||0)+'" onchange="editGamePt('+s.id+','+gi+','+i+',this.value)"></div>';
     var rankHtml='';
     for(var pi=0;pi<n;pi++){
-      var pt=calcPlayerPt(g,pi,n);
-      var ptCls,ptStr;
-      if(pt==null){
-        var dnpVal=mode==='team'?(g.teamAssignments||[])[pi]:g.ranks[pi];
-        if(dnpVal==='dnp'){ptCls='pt-zero';ptStr='不参加';}
-        else{ptCls='';ptStr='—';}
-      }else{
-        ptCls=pt>0?'pt-pos':pt<0?'pt-neg':'pt-zero';
-        ptStr=pt>0?'+'+pt:''+pt;
-      }
-      var opts;
-      if(mode==='team'){
-        var ta=(g.teamAssignments||[])[pi];
-        var taStr=(ta==null||ta==='')?'':(ta==='dnp'?'dnp':String(ta));
-        opts='<option value=""'+(taStr===''?' selected':'')+'>—</option>';
-        for(var ti2=0;ti2<(g.teamCount||2);ti2++)opts+='<option value="'+ti2+'"'+(taStr===String(ti2)?' selected':'')+'>'+TEAM_LABELS[ti2]+'チーム</option>';
-        opts+='<option value="dnp"'+(taStr==='dnp'?' selected':'')+'>不参加</option>';
-        rankHtml+='<div class="edit-rank-row"><span class="epname">'+getName(pi)+'</span><select class="edit-rank-select" onchange="editSetTeamAssign('+s.id+','+gi+','+pi+',this.value)">'+opts+'</select><span class="edit-pt-preview '+ptCls+'" id="epp-'+s.id+'-'+gi+'-'+pi+'">'+ptStr+'</span></div>';
-      }else{
-        var r=g.ranks[pi];
-        opts='<option value=""'+(r===null?' selected':'')+'>—</option>';
-        for(var nn=1;nn<=n;nn++)opts+='<option value="'+nn+'"'+(r===nn?' selected':'')+'>'+nn+'位</option>';
-        opts+='<option value="dnp"'+(r==='dnp'?' selected':'')+'>不参加</option>';
-        rankHtml+='<div class="edit-rank-row"><span class="epname">'+getName(pi)+'</span><select class="edit-rank-select" onchange="editRank('+s.id+','+gi+','+pi+',this.value)">'+opts+'</select><span class="edit-pt-preview '+ptCls+'" id="epp-'+s.id+'-'+gi+'-'+pi+'">'+ptStr+'</span></div>';
-      }
+      var r=g.ranks[pi],ptCls,ptStr;
+      if(r==='dnp'){ptCls='pt-zero';ptStr='不参加';}else if(r===null){ptCls='';ptStr='—';}else{var ptVal=pts[r-1]||0;ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=fmtYen(ptVal);}
+      var opts='<option value=""'+(r===null?' selected':'')+'>—</option>';
+      for(var nn=1;nn<=n;nn++)opts+='<option value="'+nn+'"'+(r===nn?' selected':'')+'>'+nn+'位</option>';
+      opts+='<option value="dnp"'+(r==='dnp'?' selected':'')+'>不参加</option>';
+      rankHtml+='<div class="edit-rank-row"><span class="epname">'+esc(getName(pi))+'</span><select class="edit-rank-select" onchange="editRank('+s.id+','+gi+','+pi+',this.value)">'+opts+'</select><span class="edit-pt-preview '+ptCls+'" id="epp-'+s.id+'-'+gi+'-'+pi+'">'+ptStr+'</span></div>';
     }
-    return'<div class="edit-game-block"><div class="edit-game-header"><span class="edit-game-num">GAME '+(gi+1)+'</span><button class="edit-pts-toggle'+(hasCustom?' active':'')+'" onclick="editToggleCustomPts('+s.id+','+gi+')">'+(hasCustom?'⚙ CUSTOM':'⚙ POINTS')+'</button></div>'+modeHtml+teamConfigHtml+'<div class="edit-pts-area'+(hasCustom?' open':'')+'" id="epa-'+s.id+'-'+gi+'"><div class="edit-pts-grid">'+ptsHtml+'</div></div><div class="edit-rank-rows">'+rankHtml+'</div></div>';
+    return'<div class="edit-game-block"><div class="edit-game-header"><span class="edit-game-num">GAME '+(gi+1)+'</span><div style="display:flex;gap:5px;align-items:center;margin-left:auto;"><button class="edit-pts-toggle'+(hasCustom?' active':'')+'" onclick="editToggleCustomPts('+s.id+','+gi+')">'+(hasCustom?'⚙ カスタム配点中':'⚙ 配点設定')+'</button><button class="edit-del-game-btn" onclick="editDeleteGame('+s.id+','+gi+')">✕</button></div></div><div class="edit-pts-area'+(hasCustom?' open':'')+'" id="epa-'+s.id+'-'+gi+'"><div class="edit-pts-grid">'+ptsHtml+'</div></div><div class="edit-rank-rows">'+rankHtml+'</div></div>';
   }).join('');
-  return'<div class="hist-edit"><div class="edit-section-label">プレイヤー名</div><div class="edit-names-grid">'+namesHtml+'</div><div class="edit-section-label">ゲーム結果</div>'+gamesHtml+'<button class="edit-save-btn" onclick="commitEdit('+s.id+')">✅ 変更を保存</button></div>';
+  return'<div class="hist-edit"><div class="edit-section-label">プレイヤー名</div><div class="edit-names-grid">'+namesHtml+'</div><div class="edit-section-label">ゲーム結果</div>'+gamesHtml+'<div class="edit-section-label">🎁 ご祝儀</div><div class="edit-goriyaku-form"><select class="edit-goriyaku-game-sel" id="egGame'+s.id+'"><option value="">ゲーム選択</option>'+draft.games.map(function(g,gi){return'<option value="'+gi+'">GAME '+(gi+1)+'</option>';}).join('')+'</select><select class="edit-goriyaku-player-sel" id="egPlayer'+s.id+'"><option value="">受取人</option>'+draft.names.map(function(nm,i){return'<option value="'+i+'">'+esc(getName(i))+'</option>';}).join('')+'</select><span style="font-size:.72rem;color:#c07aff;">¥</span><input class="edit-goriyaku-amount" type="number" inputmode="numeric" id="egAmt'+s.id+'" placeholder="0" min="0" step="100"><button class="edit-goriyaku-add-btn" onclick="editAddGoriyaku('+s.id+')">＋</button></div>'+(draft.goriyakuItems.length===0?'<div class="edit-goriyaku-empty">ご祝儀なし</div>':draft.goriyakuItems.map(function(item,idx){return'<div class="edit-goriyaku-item"><span class="edit-goriyaku-game">GAME '+(item.gameIdx+1)+'</span><span class="edit-goriyaku-name">'+esc(getName(item.playerIdx))+'</span><span class="edit-goriyaku-amt">¥ '+item.amount.toLocaleString()+'</span><button class="edit-goriyaku-del" onclick="editDeleteGoriyaku('+s.id+','+idx+')">✕</button></div>';}).join(''))+'<button class="edit-add-game-btn" onclick="editAddGame('+s.id+')">＋ ゲーム追加</button><button class="edit-save-btn" onclick="commitEdit('+s.id+')">✅ 変更を保存</button></div>';
 }
-function editSlot(id,i,val){var s=getSessions().find(function(x){return x.id===id;});if(!s)return;var draft=getEditDraft(s);draft.names[i]=val;}
+
+function findSession(id){return getSessions().find(function(x){return x.id===id;});}
+function editSlot(id,i,sel){
+  var s=findSession(id);if(!s)return;var draft=getEditDraft(s);var val=sel.value;
+  if(val&&draft.names.some(function(nm,j){return j!==i&&nm===val;})){showToast('「'+val+'」は既に選択されています');sel.value=draft.names[i]||'';return;}
+  draft.names[i]=val;
+}
 function editRank(id,gi,pi,val){
-  var s=getSessions().find(function(x){return x.id===id;});if(!s)return;var draft=getEditDraft(s);
+  var s=findSession(id);if(!s)return;var draft=getEditDraft(s);if(!draft.games[gi])return;
   if(val==='dnp')draft.games[gi].ranks[pi]='dnp';else draft.games[gi].ranks[pi]=val?parseInt(val):null;
   var pts=draft.games[gi].customPoints||defaultPtsForCount(s.playerCount),r=draft.games[gi].ranks[pi];
   var ptCls,ptStr;
-  if(r==='dnp'){ptCls='pt-zero';ptStr='不参加';}else if(r===null){ptCls='';ptStr='—';}else{var ptVal=pts[r-1];ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=ptVal>0?'+'+ptVal:''+ptVal;}
+  if(r==='dnp'){ptCls='pt-zero';ptStr='不参加';}else if(r===null){ptCls='';ptStr='—';}else{var ptVal=pts[r-1]||0;ptCls=ptVal>0?'pt-pos':ptVal<0?'pt-neg':'pt-zero';ptStr=fmtYen(ptVal);}
   var el=document.getElementById('epp-'+id+'-'+gi+'-'+pi);if(el){el.className='edit-pt-preview '+ptCls;el.textContent=ptStr;}
 }
 function editToggleCustomPts(id,gi){
+  var s=findSession(id);if(!s)return;var draft=getEditDraft(s);if(!draft.games[gi])return;
+  draft.games[gi].customPoints=draft.games[gi].customPoints?null:defaultPtsForCount(s.playerCount).slice();renderHistory();
+}
+function editGamePt(id,gi,ri,val){var s=findSession(id);if(!s)return;var draft=getEditDraft(s);if(draft.games[gi]&&draft.games[gi].customPoints)draft.games[gi].customPoints[ri]=parseInt(val)||0;}
+function editAddGoriyaku(id){
   var s=getSessions().find(function(x){return x.id===id;});if(!s)return;
-  var draft=getEditDraft(s),g=draft.games[gi];
-  if(g.mode==='team'){
-    g.teamCustomPoints=g.teamCustomPoints?null:defaultTeamPts(g.teamCount||2).slice();
-  }else{
-    g.customPoints=g.customPoints?null:defaultPtsForCount(s.playerCount).slice();
-  }
+  var draft=getEditDraft(s);
+  var gameSel=document.getElementById('egGame'+id);
+  var playerSel=document.getElementById('egPlayer'+id);
+  var amtEl=document.getElementById('egAmt'+id);
+  if(!gameSel||!playerSel||!amtEl)return;
+  var gi=gameSel.value;
+  var pi=playerSel.value;
+  var amt=Math.round(Number(amtEl.value));
+  if(gi===''){showToast('ゲームを選択してください');return;}
+  if(pi===''){showToast('受取人を選択してください');return;}
+  if(!isFinite(amt)||amt<=0){showToast('金額を入力してください');return;}
+  if(amt>1000000){showToast('金額が大きすぎます');return;}
+  var nm=draft.names[parseInt(pi)]||'P'+(parseInt(pi)+1);
+  draft.goriyakuItems.push({gameIdx:parseInt(gi),playerIdx:parseInt(pi),playerName:nm,amount:amt});
   renderHistory();
 }
-function editGamePt(id,gi,ri,val){
+
+function editDeleteGoriyaku(id,idx){
   var s=getSessions().find(function(x){return x.id===id;});if(!s)return;
-  var draft=getEditDraft(s),g=draft.games[gi];
-  if(g.mode==='team'){
-    if(g.teamCustomPoints)g.teamCustomPoints[ri]=parseInt(val)||0;
-  }else{
-    if(g.customPoints)g.customPoints[ri]=parseInt(val)||0;
-  }
-}
-function editSetGameMode(id,gi,mode){
-  var s=getSessions().find(function(x){return x.id===id;});if(!s)return;
-  var draft=getEditDraft(s),g=draft.games[gi];
-  g.mode=mode;
-  if(mode==='team'){
-    if(!g.teamCount)g.teamCount=2;
-    if(!g.teamAssignments)g.teamAssignments=Array(s.playerCount).fill(null);
-    if(!g.teamRanks)g.teamRanks=Array(g.teamCount).fill(null);
-  }
+  var draft=getEditDraft(s);
+  draft.goriyakuItems.splice(idx,1);
   renderHistory();
 }
-function editSetTeamCount(id,gi,n){
+
+function editAddGame(id){
   var s=getSessions().find(function(x){return x.id===id;});if(!s)return;
-  var draft=getEditDraft(s),g=draft.games[gi];
-  g.teamCount=n;
-  if(!g.teamRanks)g.teamRanks=[];
-  g.teamRanks=g.teamRanks.slice(0,n);
-  while(g.teamRanks.length<n)g.teamRanks.push(null);
-  if(g.teamCustomPoints){
-    g.teamCustomPoints=g.teamCustomPoints.slice(0,n);
-    while(g.teamCustomPoints.length<n)g.teamCustomPoints.push(0);
-  }
-  if(g.teamAssignments){
-    g.teamAssignments=g.teamAssignments.map(function(t){
-      if(t==null||t==='dnp')return t;
-      var idx=parseInt(t);
-      return idx>=n?null:idx;
-    });
-  }
+  var draft=getEditDraft(s);
+  draft.games.push({ranks:Array(s.playerCount).fill(null),customPoints:null});
   renderHistory();
 }
-function editSetTeamRank(id,gi,ti,val){
+
+function editDeleteGame(id,gi){
   var s=getSessions().find(function(x){return x.id===id;});if(!s)return;
-  var draft=getEditDraft(s),g=draft.games[gi];
-  if(!g.teamRanks)g.teamRanks=[];
-  g.teamRanks[ti]=val?parseInt(val):null;
+  var draft=getEditDraft(s);
+  if(draft.games.length<=1){showToast('ゲームは1つ以上必要です');return;}
+  var hasGor=draft.goriyakuItems.some(function(it){return it.gameIdx===gi;});
+  if(!confirm('GAME '+(gi+1)+' を削除しますか？'+(hasGor?'\n（このゲームのご祝儀も削除されます）':'')))return;
+  draft.games.splice(gi,1);
+  draft.goriyakuItems=shiftGoriyakuAfterDelete(draft.goriyakuItems,gi);
   renderHistory();
 }
-function editSetTeamAssign(id,gi,pi,val){
-  var s=getSessions().find(function(x){return x.id===id;});if(!s)return;
-  var draft=getEditDraft(s),g=draft.games[gi];
-  if(!g.teamAssignments)g.teamAssignments=Array(s.playerCount).fill(null);
-  if(val==='dnp')g.teamAssignments[pi]='dnp';
-  else if(val==='')g.teamAssignments[pi]=null;
-  else g.teamAssignments[pi]=parseInt(val);
-  renderHistory();
-}
+
+var committing={};
 function commitEdit(id){
-  var s=getSessions().find(function(x){return x.id===id;});if(!s||!editStates[id]||!editStates[id].draft)return;
+  if(committing[id])return;
+  var s=findSession(id);if(!s||!editStates[id]||!editStates[id].draft)return;
   var draft=editStates[id].draft;
-  document.querySelectorAll('#hsess-'+id+' .edit-slot-select').forEach(function(sel,i){draft.names[i]=sel.value;});
-  var d=JSON.parse(JSON.stringify(cachedData)),idx=d.sessions.findIndex(function(x){return x.id===id;});if(idx===-1)return;
-  d.sessions[idx].names=draft.names.slice();
-  d.sessions[idx].games=draft.games.map(function(g){return{mode:g.mode==='team'?'team':'individual',ranks:g.ranks.slice(),customPoints:g.customPoints?g.customPoints.slice():null,teamCount:g.teamCount||null,teamAssignments:g.teamAssignments?g.teamAssignments.slice():null,teamRanks:g.teamRanks?g.teamRanks.slice():null,teamCustomPoints:g.teamCustomPoints?g.teamCustomPoints.slice():null};});
-  var n=d.sessions[idx].playerCount,totals=Array(n).fill(0);
-  d.sessions[idx].games.forEach(function(g){
-    for(var pi=0;pi<n;pi++){
-      var pt=calcPlayerPt(g,pi,n);
-      if(pt!=null)totals[pi]+=pt;
-    }
+  var n=s.playerCount;
+  var names=draft.names.slice();
+  var gms=draft.games.map(function(g){return{ranks:g.ranks.slice(),customPoints:g.customPoints?g.customPoints.slice():null};});
+  var dup=[];gms.forEach(function(g,gi){var rk=g.ranks.filter(function(r){return r!==null&&r!=='dnp';});if(rk.length!==new Set(rk).size)dup.push(gi+1);});
+  if(dup.length&&!confirm('GAME '+dup.join(', ')+' で順位が重複しています。\nこのまま保存しますか？'))return;
+  var items=draft.goriyakuItems.filter(function(it){return it.gameIdx<gms.length&&it.playerIdx<n;}).map(function(it){
+    var nm=(names[it.playerIdx]&&names[it.playerIdx].trim())?names[it.playerIdx].trim():'P'+(it.playerIdx+1);
+    return{gameIdx:it.gameIdx,playerIdx:it.playerIdx,playerName:nm,amount:it.amount};
   });
-  d.sessions[idx].totals=totals;
-  saveData(d,function(){delete editStates[id].draft;editStates[id].editMode=false;renderHistory();showToast('✅ UPDATED!');});
+  var totals=Array(n).fill(0);
+  gms.forEach(function(g){var pts=g.customPoints||defaultPtsForCount(n);g.ranks.forEach(function(r,pi){if(r!==null&&r!=='dnp'&&pi<n)totals[pi]+=(pts[r-1]||0);});});
+  committing[id]=true;
+  updateData(function(d){
+    var idx=d.sessions.findIndex(function(x){return x.id===id;});
+    if(idx===-1)return false;  // 他の端末で削除済み
+    var t=d.sessions[idx];
+    t.names=names;t.games=gms;t.totals=totals;
+    if(items.length>0)t.goriyaku={items:items};else delete t.goriyaku;
+  },function(){
+    committing[id]=false;
+    if(editStates[id]){delete editStates[id].draft;editStates[id].editMode=false;}
+    renderHistory();showToast('✅ 更新しました！');
+  },function(e){
+    committing[id]=false;
+    if(!e){showToast('⚠ この記録は他の端末で削除されています');if(editStates[id])delete editStates[id];renderHistory();}
+  });
 }
-function resetAll(){if(games.length===0)return;if(!confirm('現在の入力をリセットしますか？\n（保存済み履歴は消えません）'))return;games=[];renderGames();renderTotals();}
-function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
-loadData(function(){renderRoster();setCount(4);renderGames();renderTotals();});
+
+// ======================================================
+// ご祝儀セクション
+// ======================================================
+function renderGoriyaku(){
+  // 集計リスト描画（下部パネル）
+  var listEl=document.getElementById('goriyakuList');
+  if(listEl){
+    if(goriyakuItems.length===0){
+      listEl.innerHTML='<div class="goriyaku-list-empty">ご祝儀はまだありません</div>';
+    }else{
+      listEl.innerHTML=goriyakuItems.map(function(item,idx){
+        return'<div class="goriyaku-item">'
+          +'<span class="goriyaku-item-game">GAME '+(item.gameIdx+1)+'</span>'
+          +'<span class="goriyaku-item-name">'+esc(dn(item.playerIdx))+'</span>'
+          +'<span class="goriyaku-item-amount">¥ '+item.amount.toLocaleString()+'</span>'
+          +'</div>';
+      }).join('');
+    }
+  }
+  // 合計更新
+  var grand=goriyakuItems.reduce(function(a,b){return a+b.amount;},0);
+  var totalEl=document.getElementById('goriyakuTotal');
+  if(totalEl)totalEl.textContent='¥ '+grand.toLocaleString();
+}
+
+function deleteGoriyakuItem(idx){
+  var it=goriyakuItems[idx];if(!it)return;
+  if(!confirm(dn(it.playerIdx)+' の ¥'+it.amount.toLocaleString()+' を削除しますか？'))return;
+  var gi=it.gameIdx;
+  goriyakuItems.splice(idx,1);
+  renderGameCard(gi);
+  renderGoriyaku();markDirty();
+}
+
+function resetAll(){
+  if(!hasInProgressData()&&!currentSessionId)return;
+  var msg=isDirty&&games.length>0?'⚠ 未保存の変更があります！\n\n':'';
+  if(!confirm(msg+'現在の入力をリセットしますか？\n（保存済み履歴は消えません）'))return;
+  games=[];goriyakuItems=[];gameGoriyakuOpen={};currentSessionId=null;isDirty=false;
+  renderGames();renderTotals();renderGoriyaku();persistDraft();
+}
+
+var toastTimer=null;
+function showToast(msg){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.remove('show');},2600);}
+
+// ============================================================
+// ページ離脱/リロード保護
+//  ・PC/Android：離脱前に確認ダイアログ
+//  ・iPhone：確認ダイアログが出せないため、端末内に自動バックアップして次回起動時に復元
+// ============================================================
+window.addEventListener('beforeunload',function(e){
+  persistDraft();
+  if(hasInProgressData()&&isDirty){
+    e.preventDefault();
+    e.returnValue='入力中のデータが保存されていません。ページを離れますか？';
+    return e.returnValue;
+  }
+});
+window.addEventListener('pagehide',persistDraft);
+
+// 画面に戻ってきた時：記録中のデータには触れず、履歴・集計だけ最新化
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='hidden'){persistDraft();return;}
+  if(!appReady)return;
+  db.ref('bowling').get().then(function(snap){
+    cachedData=normalizeData(snap.val());
+    refreshActivePanel();updateNameGridOptions();
+  }).catch(function(){});
+});
+
+// ============================================================
+// 起動
+// ============================================================
+(function init(){
+  var restored=restoreDraft();
+  var start=function(){
+    appReady=true;
+    renderRoster();
+    setCount(playerCount);
+    if(restored)showToast(currentSessionId&&!isDirty?'↩ 前回の記録を復元しました（保存済み）':'↩ 保存前の入力を復元しました');
+  };
+  // 通信が遅くても入力できるよう、3秒で先に画面を出す
+  var started=false;
+  var go=function(){if(started)return;started=true;start();};
+  setTimeout(go,3000);
+  loadData(function(){if(started){updateNameGridOptions();refreshActivePanel();}else go();});
+})();
 </script>
 </body>
 </html>
