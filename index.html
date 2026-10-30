@@ -260,6 +260,24 @@ header h1{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3p
 .confirm-ok{flex:1;padding:11px;background:var(--accent2);border:none;border-radius:10px;color:#fff;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:900;cursor:pointer}
 html,body{overscroll-behavior-y:contain}
 .save-btn:disabled{opacity:.5;pointer-events:none}
+/* 配点入力（±ボタン付き） */
+.pts-field{display:inline-flex;align-items:stretch}
+.pm-btn{background:rgba(240,192,64,.15);border:1px solid rgba(240,192,64,.4);border-right:none;border-radius:7px 0 0 7px;color:#f0c040;font-size:.85rem;font-weight:900;padding:0 7px;cursor:pointer;-webkit-appearance:none}
+.pm-btn:active{background:rgba(240,192,64,.35)}
+.pts-field .game-pts-input,.pts-field .edit-pts-input{border-radius:0 7px 7px 0;width:54px}
+.gor-hint{font-size:.66rem;color:#a98bd6;margin-top:5px}
+.game-goriyaku-item-amount,.goriyaku-item-amount,.hist-goriyaku-amount,.edit-goriyaku-amt{font-family:'Noto Sans JP',sans-serif!important;font-size:.72rem!important;min-width:0!important;white-space:nowrap;color:#d6b8ff}
+.game-goriyaku-item-amount b,.goriyaku-item-amount b,.hist-goriyaku-amount b,.edit-goriyaku-amt b{color:var(--goriyaku);font-size:.85rem}
+/* バックアップ */
+.backup-card{background:var(--card);border:1px solid rgba(62,207,110,.3);border-radius:12px;padding:12px}
+.backup-note{font-size:.72rem;color:#aaa;line-height:1.6;margin-bottom:10px}
+.backup-dl-btn{width:100%;padding:10px;background:rgba(62,207,110,.12);border:1px solid rgba(62,207,110,.4);border-radius:9px;color:#3ecf6e;font-family:'Noto Sans JP',sans-serif;font-size:.8rem;font-weight:900;cursor:pointer;margin-bottom:10px}
+.backup-list{display:flex;flex-direction:column;gap:6px}
+.backup-row{display:flex;align-items:center;gap:8px;padding:7px 9px;background:rgba(255,255,255,.04);border-radius:8px;font-size:.78rem}
+.backup-date{font-weight:700;flex:1}
+.backup-count{color:#888;font-size:.7rem}
+.backup-restore-btn{background:rgba(77,216,240,.1);border:1px solid rgba(77,216,240,.35);border-radius:6px;color:#4dd8f0;font-size:.68rem;font-weight:700;padding:4px 8px;cursor:pointer}
+.backup-empty{font-size:.72rem;color:#666;text-align:center;padding:6px}
 </style>
 </head>
 <body>
@@ -337,6 +355,14 @@ html,body{overscroll-behavior-y:contain}
       <button class="roster-add-btn" onclick="addRosterUser()">＋ 追加</button>
     </div>
   </div>
+  <div class="section" style="margin-top:18px;">
+    <div class="section-label">🛡 データの保護（バックアップ）</div>
+    <div class="backup-card">
+      <div class="backup-note">履歴は毎日、最初の保存の前に自動でバックアップされます（30日分）。万一おかしくなったら、ここから元に戻せます。</div>
+      <button class="backup-dl-btn" onclick="downloadBackup()">📦 今のデータをファイルに保存</button>
+      <div id="backupList" class="backup-list"></div>
+    </div>
+  </div>
   <div style="margin:12px 14px 0;font-size:.68rem;color:#555;line-height:1.6;">
     💡 ここで登録したユーザーは記録・履歴の編集時にプルダウンから選べます<br>
     💡 ユーザーを削除しても過去の履歴は残ります
@@ -347,8 +373,35 @@ html,body{overscroll-behavior-y:contain}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-firebase.initializeApp({databaseURL:"https://bowling-score-c7380-default-rtdb.firebaseio.com/"});
-var db=firebase.database();
+// ------------------------------------------------------
+// Firebaseが読み込めない時（プレビュー表示・電波不良など）でも画面が止まらないようにする
+// ------------------------------------------------------
+var FB_OK=false,db=null;
+try{
+  if(typeof firebase!=='undefined'){
+    firebase.initializeApp({databaseURL:"https://bowling-score-c7380-default-rtdb.firebaseio.com/"});
+    db=firebase.database();FB_OK=true;
+  }
+}catch(e){console.error(e);FB_OK=false;}
+if(!FB_OK)db=createLocalDb();
+
+// 端末内だけで動く簡易データベース（共有はされない）
+function createLocalDb(){
+  var KEY='bowling_local_db',mem=null,listeners=[];
+  function load(){if(mem!==null)return mem;try{var r=localStorage.getItem(KEY);mem=r?JSON.parse(r):null;}catch(e){mem=null;}return mem;}
+  function store(v){mem=v==null?null:JSON.parse(JSON.stringify(v));try{localStorage.setItem(KEY,JSON.stringify(mem));}catch(e){}
+    setTimeout(function(){listeners.forEach(function(cb){cb(snap());});},0);}
+  function snap(){var v=load();var copy=v==null?null:JSON.parse(JSON.stringify(v));return{val:function(){return copy;},exists:function(){return copy!=null;}};}
+  return{ref:function(path){
+    if(path==='.info/connected')return{on:function(ev,cb){setTimeout(function(){cb({val:function(){return false;}});},0);}};
+    return{
+      get:function(){return Promise.resolve(snap());},
+      on:function(ev,cb){listeners.push(cb);setTimeout(function(){cb(snap());},0);},
+      set:function(v){store(v);return Promise.resolve();},
+      transaction:function(fn){var r=fn(snap().val());if(r===undefined)return Promise.resolve({committed:false,snapshot:snap()});store(r);return Promise.resolve({committed:true,snapshot:snap()});}
+    };
+  }};
+}
 var MEDALS=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'];
 var MIN_PLAYERS=2,MAX_PLAYERS=12;
 var playerCount=4,selectedSlots=['','','',''],games=[];
@@ -405,13 +458,18 @@ function normalizeSession(s){
       return{gameIdx:parseInt(it.gameIdx)||0,playerIdx:parseInt(it.playerIdx)||0,playerName:it.playerName||'',amount:parseInt(it.amount)||0};
     });
     if(items.length>0)out.goriyaku={items:items};
+    // 旧形式（閾値方式）のご祝儀：表示だけする（データはサーバー上にそのまま残る）
+    if(s.goriyaku.amounts&&typeof s.goriyaku.amounts==='object'){
+      out.legacyGoriyaku=Object.keys(s.goriyaku.amounts).map(function(k){var a=s.goriyaku.amounts[k]||{};return{name:a.name||'',amount:parseInt(a.amount)||0};}).filter(function(a){return a.amount>0;});
+    }
   }
+  out.yen=yenTotals(totals,games,out.goriyaku?out.goriyaku.items:[]);
   return out;
 }
 function normalizeData(d){
   d=(d&&typeof d==='object')?d:{};
   var roster=toArr(d.roster).filter(function(x){return typeof x==='string'&&x.trim()!=='';});
-  var sessions=toArr(d.sessions).map(normalizeSession).filter(function(s){return s&&s.id!=null;});
+  var sessions=toArr(d.sessions).map(function(s,i){var n=normalizeSession(s);if(n&&n.id==null)n.id=-(i+1);return n;}).filter(function(s){return s!=null;});
   return{roster:roster,sessions:sessions};
 }
 
@@ -429,24 +487,103 @@ function loadData(cb){
 // （他の端末がほぼ同時に保存しても、互いの記録を消さない）
 // mutator(data) は data を書き換える関数。false を返すと中止。
 // ------------------------------------------------------
-function updateData(mutator,onDone,onFail){
+// opts.allowDelete: 記録を1件削除する操作のときだけ true
+function updateData(mutator,onDone,onFail,opts){
+  opts=opts||{};
   setSyncStatus('loading');
-  if(!isConnected)showToast('📡 オフラインです。接続が戻ると保存されます');
+  if(!FB_OK)showToast('⚠ サーバー未接続のため、この端末にだけ保存します');
+  else if(!isConnected)showToast('📡 オフラインです。接続が戻ると保存されます');
+  var guardFailed=false;
+  ensureDailyBackup(function(){
   db.ref('bowling').transaction(function(cur){
-    var d=normalizeData(cur);
+    // 【履歴保護】サーバー上のデータをそのままコピーして、変更する所だけ書き換える
+    //  （他の記録・古い形式のデータ・知らない項目は一切いじらない）
+    var d=(cur&&typeof cur==='object')?JSON.parse(JSON.stringify(cur)):{};
+    d.roster=toArr(d.roster).filter(function(x){return x!=null;});
+    d.sessions=toArr(d.sessions).filter(function(x){return x!=null;});
+    var before=d.sessions.length;
     if(mutator(d)===false)return;   // undefined を返すと中止
+    var after=d.sessions.length;
+    // 【履歴保護】削除操作以外で記録が減る／削除でも2件以上減る書き込みは止める
+    if(after<before&&!(opts.allowDelete&&after===before-1)){guardFailed=true;return;}
     return d;
   }).then(function(res){
     setSyncStatus('ok');
     if(res&&res.committed){
       cachedData=normalizeData(res.snapshot.val());
       if(onDone)onDone();
-    }else if(onFail)onFail();
+    }else{
+      if(guardFailed)showToast('🛡 履歴が消える恐れのある保存を止めました（データは無事です）');
+      if(onFail)onFail(guardFailed?'guard':undefined);
+    }
   }).catch(function(e){
     setSyncStatus('ng');console.error(e);
     showToast('⚠ 保存に失敗しました。通信状況を確認して再度お試しください');
     if(onFail)onFail(e);
   });
+  });
+}
+
+// ------------------------------------------------------
+// 【履歴保護】自動バックアップ
+//   その日最初の保存の前に、サーバー上の全データを bowling_backups/日付 にコピー（30日分保持）
+// ------------------------------------------------------
+var backupDoneDate=null;
+function todayKey(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function ensureDailyBackup(next){
+  var key=todayKey();
+  if(!FB_OK||backupDoneDate===key){next();return;}
+  var called=false,go=function(){if(!called){called=true;next();}};
+  setTimeout(go,4000);  // バックアップが遅くても保存は止めない
+  db.ref('bowling_backups/'+key).get().then(function(snap){
+    if(snap.exists()){backupDoneDate=key;go();return;}
+    return db.ref('bowling').get().then(function(cur){
+      if(!cur.exists()){go();return;}
+      return db.ref('bowling_backups/'+key).set({savedAt:Date.now(),data:cur.val()}).then(function(){backupDoneDate=key;pruneBackups();go();});
+    });
+  }).catch(function(e){console.warn('backup failed',e);go();});
+}
+function pruneBackups(){
+  db.ref('bowling_backups').get().then(function(snap){
+    var keys=Object.keys(snap.val()||{}).sort();
+    keys.slice(0,Math.max(0,keys.length-30)).forEach(function(k){db.ref('bowling_backups/'+k).remove();});
+  }).catch(function(){});
+}
+// バックアップファイルをダウンロード
+function downloadBackup(){
+  db.ref('bowling').get().then(function(snap){
+    var blob=new Blob([JSON.stringify({app:'bowling-score',exportedAt:new Date().toISOString(),data:snap.val()},null,1)],{type:'application/json'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bowling-backup-'+todayKey()+'.json';
+    document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1000);
+    showToast('📦 バックアップを保存しました');
+  }).catch(function(){showToast('⚠ バックアップに失敗しました');});
+}
+// サーバー上のバックアップ一覧
+function renderBackupList(){
+  var el=document.getElementById('backupList');if(!el)return;
+  if(!FB_OK){el.innerHTML='<div class="backup-empty">サーバー未接続のため表示できません</div>';return;}
+  el.innerHTML='<div class="backup-empty">読み込み中…</div>';
+  db.ref('bowling_backups').get().then(function(snap){
+    var v=snap.val()||{},keys=Object.keys(v).sort().reverse();
+    if(!keys.length){el.innerHTML='<div class="backup-empty">まだ自動バックアップはありません（次に保存した時に作られます）</div>';return;}
+    el.innerHTML=keys.map(function(k){
+      var d=v[k]&&v[k].data,n=d?toArr(d.sessions).filter(function(x){return x;}).length:0;
+      return'<div class="backup-row"><span class="backup-date">'+esc(k)+'</span><span class="backup-count">履歴 '+n+'件</span><button class="backup-restore-btn" onclick="restoreBackup(\''+esc(k)+'\')">この日に戻す</button></div>';
+    }).join('');
+  }).catch(function(){el.innerHTML='<div class="backup-empty">読み込みに失敗しました</div>';});
+}
+// バックアップから復元（復元前の状態も別名で保存しておく）
+function restoreBackup(key){
+  if(!confirm(key+' のバックアップに戻しますか？\n\n現在のデータは「復元前」として別に保存されるので、やり直しもできます。'))return;
+  db.ref('bowling_backups/'+key).get().then(function(snap){
+    var b=snap.val();if(!b||!b.data){showToast('⚠ バックアップが見つかりません');return;}
+    return db.ref('bowling').get().then(function(cur){
+      var stamp='before-restore-'+todayKey()+'-'+Date.now();
+      return db.ref('bowling_backups/'+stamp).set({savedAt:Date.now(),data:cur.val()}).then(function(){
+        return db.ref('bowling').set(b.data);
+      }).then(function(){showToast('↩ '+key+' の状態に戻しました');renderBackupList();});
+    });
+  }).catch(function(e){console.error(e);showToast('⚠ 復元に失敗しました');});
 }
 
 // ------------------------------------------------------
@@ -548,7 +685,7 @@ function switchTab(tab){
   document.getElementById('panel-'+tab).classList.add('active');
   if(tab==='stats')renderStats();
   if(tab==='history')renderHistory();
-  if(tab==='users')renderRoster();
+  if(tab==='users'){renderRoster();renderBackupList();}
 }
 
 function renderRoster(){
@@ -704,7 +841,23 @@ function toggleCustomPts(gi){
   renderGameCard(gi);renderTotals();renderGoriyaku();markDirty();
 }
 
-function setCustomPt(gi,ri,val){if(!games[gi]||!games[gi].customPoints)return;games[gi].customPoints[ri]=parseInt(val)||0;renderGameCard(gi);renderTotals();renderGoriyaku();markDirty();}
+function setCustomPt(gi,ri,val){
+  if(!games[gi]||!games[gi].customPoints)return;
+  games[gi].customPoints[ri]=toInt(val);
+  // カードを描き直さずに表示だけ更新（次の欄へ移ったカーソルが外れないように）
+  updateCardPreviews(gi);renderTotals();renderGoriyaku();markDirty();
+}
+function updateCardPreviews(gi){
+  var c=document.getElementById('gamesContainer'),card=c&&c.children[games.length-1-gi];if(!card)return;
+  var pts=getPts(gi);
+  card.querySelectorAll('.game-pts-input').forEach(function(inp,i){if(document.activeElement!==inp)inp.value=pts[i]||0;});
+  card.querySelectorAll('.rank-row .pt-preview').forEach(function(el,pi){
+    var r=games[gi].ranks[pi],cls='',str='—';
+    if(r==='dnp'){cls='pt-zero';str='不参加';}
+    else if(r!==null){var v=pts[r-1]||0;cls=v>0?'pt-pos':v<0?'pt-neg':'pt-zero';str=fmtYen(v);}
+    el.className='pt-preview '+cls;el.textContent=str;
+  });
+}
 
 function renderGames(){
   var c=document.getElementById('gamesContainer');c.innerHTML='';
@@ -714,14 +867,15 @@ function renderGames(){
 
 function renderGameCard(gi){
   var c=document.getElementById('gamesContainer'),domIdx=games.length-1-gi;
-  if(c.children[domIdx])c.replaceChild(createGameCard(gi),c.children[domIdx]);
+  var old=c.children[domIdx];if(!old||!games[gi])return;
+  try{c.replaceChild(createGameCard(gi),old);}catch(e){renderGames();}
 }
 
 function createGameCard(gi){
   var g=games[gi],hasCustom=!!g.customPoints,pts=getPts(gi);
   var ranks=g.ranks.filter(function(r){return r!==null&&r!=='dnp';}),hasDup=ranks.length!==new Set(ranks).size;
   var customHtml='';
-  for(var i=0;i<playerCount;i++)customHtml+='<div class="game-pts-item"><label>'+(i+1)+'位</label><input class="game-pts-input" type="number" inputmode="numeric" value="'+(pts[i]||0)+'" onchange="setCustomPt('+gi+','+i+',this.value)"></div>';
+  for(var i=0;i<playerCount;i++)customHtml+='<div class="game-pts-item"><label>'+(i+1)+'位</label>'+ptsInputHtml('game-pts-input',pts[i],'setCustomPt('+gi+','+i+',this.value)')+'</div>';
   var rowsHtml='';
   for(var pi=0;pi<playerCount;pi++){
     var r=g.ranks[pi],ptCls,ptStr;
@@ -738,17 +892,58 @@ function createGameCard(gi){
   var hasGoriyaku=gameGoriyaku.length>0;
   var goriyakuItemsHtml=gameGoriyaku.map(function(item){
     var realIdx=goriyakuItems.indexOf(item);
-    return'<div class="game-goriyaku-item"><span class="game-goriyaku-item-name">'+esc(dn(item.playerIdx))+'</span><span class="game-goriyaku-item-amount">¥ '+item.amount.toLocaleString()+'</span><button class="game-goriyaku-item-del" onclick="deleteGoriyakuItem('+realIdx+')">✕</button></div>';
+    return'<div class="game-goriyaku-item"><span class="game-goriyaku-item-name">'+esc(dn(item.playerIdx))+'</span><span class="game-goriyaku-item-amount">'+gorDetailHtml(item,games)+'</span><button class="game-goriyaku-item-del" onclick="deleteGoriyakuItem('+realIdx+')">✕</button></div>';
   }).join('');
   var goriyakuOpen=gameGoriyakuOpen[gi]||hasGoriyaku;
   var playerOptsHtml='<option value="">受取人</option>';
   for(var pi2=0;pi2<playerCount;pi2++)playerOptsHtml+='<option value="'+pi2+'">'+esc(dn(pi2))+'</option>';
   var card=document.createElement('div');card.className='game-card';
-  card.innerHTML='<div class="game-card-header"><span class="game-num">GAME '+(gi+1)+'</span><div class="game-card-actions"><button class="pts-toggle-btn'+(hasCustom?' active':'')+'" onclick="toggleCustomPts('+gi+')">'+(hasCustom?'⚙ カスタム配点中':'⚙ 配点設定')+'</button><button class="goriyaku-toggle-btn'+(hasGoriyaku?' active':'')+'" onclick="toggleGameGoriyaku('+gi+')">'+(hasGoriyaku?'🎁 ご祝儀中':'🎁 ご祝儀')+'</button><button class="del-btn" onclick="deleteGame('+gi+')">✕</button></div></div><div class="game-pts-area'+(hasCustom?' open':'')+'"><div class="game-pts-grid">'+customHtml+'</div></div><div class="game-goriyaku-area'+(goriyakuOpen?' open':'')+'"><div class="game-goriyaku-form"><select class="game-goriyaku-select" id="ggSel'+gi+'">'+playerOptsHtml+'</select><span style="font-size:.72rem;color:#c07aff;margin:0 2px;">¥</span><input class="game-goriyaku-amount" type="number" inputmode="numeric" id="ggAmt'+gi+'" placeholder="0" min="0" step="100"><button class="game-goriyaku-add-btn" onclick="addGameGoriyakuItem('+gi+')">＋ 追加</button></div>'+(goriyakuItemsHtml?'<div class="game-goriyaku-items">'+goriyakuItemsHtml+'</div>':'')+'</div><div class="rank-inputs">'+rowsHtml+'</div>'+(hasDup?'<div class="dup-warn">⚠ 同じ順位が重複しています</div>':'');
+  card.innerHTML='<div class="game-card-header"><span class="game-num">GAME '+(gi+1)+'</span><div class="game-card-actions"><button class="pts-toggle-btn'+(hasCustom?' active':'')+'" onclick="toggleCustomPts('+gi+')">'+(hasCustom?'⚙ カスタム配点中':'⚙ 配点設定')+'</button><button class="goriyaku-toggle-btn'+(hasGoriyaku?' active':'')+'" onclick="toggleGameGoriyaku('+gi+')">'+(hasGoriyaku?'🎁 ご祝儀中':'🎁 ご祝儀')+'</button><button class="del-btn" onclick="deleteGame('+gi+')">✕</button></div></div><div class="game-pts-area'+(hasCustom?' open':'')+'"><div class="game-pts-grid">'+customHtml+'</div></div><div class="game-goriyaku-area'+(goriyakuOpen?' open':'')+'"><div class="game-goriyaku-form"><select class="game-goriyaku-select" id="ggSel'+gi+'">'+playerOptsHtml+'</select><span style="font-size:.72rem;color:#c07aff;margin:0 2px;">¥</span><input class="game-goriyaku-amount" type="number" inputmode="numeric" id="ggAmt'+gi+'" placeholder="1人あたり" min="0" step="100"><button class="game-goriyaku-add-btn" onclick="addGameGoriyakuItem('+gi+')">＋ 追加</button></div><div class="gor-hint">金額は「他の人1人あたり」から受け取る額</div>'+(goriyakuItemsHtml?'<div class="game-goriyaku-items">'+goriyakuItemsHtml+'</div>':'')+'</div><div class="rank-inputs">'+rowsHtml+'</div>'+(hasDup?'<div class="dup-warn">⚠ 同じ順位が重複しています</div>':'');
   return card;
 }
 
 function ptToYen(pt){return pt*100;}
+function fmtYenRaw(y){y=Math.round(y)||0;return(y>0?'+':'')+y.toLocaleString()+'円';}
+
+// ------------------------------------------------------
+// ご祝儀：入力額は「他の参加者1人あたり」の金額
+//   受取人：＋ 金額 × （そのゲームの参加者 − 自分）
+//   ほかの参加者：それぞれ − 金額
+//   （そのゲームを「不参加」にした人は払わない）
+// ------------------------------------------------------
+function gorPayers(ranks,recv){var a=[];(ranks||[]).forEach(function(r,pi){if(pi!==recv&&r!=='dnp')a.push(pi);});return a;}
+function gorItemTotal(item,gms){var g=gms[item.gameIdx];return g?item.amount*gorPayers(g.ranks,item.playerIdx).length:0;}
+function gorAdjust(n,gms,items){
+  var adj=Array(n).fill(0);
+  (items||[]).forEach(function(it){
+    var g=gms[it.gameIdx];if(!g||it.playerIdx>=n)return;
+    var payers=gorPayers(g.ranks,it.playerIdx);
+    adj[it.playerIdx]+=it.amount*payers.length;
+    payers.forEach(function(p){adj[p]-=it.amount;});
+  });
+  return adj;
+}
+// 円での合計（配点 ×100円 ＋ ご祝儀の受け取り/支払い）
+function yenTotals(ptTotals,gms,items){var adj=gorAdjust(ptTotals.length,gms,items);return ptTotals.map(function(p,i){return ptToYen(p||0)+adj[i];});}
+function gorDetailHtml(item,gms){
+  var g=gms[item.gameIdx],cnt=g?gorPayers(g.ranks,item.playerIdx).length:0;
+  return'¥'+item.amount.toLocaleString()+' × '+cnt+'人 = <b>¥'+(item.amount*cnt).toLocaleString()+'</b>';
+}
+
+// マイナス入力対応：全角や「−」「ー」も受け付ける
+function toInt(v){
+  var s=String(v==null?'':v).replace(/[０-９]/g,function(ch){return String.fromCharCode(ch.charCodeAt(0)-0xFEE0);}).replace(/[−ー－‐―]/g,'-').replace(/[^0-9\-]/g,'');
+  var n=parseInt(s,10);return isNaN(n)?0:n;
+}
+// 配点入力欄（±ボタン付き。iPhoneの数字キーボードには − が無いため）
+function ptsInputHtml(cls,val,onchangeJs){
+  return'<span class="pts-field"><button type="button" class="pm-btn" onclick="flipSign(this)">±</button><input class="'+cls+'" type="text" inputmode="numeric" pattern="-?[0-9]*" value="'+(val||0)+'" onfocus="this.select()" onchange="'+onchangeJs+'"></span>';
+}
+function flipSign(btn){
+  var inp=btn.nextElementSibling;if(!inp)return;
+  inp.value=String(-toInt(inp.value));
+  inp.dispatchEvent(new Event('change'));
+}
 function fmtYen(pt){var y=ptToYen(pt);return(y>0?'+':'')+y.toLocaleString()+'円';}
 function fmtYenAbs(pt){return Math.abs(ptToYen(pt)).toLocaleString()+'円';}
 
@@ -759,10 +954,10 @@ function calcTotals(){
 }
 
 function renderTotals(){
-  var totals=calcTotals(),sorted=totals.map(function(s,i){return{i:i,s:s};}).sort(function(a,b){return b.s-a.s;});
+  var totals=yenTotals(calcTotals(),games,goriyakuItems),sorted=totals.map(function(s,i){return{i:i,s:s};}).sort(function(a,b){return b.s-a.s;});
   var card=document.getElementById('totalCard');
   if(games.length===0){card.innerHTML='<div class="total-empty">合計スコアはここに表示されます</div>';}
-  else{card.innerHTML=sorted.map(function(item,rank){var s=item.s,cls=rank<3?'rank-'+(rank+1):'',ptCls=s>0?'pt-pos':s<0?'pt-neg':'pt-zero';return'<div class="total-pill '+cls+'"><span class="pill-medal">'+(MEDALS[rank]||'')+'</span><span class="pill-name">'+esc(dn(item.i))+'</span><span class="pill-score '+ptCls+'">'+fmtYen(s)+'</span></div>';}).join('');}
+  else{card.innerHTML=sorted.map(function(item,rank){var s=item.s,cls=rank<3?'rank-'+(rank+1):'',ptCls=s>0?'pt-pos':s<0?'pt-neg':'pt-zero';return'<div class="total-pill '+cls+'"><span class="pill-medal">'+(MEDALS[rank]||'')+'</span><span class="pill-name">'+esc(dn(item.i))+'</span><span class="pill-score '+ptCls+'">'+fmtYenRaw(s)+'</span></div>';}).join('');}
   var completeGames=games.filter(function(g){return g.ranks.every(function(r){return r!==null;});});
   var bc=document.getElementById('balanceCard');
   if(completeGames.length===0){bc.innerHTML='';return;}
@@ -810,7 +1005,7 @@ function saveSession(){
   var done=function(){isSaving=false;if(btn)btn.disabled=false;};
   updateData(function(d){
     var idx=d.sessions.findIndex(function(x){return x.id===sid;});
-    if(idx>=0){session.date=d.sessions[idx].date||session.date;d.sessions[idx]=session;}
+    if(idx>=0){session.date=d.sessions[idx].date||session.date;d.sessions[idx]=Object.assign({},d.sessions[idx],session);if(!session.goriyaku&&d.sessions[idx].goriyaku&&!d.sessions[idx].goriyaku.amounts)delete d.sessions[idx].goriyaku;}
     else d.sessions.unshift(session);
   },function(){
     done();
@@ -828,15 +1023,15 @@ function renderStats(){
       var nm=(name&&name.trim())?name.trim():'P'+(i+1);
       if(!userMap[nm])userMap[nm]={total:0,gameCount:0,sessionCount:0};
       var played=s.games.filter(function(g){return g.ranks[i]!==null&&g.ranks[i]!=='dnp';}).length;
-      userMap[nm].total+=(s.totals[i]||0);
+      userMap[nm].total+=(s.yen?s.yen[i]:ptToYen(s.totals[i]||0))||0;
       if(played>0)userMap[nm].sessionCount++;
       userMap[nm].gameCount+=played;
     });
   });
   var sorted=Object.entries(userMap).map(function(e){return{name:e[0],total:e[1].total,gameCount:e[1].gameCount,sessionCount:e[1].sessionCount};}).sort(function(a,b){return b.total-a.total;});
   card.innerHTML=sorted.map(function(u,rank){
-    var cls=rank<3?'stats-row rank-'+(rank+1):'stats-row',ptCls=u.total>0?'pt-pos':u.total<0?'pt-neg':'pt-zero',avgYen=u.gameCount>0?Math.round(ptToYen(u.total)/u.gameCount):0;
-    return'<div class="'+cls+'"><div class="stats-left"><span class="stats-medal">'+(MEDALS[rank]||'')+'</span><div><div class="stats-name">'+esc(u.name)+'</div><div class="stats-sub">'+u.sessionCount+'回参加 / '+u.gameCount+'ゲーム / 平均'+(avgYen>0?'+':'')+avgYen.toLocaleString()+'円</div></div></div><div class="stats-right"><div class="stats-total '+ptCls+'">'+fmtYen(u.total)+'</div></div></div>';
+    var cls=rank<3?'stats-row rank-'+(rank+1):'stats-row',ptCls=u.total>0?'pt-pos':u.total<0?'pt-neg':'pt-zero',avgYen=u.gameCount>0?Math.round(u.total/u.gameCount):0;
+    return'<div class="'+cls+'"><div class="stats-left"><span class="stats-medal">'+(MEDALS[rank]||'')+'</span><div><div class="stats-name">'+esc(u.name)+'</div><div class="stats-sub">'+u.sessionCount+'回参加 / '+u.gameCount+'ゲーム / 平均'+(avgYen>0?'+':'')+avgYen.toLocaleString()+'円</div></div></div><div class="stats-right"><div class="stats-total '+ptCls+'">'+fmtYenRaw(u.total)+'</div></div></div>';
   }).join('');
 }
 
@@ -888,7 +1083,7 @@ function deleteSession(id){
       // 記録画面で保存中のセッションを消した場合、次の保存は新規として扱う
       if(currentSessionId===id){currentSessionId=null;isDirty=true;persistDraft();}
       renderHistory();showToast('🗑 削除しました');
-    });
+    },null,{allowDelete:true});
   });
 }
 
@@ -905,8 +1100,8 @@ function showConfirmModal(title,sub,onConfirm){
 
 function buildViewHtml(s){
   var getName=function(i){return(s.names[i]&&s.names[i].trim())?s.names[i].trim():'P'+(i+1);};
-  var sorted=s.totals.map(function(sc,i){return{i:i,sc:sc};}).sort(function(a,b){return b.sc-a.sc;});
-  var rankingHtml=sorted.map(function(item,rank){var sc=item.sc,ptCls=sc>0?'pt-pos':sc<0?'pt-neg':'pt-zero';return'<div class="hist-rank-row"><div class="hist-rank-left"><span class="hist-rank-medal">'+(MEDALS[rank]||'')+'</span><span class="hist-rank-name">'+esc(getName(item.i))+'</span></div><span class="hist-rank-score '+ptCls+'">'+fmtYen(sc)+'</span></div>';}).join('');
+  var sorted=(s.yen||s.totals.map(ptToYen)).map(function(sc,i){return{i:i,sc:sc};}).sort(function(a,b){return b.sc-a.sc;});
+  var rankingHtml=sorted.map(function(item,rank){var sc=item.sc,ptCls=sc>0?'pt-pos':sc<0?'pt-neg':'pt-zero';return'<div class="hist-rank-row"><div class="hist-rank-left"><span class="hist-rank-medal">'+(MEDALS[rank]||'')+'</span><span class="hist-rank-name">'+esc(getName(item.i))+'</span></div><span class="hist-rank-score '+ptCls+'">'+fmtYenRaw(sc)+'</span></div>';}).join('');
   var gamesHtml=s.games.map(function(g,gi){return{g:g,gi:gi};}).reverse().map(function(obj){
     var g=obj.g,gi=obj.gi,pts=g.customPoints||defaultPtsForCount(s.playerCount);
     var rows=g.ranks.map(function(r,pi){
@@ -922,8 +1117,11 @@ function buildViewHtml(s){
   if(s.goriyaku&&s.goriyaku.items&&s.goriyaku.items.length>0){
     var gitems=s.goriyaku.items;
     var gTotal=0;
-    var gRows=gitems.map(function(item){gTotal+=item.amount;return'<div class="hist-goriyaku-row"><span class="goriyaku-item-game" style="font-size:.7rem;background:rgba(192,122,255,.18);border-radius:4px;padding:1px 5px;margin-right:4px;">GAME '+(item.gameIdx+1)+'</span><span class="hist-goriyaku-name">'+esc(item.playerName||getName(item.playerIdx))+'</span><span class="hist-goriyaku-amount">¥ '+item.amount.toLocaleString()+'</span></div>';}).join('');
-    goriyakuHtml='<div class="hist-goriyaku-block"><div class="hist-goriyaku-label">🎁 ご祝儀</div>'+gRows+'<div class="hist-goriyaku-row" style="margin-top:4px;border-top:1px solid rgba(192,122,255,.2);padding-top:4px;"><span style="font-size:.72rem;color:#aaa;">合計</span><span class="hist-goriyaku-amount">¥ '+gTotal.toLocaleString()+'</span></div></div>';
+    var gRows=gitems.map(function(item){gTotal+=gorItemTotal(item,s.games);return'<div class="hist-goriyaku-row"><span class="goriyaku-item-game" style="font-size:.7rem;background:rgba(192,122,255,.18);border-radius:4px;padding:1px 5px;margin-right:4px;">GAME '+(item.gameIdx+1)+'</span><span class="hist-goriyaku-name">'+esc(item.playerName||getName(item.playerIdx))+'</span><span class="hist-goriyaku-amount">'+gorDetailHtml(item,s.games)+'</span></div>';}).join('');
+    goriyakuHtml='<div class="hist-goriyaku-block"><div class="hist-goriyaku-label">🎁 ご祝儀（合計に反映済み）</div>'+gRows+'<div class="hist-goriyaku-row" style="margin-top:4px;border-top:1px solid rgba(192,122,255,.2);padding-top:4px;"><span style="font-size:.72rem;color:#aaa;">合計</span><span class="hist-goriyaku-amount">¥ '+gTotal.toLocaleString()+'</span></div></div>';
+  }
+  if(s.legacyGoriyaku&&s.legacyGoriyaku.length){
+    goriyakuHtml+='<div class="hist-goriyaku-block"><div class="hist-goriyaku-label">🎁 ご祝儀（旧形式・合計には未反映）</div>'+s.legacyGoriyaku.map(function(a){return'<div class="hist-goriyaku-row"><span class="hist-goriyaku-name">'+esc(a.name)+'</span><span class="hist-goriyaku-amount">¥'+a.amount.toLocaleString()+'</span></div>';}).join('')+'</div>';
   }
   return'<div class="hist-view"><div class="hist-ranking">'+rankingHtml+'</div>'+goriyakuHtml+'<div class="hist-games-label">ゲーム詳細</div>'+gamesHtml+'</div>';
 }
@@ -943,7 +1141,7 @@ function buildEditHtml(s){
   }).join('');
   var gamesHtml=draft.games.map(function(g,gi){return{g:g,gi:gi};}).reverse().map(function(obj){
     var g=obj.g,gi=obj.gi,hasCustom=!!g.customPoints,pts=g.customPoints||defaultPtsForCount(n);
-    var ptsHtml='';for(var i=0;i<n;i++)ptsHtml+='<div class="edit-pts-item"><label>'+(i+1)+'位</label><input class="edit-pts-input" type="number" inputmode="numeric" value="'+(pts[i]||0)+'" onchange="editGamePt('+s.id+','+gi+','+i+',this.value)"></div>';
+    var ptsHtml='';for(var i=0;i<n;i++)ptsHtml+='<div class="edit-pts-item"><label>'+(i+1)+'位</label>'+ptsInputHtml('edit-pts-input',pts[i],'editGamePt('+s.id+','+gi+','+i+',this.value)')+'</div>';
     var rankHtml='';
     for(var pi=0;pi<n;pi++){
       var r=g.ranks[pi],ptCls,ptStr;
@@ -955,7 +1153,7 @@ function buildEditHtml(s){
     }
     return'<div class="edit-game-block"><div class="edit-game-header"><span class="edit-game-num">GAME '+(gi+1)+'</span><div style="display:flex;gap:5px;align-items:center;margin-left:auto;"><button class="edit-pts-toggle'+(hasCustom?' active':'')+'" onclick="editToggleCustomPts('+s.id+','+gi+')">'+(hasCustom?'⚙ カスタム配点中':'⚙ 配点設定')+'</button><button class="edit-del-game-btn" onclick="editDeleteGame('+s.id+','+gi+')">✕</button></div></div><div class="edit-pts-area'+(hasCustom?' open':'')+'" id="epa-'+s.id+'-'+gi+'"><div class="edit-pts-grid">'+ptsHtml+'</div></div><div class="edit-rank-rows">'+rankHtml+'</div></div>';
   }).join('');
-  return'<div class="hist-edit"><div class="edit-section-label">プレイヤー名</div><div class="edit-names-grid">'+namesHtml+'</div><div class="edit-section-label">ゲーム結果</div>'+gamesHtml+'<div class="edit-section-label">🎁 ご祝儀</div><div class="edit-goriyaku-form"><select class="edit-goriyaku-game-sel" id="egGame'+s.id+'"><option value="">ゲーム選択</option>'+draft.games.map(function(g,gi){return'<option value="'+gi+'">GAME '+(gi+1)+'</option>';}).join('')+'</select><select class="edit-goriyaku-player-sel" id="egPlayer'+s.id+'"><option value="">受取人</option>'+draft.names.map(function(nm,i){return'<option value="'+i+'">'+esc(getName(i))+'</option>';}).join('')+'</select><span style="font-size:.72rem;color:#c07aff;">¥</span><input class="edit-goriyaku-amount" type="number" inputmode="numeric" id="egAmt'+s.id+'" placeholder="0" min="0" step="100"><button class="edit-goriyaku-add-btn" onclick="editAddGoriyaku('+s.id+')">＋</button></div>'+(draft.goriyakuItems.length===0?'<div class="edit-goriyaku-empty">ご祝儀なし</div>':draft.goriyakuItems.map(function(item,idx){return'<div class="edit-goriyaku-item"><span class="edit-goriyaku-game">GAME '+(item.gameIdx+1)+'</span><span class="edit-goriyaku-name">'+esc(getName(item.playerIdx))+'</span><span class="edit-goriyaku-amt">¥ '+item.amount.toLocaleString()+'</span><button class="edit-goriyaku-del" onclick="editDeleteGoriyaku('+s.id+','+idx+')">✕</button></div>';}).join(''))+'<button class="edit-add-game-btn" onclick="editAddGame('+s.id+')">＋ ゲーム追加</button><button class="edit-save-btn" onclick="commitEdit('+s.id+')">✅ 変更を保存</button></div>';
+  return'<div class="hist-edit"><div class="edit-section-label">プレイヤー名</div><div class="edit-names-grid">'+namesHtml+'</div><div class="edit-section-label">ゲーム結果</div>'+gamesHtml+'<div class="edit-section-label">🎁 ご祝儀</div><div class="edit-goriyaku-form"><select class="edit-goriyaku-game-sel" id="egGame'+s.id+'"><option value="">ゲーム選択</option>'+draft.games.map(function(g,gi){return'<option value="'+gi+'">GAME '+(gi+1)+'</option>';}).join('')+'</select><select class="edit-goriyaku-player-sel" id="egPlayer'+s.id+'"><option value="">受取人</option>'+draft.names.map(function(nm,i){return'<option value="'+i+'">'+esc(getName(i))+'</option>';}).join('')+'</select><span style="font-size:.72rem;color:#c07aff;">¥</span><input class="edit-goriyaku-amount" type="number" inputmode="numeric" id="egAmt'+s.id+'" placeholder="1人あたり" min="0" step="100"><button class="edit-goriyaku-add-btn" onclick="editAddGoriyaku('+s.id+')">＋</button></div>'+(draft.goriyakuItems.length===0?'<div class="edit-goriyaku-empty">ご祝儀なし</div>':draft.goriyakuItems.map(function(item,idx){return'<div class="edit-goriyaku-item"><span class="edit-goriyaku-game">GAME '+(item.gameIdx+1)+'</span><span class="edit-goriyaku-name">'+esc(getName(item.playerIdx))+'</span><span class="edit-goriyaku-amt">'+gorDetailHtml(item,draft.games)+'</span><button class="edit-goriyaku-del" onclick="editDeleteGoriyaku('+s.id+','+idx+')">✕</button></div>';}).join(''))+'<button class="edit-add-game-btn" onclick="editAddGame('+s.id+')">＋ ゲーム追加</button><button class="edit-save-btn" onclick="commitEdit('+s.id+')">✅ 変更を保存</button></div>';
 }
 
 function findSession(id){return getSessions().find(function(x){return x.id===id;});}
@@ -976,7 +1174,11 @@ function editToggleCustomPts(id,gi){
   var s=findSession(id);if(!s)return;var draft=getEditDraft(s);if(!draft.games[gi])return;
   draft.games[gi].customPoints=draft.games[gi].customPoints?null:defaultPtsForCount(s.playerCount).slice();renderHistory();
 }
-function editGamePt(id,gi,ri,val){var s=findSession(id);if(!s)return;var draft=getEditDraft(s);if(draft.games[gi]&&draft.games[gi].customPoints)draft.games[gi].customPoints[ri]=parseInt(val)||0;}
+function editGamePt(id,gi,ri,val){var s=findSession(id);if(!s)return;var draft=getEditDraft(s);if(draft.games[gi]&&draft.games[gi].customPoints)draft.games[gi].customPoints[ri]=toInt(val);
+  draft.games[gi].ranks.forEach(function(r,pi){
+    var el=document.getElementById('epp-'+id+'-'+gi+'-'+pi);if(!el||r===null||r==='dnp')return;
+    var v=draft.games[gi].customPoints[r-1]||0;el.className='edit-pt-preview '+(v>0?'pt-pos':v<0?'pt-neg':'pt-zero');el.textContent=fmtYen(v);
+  });}
 function editAddGoriyaku(id){
   var s=getSessions().find(function(x){return x.id===id;});if(!s)return;
   var draft=getEditDraft(s);
@@ -1043,14 +1245,17 @@ function commitEdit(id){
     if(idx===-1)return false;  // 他の端末で削除済み
     var t=d.sessions[idx];
     t.names=names;t.games=gms;t.totals=totals;
-    if(items.length>0)t.goriyaku={items:items};else delete t.goriyaku;
+    var legacy=(t.goriyaku&&t.goriyaku.amounts)?t.goriyaku.amounts:null;
+    var g={};if(legacy){g.amounts=legacy;if(t.goriyaku.threshold!=null)g.threshold=t.goriyaku.threshold;}
+    if(items.length>0)g.items=items;
+    if(Object.keys(g).length)t.goriyaku=g;else delete t.goriyaku;
   },function(){
     committing[id]=false;
     if(editStates[id]){delete editStates[id].draft;editStates[id].editMode=false;}
     renderHistory();showToast('✅ 更新しました！');
   },function(e){
     committing[id]=false;
-    if(!e){showToast('⚠ この記録は他の端末で削除されています');if(editStates[id])delete editStates[id];renderHistory();}
+    if(e===undefined){showToast('⚠ この記録は他の端末で削除されています');if(editStates[id])delete editStates[id];renderHistory();}
   });
 }
 
@@ -1068,20 +1273,20 @@ function renderGoriyaku(){
         return'<div class="goriyaku-item">'
           +'<span class="goriyaku-item-game">GAME '+(item.gameIdx+1)+'</span>'
           +'<span class="goriyaku-item-name">'+esc(dn(item.playerIdx))+'</span>'
-          +'<span class="goriyaku-item-amount">¥ '+item.amount.toLocaleString()+'</span>'
+          +'<span class="goriyaku-item-amount">'+gorDetailHtml(item,games)+'</span>'
           +'</div>';
       }).join('');
     }
   }
   // 合計更新
-  var grand=goriyakuItems.reduce(function(a,b){return a+b.amount;},0);
+  var grand=goriyakuItems.reduce(function(a,b){return a+gorItemTotal(b,games);},0);
   var totalEl=document.getElementById('goriyakuTotal');
   if(totalEl)totalEl.textContent='¥ '+grand.toLocaleString();
 }
 
 function deleteGoriyakuItem(idx){
   var it=goriyakuItems[idx];if(!it)return;
-  if(!confirm(dn(it.playerIdx)+' の ¥'+it.amount.toLocaleString()+' を削除しますか？'))return;
+  if(!confirm(dn(it.playerIdx)+' へのご祝儀（1人あたり¥'+it.amount.toLocaleString()+'）を削除しますか？'))return;
   var gi=it.gameIdx;
   goriyakuItems.splice(idx,1);
   renderGameCard(gi);
@@ -1133,7 +1338,8 @@ document.addEventListener('visibilitychange',function(){
     appReady=true;
     renderRoster();
     setCount(playerCount);
-    if(restored)showToast(currentSessionId&&!isDirty?'↩ 前回の記録を復元しました（保存済み）':'↩ 保存前の入力を復元しました');
+    if(!FB_OK){showToast('⚠ サーバーに接続できません（この端末だけで動作中・共有されません）');setSyncStatus('ng');}
+    else if(restored)showToast(currentSessionId&&!isDirty?'↩ 前回の記録を復元しました（保存済み）':'↩ 保存前の入力を復元しました');
   };
   // 通信が遅くても入力できるよう、3秒で先に画面を出す
   var started=false;
